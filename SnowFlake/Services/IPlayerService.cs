@@ -8,13 +8,13 @@ namespace SnowFlake.Services;
 public interface IPlayerService
 {
     //Create 
-    Task<CreatePlayerResponse> Create(CreatePlayerRequest createPlayerRequest);
+    void Create(CreatePlayerRequest createPlayerRequest);
     //Reterive
-    Task<GetPlayerListResponse> GetAll(GetPlayerListRequest getPlayerListRequest);
+    GetPlayersResponse GetAll();
     //GetById
-    Task<GetPlayerResponse> GetById(string playerId);
+    GetPlayerResponse GetById(string playerId);
     //Update 
-    Task Update(UpdatePlayerRequest updatePlayerRequest);
+    void Update(UpdatePlayerRequest updatePlayerRequest);
     //delete 
-    Task<bool> Delete(string Id);
+    bool Delete(string playerId);
 }

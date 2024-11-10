@@ -10,5 +10,6 @@ public class PlayerEntity : BaseEntity
     public string? Major { get; set; }
     public string? Faculty { get; set; }
     public string? FirebaseId { get; set; }
-    public string ProfileImageUrl { get; set; }
+    public string TeamId { get; set; }
+    public string? ProfileImageUrl { get; set; }
 }

@@ -28,8 +28,9 @@ public class TeamController : ControllerBase
     {
         var teams = _teamService.GetAll();
         if (teams == null) return null;
+        if (teams.Teams == null) return null;
         
-        return teams.Teams == null ? (IActionResult) NotFound() : Ok(teams);
+        return teams.Teams.Count() == 0 ? (IActionResult) NotFound() : Ok(teams);
     }
     
     [HttpGet("{teamId}")]

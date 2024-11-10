@@ -1,6 +1,9 @@
-﻿namespace SnowFlake.Repository;
+﻿using SnowFlake.Dtos;
+using SnowFlake.Repositories.Common;
 
-public interface IPlayerRepository
+namespace SnowFlake.Repository;
+
+public interface IPlayerRepository : IBaseRepository<PlayerEntity>
 {
     
 }
