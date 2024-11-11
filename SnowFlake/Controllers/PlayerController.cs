@@ -32,7 +32,7 @@ public class PlayerController : ControllerBase
         return players.Players.Count() == 0 ? (IActionResult) NotFound() : Ok(players);
     }
 
-    [HttpGet("{playerId")]
+    [HttpGet("{playerId}")]
     public IActionResult Edit(string playerId)
     {
         var player = _playerService.GetById((playerId));

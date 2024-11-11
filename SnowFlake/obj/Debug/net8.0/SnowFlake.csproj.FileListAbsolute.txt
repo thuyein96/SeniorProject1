@@ -110,3 +110,4 @@ C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\obj\Debug\net8.0\ref\SnowFlake.
 C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\bin\Debug\net8.0\Newtonsoft.Json.dll
 C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\bin\Debug\net8.0\MySqlConnector.dll
 C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
+C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\obj\Debug\net8.0\SnowFlake.sourcelink.json

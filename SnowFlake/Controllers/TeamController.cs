@@ -43,17 +43,7 @@ public class TeamController : ControllerBase
     [HttpPut]
     public IActionResult Update(UpdateTeamRequest updateTeamRequest)
     {
-        var team = new TeamEntity
-        {
-            Id = updateTeamRequest.Id,
-            TeamNumber = updateTeamRequest.TeamNumber,
-            Tokens = updateTeamRequest.Tokens,
-            MaxMembers = updateTeamRequest.MaxMembers,
-            ProfileImageUrl = updateTeamRequest.ProfileImageUrl,
-            CreationDate = updateTeamRequest.CreatedOn,
-            ModifiedDate = DateTime.Now
-        };
-        _teamService.Update(team);
+        _teamService.Update(updateTeamRequest);
         return NoContent();
     }
     

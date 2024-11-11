@@ -5,7 +5,7 @@ using SnowFlake.UnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
 //get the configuration 
 var connectionString = builder.Configuration.GetConnectionString("SnowFlakeDbContext");
 //register the SnowFlakeDbContext with connectionString of appSetting.json
@@ -30,8 +30,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthorization();
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers(); // Maps controller endpoints
-});
+app.MapControllers();
+//app.UseEndpoints(endpoints =>
+//{
+//     // Maps controller endpoints
+//});
 app.Run();

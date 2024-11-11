@@ -12,5 +12,4 @@ public class UpdatePlayerRequest
     public string FireBaseId { get; set; }
     public string? ProfileImageUrl { get; set; }
     public DateTime CreatedAt { get; set; }
-    public DateTime? ModifiedOn { get; set; }
 }

@@ -1,6 +1,8 @@
 ﻿using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Team.CreateTeam;
+using SnowFlake.Dtos.APIs.Team.GetTeam;
 using SnowFlake.Dtos.APIs.Team.GetTeams;
+using SnowFlake.Dtos.APIs.Team.UpdateTeam;
 using SnowFlake.Repository;
 using SnowFlake.UnitOfWork;
 
@@ -46,24 +48,38 @@ public class TeamService : ITeamService
         return response;
     }
 
-    public TeamEntity GetById(string TeamId)
+    public GetTeamResponse GetById(string TeamId)
     {
         if(string.IsNullOrWhiteSpace(TeamId)) return null;
         
-        return _unitOfWork.TeamRepository.GetBy(t => t.Id == TeamId).Select(s => new TeamEntity
+        return _unitOfWork.TeamRepository.GetBy(t => t.Id == TeamId).Select(s => new GetTeamResponse
         {
             Id = s.Id,
             Tokens = s.Tokens,
             MaxMembers = s.MaxMembers,
-            ProfileImageUrl = s.ProfileImageUrl
+            ProfileImageUrl = s.ProfileImageUrl,
+            TeamNumber = s.TeamNumber,
+            CreatedOn = s.CreationDate,
+            ModifiedOn = s.ModifiedDate
         }).FirstOrDefault();
     }
 
-    public void Update(TeamEntity updateTeam)
+    public void Update(UpdateTeamRequest updateTeamRequest)
     {
-        if(updateTeam is null) return;
-        
-        _unitOfWork.TeamRepository.Update(updateTeam);
+        if(updateTeamRequest is null) return;
+
+        var team = new TeamEntity
+        {
+            Id = updateTeamRequest.Id,
+            TeamNumber = updateTeamRequest.TeamNumber,
+            Tokens = updateTeamRequest.Tokens,
+            MaxMembers = updateTeamRequest.MaxMembers,
+            ProfileImageUrl = updateTeamRequest.ProfileImageUrl,
+            CreationDate = updateTeamRequest.CreatedOn,
+            ModifiedDate = DateTime.Now
+        };
+
+        _unitOfWork.TeamRepository.Update(team);
         _unitOfWork.Commit();
     }
 
