@@ -1,28 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\thuye\\RiderProjects\\SnowFlake\\SnowFlake\\SnowFlake.csproj": {}
+    "/Users/heian/Desktop/2:2024/Senior Project 1/SnowFlake_Backend/SnowFlake/SnowFlake.csproj": {}
   },
   "projects": {
-    "C:\\Users\\thuye\\RiderProjects\\SnowFlake\\SnowFlake\\SnowFlake.csproj": {
+    "/Users/heian/Desktop/2:2024/Senior Project 1/SnowFlake_Backend/SnowFlake/SnowFlake.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\thuye\\RiderProjects\\SnowFlake\\SnowFlake\\SnowFlake.csproj",
+        "projectUniqueName": "/Users/heian/Desktop/2:2024/Senior Project 1/SnowFlake_Backend/SnowFlake/SnowFlake.csproj",
         "projectName": "SnowFlake",
-        "projectPath": "C:\\Users\\thuye\\RiderProjects\\SnowFlake\\SnowFlake\\SnowFlake.csproj",
-        "packagesPath": "C:\\Users\\thuye\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\thuye\\RiderProjects\\SnowFlake\\SnowFlake\\obj\\",
+        "projectPath": "/Users/heian/Desktop/2:2024/Senior Project 1/SnowFlake_Backend/SnowFlake/SnowFlake.csproj",
+        "packagesPath": "/Users/heian/.nuget/packages/",
+        "outputPath": "/Users/heian/Desktop/2:2024/Senior Project 1/SnowFlake_Backend/SnowFlake/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\thuye\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/heian/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -62,6 +59,10 @@
               "target": "Package",
               "version": "[8.0.10, )"
             },
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[3.0.0, )"
+            },
             "MySqlConnector": {
               "target": "Package",
               "version": "[2.4.0-beta.2, )"
@@ -98,7 +99,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
