@@ -1,10 +1,13 @@
-﻿namespace SnowFlake.Dtos.APIs.Team.CreateTeam;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+using Microsoft.AspNetCore.Mvc;
+
+namespace SnowFlake.Dtos.APIs.Team.CreateTeam;
 
 public class CreateTeamRequest
 {
+    public ObjectId Id { get; set; }
     public string TeamNumber { get; set; }
-    public int MaxMember { get; set; }
-    public Dictionary<string, int> Items { get; set; }
-    public int Token { get; set; }
-    public string ProfileImageUrl { get; set; }
+    public int MaxMembers { get; set; }
+    public int Tokens { get; set; }
 }

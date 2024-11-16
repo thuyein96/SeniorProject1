@@ -1,4 +1,5 @@
-﻿using SnowFlake.Dtos;
+﻿using MongoDB.Bson;
+using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Team.CreateTeam;
 using SnowFlake.Dtos.APIs.Team.GetTeam;
 using SnowFlake.Dtos.APIs.Team.GetTeams;
@@ -9,7 +10,7 @@ namespace SnowFlake.Services;
 public interface ITeamService
 {
     //Create 
-    void Create(CreateTeamRequest createTeamRequest);
+    bool Create(CreateTeamRequest createTeamRequest);
     //Reterive
     GetTeamsResponse GetAll();
     //GetById

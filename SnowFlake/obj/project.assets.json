@@ -688,6 +688,19 @@
           }
         }
       },
+      "MongoDB.EntityFrameworkCore/8.2.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "8.0.10",
+          "MongoDB.Driver": "3.0.0"
+        },
+        "compile": {
+          "lib/net8.0/MongoDB.EntityFrameworkCore.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/MongoDB.EntityFrameworkCore.dll": {}
+        }
+      },
       "Mono.TextTemplating/2.2.1": {
         "type": "package",
         "dependencies": {
@@ -2456,6 +2469,22 @@
         "packageIcon.png"
       ]
     },
+    "MongoDB.EntityFrameworkCore/8.2.0": {
+      "sha512": "fToJ8w8gudXnQqPJpCz9IyQOSgRl14HFDX2WweDlP2yF5sO8ZGr7LTAgsD32OkUtMXwvlGbCk8UbCmvBi4JnpA==",
+      "type": "package",
+      "path": "mongodb.entityframeworkcore/8.2.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "BREAKING-CHANGES.md",
+        "LICENSE.md",
+        "README.md",
+        "lib/net8.0/MongoDB.EntityFrameworkCore.dll",
+        "mongodb.entityframeworkcore.8.2.0.nupkg.sha512",
+        "mongodb.entityframeworkcore.nuspec",
+        "packageIcon.png"
+      ]
+    },
     "Mono.TextTemplating/2.2.1": {
       "sha512": "KZYeKBET/2Z0gY1WlTAK7+RHTl7GSbtvTLDXEZZojUdAPqpQNDL6tHv7VUpqfX5VEOh+uRGKaZXkuD253nEOBQ==",
       "type": "package",
@@ -3157,6 +3186,7 @@
       "Microsoft.EntityFrameworkCore.Relational >= 8.0.10",
       "Microsoft.EntityFrameworkCore.Tools >= 8.0.10",
       "MongoDB.Driver >= 3.0.0",
+      "MongoDB.EntityFrameworkCore >= 8.2.0",
       "MySqlConnector >= 2.4.0-beta.2",
       "Newtonsoft.Json >= 13.0.3",
       "Pomelo.EntityFrameworkCore.MySql >= 8.0.2",
@@ -3164,24 +3194,27 @@
     ]
   },
   "packageFolders": {
-    "/Users/heian/.nuget/packages/": {}
+    "C:\\Users\\thuye\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/heian/Desktop/2:2024/Senior Project 1/SnowFlake_Backend/SnowFlake/SnowFlake.csproj",
+      "projectUniqueName": "C:\\Users\\thuye\\RiderProjects\\SnowFlake\\SnowFlake\\SnowFlake.csproj",
       "projectName": "SnowFlake",
-      "projectPath": "/Users/heian/Desktop/2:2024/Senior Project 1/SnowFlake_Backend/SnowFlake/SnowFlake.csproj",
-      "packagesPath": "/Users/heian/.nuget/packages/",
-      "outputPath": "/Users/heian/Desktop/2:2024/Senior Project 1/SnowFlake_Backend/SnowFlake/obj/",
+      "projectPath": "C:\\Users\\thuye\\RiderProjects\\SnowFlake\\SnowFlake\\SnowFlake.csproj",
+      "packagesPath": "C:\\Users\\thuye\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\thuye\\RiderProjects\\SnowFlake\\SnowFlake\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/heian/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\thuye\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -3225,6 +3258,10 @@
             "target": "Package",
             "version": "[3.0.0, )"
           },
+          "MongoDB.EntityFrameworkCore": {
+            "target": "Package",
+            "version": "[8.2.0, )"
+          },
           "MySqlConnector": {
             "target": "Package",
             "version": "[2.4.0-beta.2, )"
@@ -3261,7 +3298,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.403/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

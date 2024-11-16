@@ -1,4 +1,7 @@
-﻿namespace SnowFlake.Dtos.APIs.Team.GetTeam;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace SnowFlake.Dtos.APIs.Team.GetTeam;
 
 public class GetTeamResponse
 {
@@ -6,7 +9,6 @@ public class GetTeamResponse
     public string TeamNumber { get; set; }
     public int MaxMembers { get; set; }
     public int Tokens { get; set; }
-    public string? ProfileImageUrl { get; set; }
-    public DateTime CreatedOn { get; set; }
-    public DateTime? ModifiedOn { get; set; }
+    public DateTime CreationDate { get; set; }
+    public DateTime? ModifiedDate { get; set; }
 }

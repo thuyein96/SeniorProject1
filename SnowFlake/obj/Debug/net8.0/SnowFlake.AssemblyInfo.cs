@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SnowFlake")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+04f166f8ba257f232b42b276069a2a4d81e63f4f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f96bf2084ae8d7d175215453ce77f30e348adc3b")]
 [assembly: System.Reflection.AssemblyProductAttribute("SnowFlake")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SnowFlake")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

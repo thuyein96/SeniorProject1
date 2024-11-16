@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using MongoDB.Bson;
+using MongoDB.EntityFrameworkCore;
 
 namespace SnowFlake.Dtos;
-[Table("Players")]
+[Collection("Players")]
 public class PlayerEntity : BaseEntity
 {
     public string Name { get; set; }
@@ -10,6 +11,6 @@ public class PlayerEntity : BaseEntity
     public string? Major { get; set; }
     public string? Faculty { get; set; }
     public string? FirebaseId { get; set; }
-    public string TeamId { get; set; }
+    public ObjectId TeamId { get; set; }
     public string? ProfileImageUrl { get; set; }
 }

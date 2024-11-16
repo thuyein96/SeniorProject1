@@ -1,6 +1,8 @@
-﻿namespace SnowFlake.Dtos.APIs.Team.DeleteTeam;
+﻿using MongoDB.Bson;
+
+namespace SnowFlake.Dtos.APIs.Team.DeleteTeam;
 
 public class DeleteTeamRequest
 {
-    public Guid TeamId { get; set; }
+    public ObjectId TeamId { get; set; }
 }

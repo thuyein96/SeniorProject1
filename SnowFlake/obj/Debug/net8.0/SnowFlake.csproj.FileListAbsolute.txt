@@ -111,3 +111,10 @@ C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\bin\Debug\net8.0\Newtonsoft.Jso
 C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\bin\Debug\net8.0\MySqlConnector.dll
 C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
 C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\obj\Debug\net8.0\SnowFlake.sourcelink.json
+C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\bin\Debug\net8.0\DnsClient.dll
+C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\bin\Debug\net8.0\MongoDB.Bson.dll
+C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\bin\Debug\net8.0\MongoDB.Driver.dll
+C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\bin\Debug\net8.0\MongoDB.EntityFrameworkCore.dll
+C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\bin\Debug\net8.0\SharpCompress.dll
+C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\bin\Debug\net8.0\Snappier.dll
+C:\Users\thuye\RiderProjects\SnowFlake\SnowFlake\bin\Debug\net8.0\ZstdSharp.dll

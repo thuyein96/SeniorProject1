@@ -1,4 +1,5 @@
-﻿using SnowFlake.Dtos;
+﻿using MongoDB.Bson;
+using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs;
 using SnowFlake.Dtos.APIs.Player.GetPlayer;
 using SnowFlake.Dtos.APIs.Player.GetPlayerList;
@@ -14,35 +15,53 @@ public class PlayerService : IPlayerService
     {
         _unitOfWork = unitOfWork;
     }
-    public void Create(CreatePlayerRequest createPlayerRequest)
+    public bool Create(CreatePlayerRequest createPlayerRequest)
     {
-        if (createPlayerRequest is null) return;
-        var player = new PlayerEntity
+        try
         {
-            Id = Guid.NewGuid().ToString(),
-            Name = createPlayerRequest.Name,
-            Email = createPlayerRequest.Email,
-            StudentId = createPlayerRequest.StudentId,
-            Major = createPlayerRequest.Major,
-            Faculty = createPlayerRequest.Faculty,
-            TeamId = createPlayerRequest.TeamId,
-            FirebaseId = createPlayerRequest.FireBaseId,
-            ProfileImageUrl = createPlayerRequest.ProfileImageUrl,
-            CreationDate = DateTime.Now,
-            ModifiedDate = null
-        };
-        
-        _unitOfWork.PlayerRepository.Create(player);
-        _unitOfWork.Commit();
+            if (createPlayerRequest is null) return false;
+
+            var player = new PlayerEntity
+            {
+                Id = createPlayerRequest.Id.ToString(),
+                Name = createPlayerRequest.Name,
+                Email = createPlayerRequest.Email,
+                StudentId = createPlayerRequest.StudentId,
+                Major = createPlayerRequest.Major,
+                Faculty = createPlayerRequest.Faculty,
+                FirebaseId = createPlayerRequest.FirebaseId,
+                TeamId = createPlayerRequest.TeamId,
+                ProfileImageUrl = createPlayerRequest.ProfileImageUrl,
+                CreationDate = DateTime.Now,
+                ModifiedDate = null
+            };
+
+            _unitOfWork.PlayerRepository.Create(player);
+            _unitOfWork.Commit();
+            return true;
+        }
+        catch (Exception)
+        {
+
+            return false;
+        }
     }
 
     public GetPlayersResponse GetAll()
     {
-        GetPlayersResponse response = new GetPlayersResponse
+        var response = new GetPlayersResponse
         {
             Players = new List<PlayerEntity>()
         };
-        response.Players = _unitOfWork.PlayerRepository.GetAll().Select(p => new PlayerEntity
+        response.Players = _unitOfWork.PlayerRepository.GetAll().Take(50).ToList();
+        return response;
+    }
+
+    public GetPlayerResponse GetById(string playerId)
+    {
+        if (string.IsNullOrWhiteSpace(playerId)) return null;
+
+        var player = _unitOfWork.PlayerRepository.GetBy(t => t.Id == playerId).Select(p => new GetPlayerResponse
         {
             Id = p.Id,
             Name = p.Name,
@@ -50,52 +69,34 @@ public class PlayerService : IPlayerService
             StudentId = p.StudentId,
             Major = p.Major,
             Faculty = p.Faculty,
-            TeamId = p.TeamId,
             FirebaseId = p.FirebaseId,
-            ProfileImageUrl = p.ProfileImageUrl,
-            CreationDate = p.CreationDate,
-            ModifiedDate = p.ModifiedDate
-        }).ToList();
-        return response;
-    }
-
-    public GetPlayerResponse GetById(string playerId)
-    {
-        if(string.IsNullOrWhiteSpace(playerId)) return null;
-        
-        return _unitOfWork.PlayerRepository.GetBy(t => t.Id == playerId).Select(p => new GetPlayerResponse
-        {
-            PlayerId = p.Id,
-            Name = p.Name,
-            Email = p.Email,
-            StudentId = p.StudentId,
-            Major = p.Major,
-            Faculty = p.Faculty,
             TeamId = p.TeamId,
-            FireBaseId = p.FirebaseId,
             ProfileImageUrl = p.ProfileImageUrl,
             CreatedAt = p.CreationDate,
-            ModifiedOn = p.ModifiedDate
-        }).FirstOrDefault();
+            ModifiedAt = p.ModifiedDate
+        }).FirstOrDefault()!;
+        return player;
     }
 
     public void Update(UpdatePlayerRequest updatePlayerRequest)
     {
-        if(updatePlayerRequest is null) return;
+        if (updatePlayerRequest is null) return;
+
         var player = new PlayerEntity
         {
-            Id = updatePlayerRequest.PlayerId,
+            Id = updatePlayerRequest.Id.ToString(),
             Name = updatePlayerRequest.Name,
             Email = updatePlayerRequest.Email,
             StudentId = updatePlayerRequest.StudentId,
             Major = updatePlayerRequest.Major,
             Faculty = updatePlayerRequest.Faculty,
-            TeamId = updatePlayerRequest.TeamId,
-            FirebaseId = updatePlayerRequest.FireBaseId,
+            FirebaseId = updatePlayerRequest.FirebaseId,
+            TeamId = ObjectId.Parse(updatePlayerRequest.TeamId),
             ProfileImageUrl = updatePlayerRequest.ProfileImageUrl,
             CreationDate = updatePlayerRequest.CreatedAt,
             ModifiedDate = DateTime.Now
         };
+
         _unitOfWork.PlayerRepository.Update(player);
         _unitOfWork.Commit();
     }
@@ -104,9 +105,11 @@ public class PlayerService : IPlayerService
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(playerId)) return false;
+
             var player = _unitOfWork.PlayerRepository.GetBy(w => w.Id == playerId).SingleOrDefault();
-            
-            if(player is null) return false;
+
+            if (player is null) return false;
             _unitOfWork.PlayerRepository.Delete(player);
             _unitOfWork.Commit();
             return true;

@@ -1,4 +1,6 @@
-﻿using SnowFlake.Dtos;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using MongoDB.Bson;
+using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Team.CreateTeam;
 using SnowFlake.Dtos.APIs.Team.GetTeam;
 using SnowFlake.Dtos.APIs.Team.GetTeams;
@@ -16,19 +18,31 @@ public class TeamService : ITeamService
     {
         _unitOfWork = unitOfWork;
     }
-    public void Create(CreateTeamRequest createTeamRequest)
+    public bool Create(CreateTeamRequest createTeamRequest)
     {
-        if (createTeamRequest is null) return;
-        var team = new TeamEntity
+        try
         {
-            Id = Guid.NewGuid().ToString(),
-            TeamNumber = createTeamRequest.TeamNumber,
-            ProfileImageUrl = createTeamRequest.ProfileImageUrl,
-            CreationDate = DateTime.Now,
-        };
-        
-        _unitOfWork.TeamRepository.Create(team);
-        _unitOfWork.Commit();
+            if (createTeamRequest is null) return false;
+
+            var team = new TeamEntity
+            {
+                Id = createTeamRequest.Id.ToString(),
+                TeamNumber = createTeamRequest.TeamNumber,
+                MaxMembers = createTeamRequest.MaxMembers,
+                Tokens = createTeamRequest.Tokens,
+                CreationDate = DateTime.Now,
+                ModifiedDate = null
+            };
+
+            _unitOfWork.TeamRepository.Create(team);
+            _unitOfWork.Commit();
+            return true;
+        }
+        catch (Exception)
+        {
+
+            return false;
+        }
     }
 
     public GetTeamsResponse GetAll()
@@ -37,46 +51,35 @@ public class TeamService : ITeamService
         {
             Teams = new List<TeamEntity>()
         };
-        response.Teams = _unitOfWork.TeamRepository.GetAll().Select(t => new TeamEntity
-        {
-            Id = t.Id.ToString(),
-            TeamNumber = t.TeamNumber,
-            Tokens = t.Tokens,
-            CreationDate = t.CreationDate,
-            ModifiedDate = t.ModifiedDate
-        }).ToList();
+        response.Teams = _unitOfWork.TeamRepository.GetAll().Take(50).ToList();
         return response;
     }
 
     public GetTeamResponse GetById(string TeamId)
     {
-        if(string.IsNullOrWhiteSpace(TeamId)) return null;
+        //if(TeamId == null || TeamId == ObjectId.Empty) return null;
         
-        return _unitOfWork.TeamRepository.GetBy(t => t.Id == TeamId).Select(s => new GetTeamResponse
+        return _unitOfWork.TeamRepository.GetBy(t => t.Id == TeamId).Select(t => new GetTeamResponse
         {
-            Id = s.Id,
-            Tokens = s.Tokens,
-            MaxMembers = s.MaxMembers,
-            ProfileImageUrl = s.ProfileImageUrl,
-            TeamNumber = s.TeamNumber,
-            CreatedOn = s.CreationDate,
-            ModifiedOn = s.ModifiedDate
+            Id = t.Id,
+            TeamNumber = t.TeamNumber,
+            MaxMembers = t.MaxMembers,
+            Tokens = t.Tokens,
+            CreationDate = t.CreationDate,
+            ModifiedDate = t.ModifiedDate,
         }).FirstOrDefault();
     }
 
     public void Update(UpdateTeamRequest updateTeamRequest)
     {
         if(updateTeamRequest is null) return;
-
         var team = new TeamEntity
         {
-            Id = updateTeamRequest.Id,
             TeamNumber = updateTeamRequest.TeamNumber,
-            Tokens = updateTeamRequest.Tokens,
             MaxMembers = updateTeamRequest.MaxMembers,
-            ProfileImageUrl = updateTeamRequest.ProfileImageUrl,
-            CreationDate = updateTeamRequest.CreatedOn,
-            ModifiedDate = DateTime.Now
+            Tokens = updateTeamRequest.Tokens,
+            CreationDate = updateTeamRequest.CreationDate,
+            ModifiedDate = updateTeamRequest.ModifiedDate
         };
 
         _unitOfWork.TeamRepository.Update(team);
