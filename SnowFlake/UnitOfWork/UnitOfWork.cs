@@ -1,4 +1,5 @@
 ﻿using SnowFlake.DAO;
+using SnowFlake.Repositories.Domain;
 using SnowFlake.Repository;
 
 namespace SnowFlake.UnitOfWork;
@@ -28,6 +29,16 @@ public class UnitOfWork : IUnitOfWork
         get
         {
             return _teamRepository = _teamRepository ?? new TeamRepository(_snowFlakeDbContext);
+        }
+    }
+
+    private IPlaygroundRepository _playgroundRepository;
+
+    public IPlaygroundRepository PlaygroundRepository
+    {
+        get
+        {
+            return _playgroundRepository = _playgroundRepository ?? new PlaygroundRepository(_snowFlakeDbContext);
         }
     }
 

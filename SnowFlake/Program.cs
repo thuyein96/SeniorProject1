@@ -1,15 +1,14 @@
-using System.Security.Authentication;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 using SnowFlake.DAO;
 using SnowFlake.Dtos;
+using SnowFlake.Hubs;
 using SnowFlake.Services;
 using SnowFlake.UnitOfWork;
-using ServerVersion = Microsoft.EntityFrameworkCore.ServerVersion;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 //get the configuration 
 // var connectionString = builder.Configuration.GetConnectionString("SnowFlakeDbContext");
 
@@ -22,8 +21,8 @@ options.UseMongoDB(mongoDBSettings.AtlasUrl ?? "", mongoDBSettings.DatabaseName 
 //register the SnowFlakeDbContext with connectionString of appSetting.json
 //builder.Services.AddDbContext<SnowFlakeDbContext>(o => o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddTransient<IPlayerService, PlayerService >();
-builder.Services.AddTransient<ITeamService, TeamService >();
+builder.Services.AddTransient<IPlayerService, PlayerService>();
+builder.Services.AddTransient<ITeamService, TeamService>();
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -42,8 +41,8 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
-//app.UseEndpoints(endpoints =>
-//{
-//     // Maps controller endpoints
-//});
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<TimerHub>("/timerHub");
+});
 app.Run();
