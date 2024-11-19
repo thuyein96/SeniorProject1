@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using SnowFlake.DAO;
 using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs;
 using SnowFlake.Dtos.APIs.Playground;
 using SnowFlake.Dtos.APIs.Team.CreateTeam;
+using SnowFlake.Hubs;
 using SnowFlake.UnitOfWork;
 
 namespace SnowFlake.Services
@@ -11,9 +13,9 @@ namespace SnowFlake.Services
     public class PlaygroundService : IPlaygroundService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IHubContext _hubContext;
+        private readonly IHubContext<TimerHub> _hubContext;
 
-        public PlaygroundService(IUnitOfWork unitOfWork, IHubContext hubContext)
+        public PlaygroundService(IUnitOfWork unitOfWork, IHubContext<TimerHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _hubContext = hubContext;
@@ -27,11 +29,12 @@ namespace SnowFlake.Services
 
                 var playground = new PlaygroundEntity
                 {
+                    Id = createPlaygroundRequest.Id.ToString(),
                     RoomCode = createPlaygroundRequest.RoomCode,
                     Rounds = createPlaygroundRequest.Rounds,
                     MaxTeam = createPlaygroundRequest.MaxTeam,
                     TeamToken = createPlaygroundRequest.TeamToken,
-                    CreationDate = createPlaygroundRequest.CreatedAt,
+                    CreationDate = DateTime.Now,
                     ModifiedDate = null
                 };
 
@@ -44,6 +47,19 @@ namespace SnowFlake.Services
 
                 return false;
             }
+        }
+
+        [HttpPost("start-timer")]
+        public async Task<bool> StartTimer(int durationInSeconds)
+        {
+            for (int i = durationInSeconds; i >= 0; i--)
+            {
+                // Send timer updates to all clients
+                await _hubContext.Clients.All.SendAsync("ReceiveTimerUpdate", i);
+                Thread.Sleep(1000); // Wait for 1 second
+            }
+
+            return true;
         }
     }
 }

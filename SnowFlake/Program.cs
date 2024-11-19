@@ -23,6 +23,7 @@ options.UseMongoDB(mongoDBSettings.AtlasUrl ?? "", mongoDBSettings.DatabaseName 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IPlayerService, PlayerService>();
 builder.Services.AddTransient<ITeamService, TeamService>();
+builder.Services.AddTransient<IPlaygroundService, PlaygroundService>();
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

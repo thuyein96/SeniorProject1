@@ -33,10 +33,17 @@ public class PlayerController : ControllerBase
         return players.Players.Count() == 0 ? (IActionResult) NotFound() : Ok(players);
     }
 
+    [HttpGet("{firebaseId}")]
+    public IActionResult IsPlayerExist(string firebaseId)
+    {
+        var player = _playerService.GetById(firebaseId);
+        return player == null ? (IActionResult)NotFound() : Ok(player);
+    }
+
     [HttpGet("{playerId}")]
     public IActionResult Edit(string playerId)
     {
-        var player = _playerService.GetById((playerId));
+        var player = _playerService.GetById(playerId);
         return player == null ? (IActionResult) NotFound() : Ok(player);
     }
 
