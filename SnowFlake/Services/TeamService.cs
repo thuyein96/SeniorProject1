@@ -73,8 +73,10 @@ public class TeamService : ITeamService
     public void Update(UpdateTeamRequest updateTeamRequest)
     {
         if(updateTeamRequest is null) return;
+        
         var team = new TeamEntity
         {
+            Id = updateTeamRequest.Id,
             TeamNumber = updateTeamRequest.TeamNumber,
             MaxMembers = updateTeamRequest.MaxMembers,
             Tokens = updateTeamRequest.Tokens,

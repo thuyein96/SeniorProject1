@@ -26,12 +26,8 @@ public class PlayerService : IPlayerService
                 Id = createPlayerRequest.Id.ToString(),
                 Name = createPlayerRequest.Name,
                 Email = createPlayerRequest.Email,
-                StudentId = createPlayerRequest.StudentId,
-                Major = createPlayerRequest.Major,
-                Faculty = createPlayerRequest.Faculty,
                 FirebaseId = createPlayerRequest.FirebaseId,
-                TeamId = createPlayerRequest.TeamId,
-                ProfileImageUrl = createPlayerRequest.ProfileImageUrl,
+                TeamId = ObjectId.Parse(createPlayerRequest.TeamId),
                 CreationDate = DateTime.Now,
                 ModifiedDate = null
             };
@@ -51,9 +47,18 @@ public class PlayerService : IPlayerService
     {
         var response = new GetPlayersResponse
         {
-            Players = new List<PlayerEntity>()
+            Players = new List<GetPlayerResponse>()
         };
-        response.Players = _unitOfWork.PlayerRepository.GetAll().Take(50).ToList();
+        response.Players = _unitOfWork.PlayerRepository.GetAll().Take(50).Select(p => new GetPlayerResponse
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Email = p.Email,
+            FirebaseId = p.FirebaseId,
+            TeamId = p.TeamId.ToString(),
+            CreatedAt = p.CreationDate,
+            ModifiedAt = p.ModifiedDate
+        }).ToList();
         return response;
     }
 
@@ -66,12 +71,8 @@ public class PlayerService : IPlayerService
             Id = p.Id,
             Name = p.Name,
             Email = p.Email,
-            StudentId = p.StudentId,
-            Major = p.Major,
-            Faculty = p.Faculty,
             FirebaseId = p.FirebaseId,
-            TeamId = p.TeamId,
-            ProfileImageUrl = p.ProfileImageUrl,
+            TeamId = p.TeamId.ToString(),
             CreatedAt = p.CreationDate,
             ModifiedAt = p.ModifiedDate
         }).FirstOrDefault()!;
@@ -85,14 +86,10 @@ public class PlayerService : IPlayerService
         var player = new PlayerEntity
         {
             Id = updatePlayerRequest.Id.ToString(),
-            Name = updatePlayerRequest.Name,
+            Name = updatePlayerRequest.PlayerName,
             Email = updatePlayerRequest.Email,
-            StudentId = updatePlayerRequest.StudentId,
-            Major = updatePlayerRequest.Major,
-            Faculty = updatePlayerRequest.Faculty,
             FirebaseId = updatePlayerRequest.FirebaseId,
             TeamId = ObjectId.Parse(updatePlayerRequest.TeamId),
-            ProfileImageUrl = updatePlayerRequest.ProfileImageUrl,
             CreationDate = updatePlayerRequest.CreatedAt,
             ModifiedDate = DateTime.Now
         };

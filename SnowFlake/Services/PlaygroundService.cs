@@ -56,7 +56,7 @@ namespace SnowFlake.Services
             {
                 // Send timer updates to all clients
                 await _hubContext.Clients.All.SendAsync("ReceiveTimerUpdate", i);
-                Thread.Sleep(1000); // Wait for 1 second
+                Thread.Sleep(1000);
             }
 
             return true;
