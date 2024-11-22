@@ -24,21 +24,11 @@ public class PlayerController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public IActionResult GetTeamPlayers([FromQuery] string? teamId)
     {
-        var players = _playerService.GetAll();
-        if (players == null) return null;
-        if (players.Players == null) return null;
-        
-        return players.Players.Count() == 0 ? (IActionResult) NotFound() : Ok(players);
+        var players = _playerService.GetAll(teamId);
+        return players == null ? (IActionResult)NotFound() : Ok(players);
     }
-
-    //[HttpGet("{firebaseId}")]
-    //public IActionResult IsPlayerExist(string firebaseId)
-    //{
-    //    var player = _playerService.GetById(firebaseId);
-    //    return player == null ? (IActionResult)NotFound() : Ok(player);
-    //}
 
     [HttpGet("{playerId}")]
     public IActionResult Edit(string playerId)

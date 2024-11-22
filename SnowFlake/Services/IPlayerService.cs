@@ -11,7 +11,7 @@ public interface IPlayerService
     //Create 
     bool Create(CreatePlayerRequest createPlayerRequest);
     //Reterive
-    GetPlayersResponse GetAll();
+    GetPlayersResponse GetAll(string? teamId);
     //GetById
     GetPlayerResponse GetById(string playerId);
     //Update 

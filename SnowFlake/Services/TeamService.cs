@@ -81,7 +81,7 @@ public class TeamService : ITeamService
             MaxMembers = updateTeamRequest.MaxMembers,
             Tokens = updateTeamRequest.Tokens,
             CreationDate = updateTeamRequest.CreationDate,
-            ModifiedDate = updateTeamRequest.ModifiedDate
+            ModifiedDate = DateTime.Now
         };
 
         _unitOfWork.TeamRepository.Update(team);
