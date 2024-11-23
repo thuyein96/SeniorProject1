@@ -42,8 +42,5 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapHub<TimerHub>("/timerHub");
-});
+app.MapHub<TimerHub>("timer-hub");
 app.Run();

@@ -47,17 +47,25 @@ public class TeamService : ITeamService
 
     public GetTeamsResponse GetAll()
     {
-        GetTeamsResponse response = new GetTeamsResponse
+        var response = new GetTeamsResponse
         {
-            Teams = new List<TeamEntity>()
+            Teams = new List<GetTeamResponse>()
         };
-        response.Teams = _unitOfWork.TeamRepository.GetAll().Take(50).ToList();
+        response.Teams = _unitOfWork.TeamRepository.GetAll().Take(50).Select( t => new GetTeamResponse
+        {
+            Id = t.Id,
+            TeamNumber = t.TeamNumber,
+            MaxMembers = t.MaxMembers,
+            Tokens = t.Tokens,
+            CreationDate = t.CreationDate,
+            ModifiedDate = t.ModifiedDate
+        }).ToList();
         return response;
     }
 
     public GetTeamResponse GetById(string TeamId)
     {
-        //if(TeamId == null || TeamId == ObjectId.Empty) return null;
+        if(string.IsNullOrWhiteSpace(TeamId)) return null;
         
         return _unitOfWork.TeamRepository.GetBy(t => t.Id == TeamId).Select(t => new GetTeamResponse
         {

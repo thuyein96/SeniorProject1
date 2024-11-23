@@ -4,8 +4,14 @@ namespace SnowFlake.Hubs;
 
 public class TimerHub : Hub
 {
-    public async Task SendTimerUpdate(int secondsRemaining)
+    public async Task SendTimerUpdate(string connectionId, int secondsRemaining)
     {
-        await Clients.All.SendAsync("ReceiveTimerUpdate", secondsRemaining);
+        for (int i = 0; i < secondsRemaining; i++)
+        {
+            var currentTime = DateTime.Now;
+
+            Thread.Sleep(1000);
+            await Clients.Client(connectionId).SendAsync("ReceiveTimerUpdate", currentTime);
+        }
     }
 }

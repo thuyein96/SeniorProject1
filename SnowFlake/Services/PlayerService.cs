@@ -43,46 +43,12 @@ public class PlayerService : IPlayerService
         }
     }
 
-    //public GetPlayersResponse GetAll()
-    //{
-    //    var response = new GetPlayersResponse
-    //    {
-    //        Players = new List<GetPlayerResponse>()
-    //    };
-    //    response.Players = _unitOfWork.PlayerRepository.GetAll().Take(50).Select(p => new GetPlayerResponse
-    //    {
-    //        Id = p.Id,
-    //        Name = p.Name,
-    //        Email = p.Email,
-    //        FirebaseId = p.FirebaseId,
-    //        TeamId = p.TeamId.ToString(),
-    //        CreatedAt = p.CreationDate,
-    //        ModifiedAt = p.ModifiedDate
-    //    }).ToList();
-    //    return response;
-    //}
-
-    public GetPlayersResponse GetAll(string? teamId)
+    public GetPlayersResponse GetAll()
     {
         var response = new GetPlayersResponse
         {
             Players = new List<GetPlayerResponse>()
         };
-
-        if(teamId is not null)
-        {
-            response.Players = _unitOfWork.PlayerRepository.GetAll().Where(p => p.TeamId == ObjectId.Parse(teamId)).Select(p => new GetPlayerResponse
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Email = p.Email,
-                FirebaseId = p.FirebaseId,
-                TeamId = p.TeamId.ToString(),
-                CreatedAt = p.CreationDate,
-                ModifiedAt = p.ModifiedDate
-            }).ToList();
-        }
-
         response.Players = _unitOfWork.PlayerRepository.GetAll().Take(50).Select(p => new GetPlayerResponse
         {
             Id = p.Id,
@@ -93,11 +59,10 @@ public class PlayerService : IPlayerService
             CreatedAt = p.CreationDate,
             ModifiedAt = p.ModifiedDate
         }).ToList();
-
         return response;
     }
 
-    public GetPlayerResponse GetById(string playerId)
+    public GetPlayerResponse GetByPlayerId(string playerId)
     {
         if (string.IsNullOrWhiteSpace(playerId)) return null;
 
@@ -112,6 +77,28 @@ public class PlayerService : IPlayerService
             ModifiedAt = p.ModifiedDate
         }).FirstOrDefault()!;
         return player;
+    }
+    
+    public GetPlayersResponse GetPlayersByTeamId(string teamId)
+    {
+        if (string.IsNullOrWhiteSpace(teamId)) return null;
+
+        var players = new GetPlayersResponse
+        {
+            Players = new List<GetPlayerResponse>()
+        };
+
+        players.Players = _unitOfWork.PlayerRepository.GetBy(t => t.TeamId == ObjectId.Parse(teamId)).Select(p => new GetPlayerResponse
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Email = p.Email,
+            FirebaseId = p.FirebaseId,
+            TeamId = p.TeamId.ToString(),
+            CreatedAt = p.CreationDate,
+            ModifiedAt = p.ModifiedDate
+        }).ToList()!;
+        return players;
     }
 
     public void Update(UpdatePlayerRequest updatePlayerRequest)

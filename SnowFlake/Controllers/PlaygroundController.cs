@@ -23,7 +23,7 @@ namespace SnowFlake.Controllers
             return NoContent();
         }
 
-        [HttpPost("start-timer")]
+        [HttpPost("start-timeStartTimerr")]
         public IActionResult StartTimer(int durationInSeconds)
         {
             _playgroundService.StartTimer(durationInSeconds);

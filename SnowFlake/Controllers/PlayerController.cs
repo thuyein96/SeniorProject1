@@ -22,18 +22,25 @@ public class PlayerController : ControllerBase
         _playerService.Create(request);
         return NoContent();
     }
-
+    
     [HttpGet]
+    public IActionResult GetAll()
+    {
+        var players = _playerService.GetAll();
+        return players == null ? (IActionResult)NotFound() : Ok(players);
+    }
+    
+    [HttpGet("search")]
     public IActionResult GetTeamPlayers([FromQuery] string? teamId)
     {
-        var players = _playerService.GetAll(teamId);
+        var players = _playerService.GetPlayersByTeamId(teamId);
         return players == null ? (IActionResult)NotFound() : Ok(players);
     }
 
     [HttpGet("{playerId}")]
     public IActionResult Edit(string playerId)
     {
-        var player = _playerService.GetById(playerId);
+        var player = _playerService.GetByPlayerId(playerId);
         return player == null ? (IActionResult) NotFound() : Ok(player);
     }
 
