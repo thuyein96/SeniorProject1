@@ -20,8 +20,12 @@ public class TeamController : ControllerBase
     [HttpPost]
     public IActionResult Entry(CreateTeamRequest createTeamRequest)
     {
-        _teamService.Create(createTeamRequest);
-        return NoContent();
+        var teamResponse = _teamService.Create(createTeamRequest);
+        return teamResponse == null ? NotFound() : Ok(new CreateTeamResponse
+        {
+            Success = true,
+            Message = teamResponse
+        });
     }
     
     [HttpGet]

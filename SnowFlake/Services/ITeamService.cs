@@ -10,7 +10,7 @@ namespace SnowFlake.Services;
 public interface ITeamService
 {
     //Create 
-    bool Create(CreateTeamRequest createTeamRequest);
+    TeamEntity Create(CreateTeamRequest createTeamRequest);
     //Reterive
     GetTeamsResponse GetAll();
     //GetById
