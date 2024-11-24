@@ -18,11 +18,11 @@ public class TeamService : ITeamService
     {
         _unitOfWork = unitOfWork;
     }
-    public bool Create(CreateTeamRequest createTeamRequest)
+    public TeamEntity Create(CreateTeamRequest createTeamRequest)
     {
         try
         {
-            if (createTeamRequest is null) return false;
+            if (createTeamRequest is null) return null;
 
             var team = new TeamEntity
             {
@@ -36,12 +36,12 @@ public class TeamService : ITeamService
 
             _unitOfWork.TeamRepository.Create(team);
             _unitOfWork.Commit();
-            return true;
+            return team;
         }
         catch (Exception)
         {
 
-            return false;
+            return null;
         }
     }
 
