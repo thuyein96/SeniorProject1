@@ -10,7 +10,7 @@ public interface IUnitOfWork
     IPlaygroundRepository PlaygroundRepository { get; } 
     
     //Commit stages (insert, update, delete)
-    void Commit();
+    Task Commit();
     //Rollback transaction
-    void Rollback();
+    Task Rollback();
 }

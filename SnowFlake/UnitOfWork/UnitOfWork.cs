@@ -42,12 +42,12 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
-    public void Commit()
+    public async Task Commit()
     {
         _snowFlakeDbContext.SaveChanges();
     }
 
-    public void Rollback()
+    public async Task Rollback()
     {
         _snowFlakeDbContext.Dispose();
     }

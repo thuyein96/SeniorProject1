@@ -4,7 +4,6 @@ using SnowFlake.Dtos;
 using SnowFlake.Hubs;
 using SnowFlake.Services;
 using SnowFlake.UnitOfWork;
-using SnowFlake.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -6,37 +6,37 @@ namespace SnowFlake.Repositories.Common;
 
 public class BaseRepository<T> : IBaseRepository<T> where T : class
 {   
-    private readonly SnowFlakeDbContext _SnowFlakeDbContext;
+    private readonly SnowFlakeDbContext _snowFlakeDbContext;
     private readonly DbSet<T> _dbSet;
 
     public BaseRepository(SnowFlakeDbContext snowFlakeDbContext)
     {
-        _SnowFlakeDbContext = snowFlakeDbContext;
-        _dbSet = _SnowFlakeDbContext.Set<T>();
+        _snowFlakeDbContext = snowFlakeDbContext;
+        _dbSet = _snowFlakeDbContext.Set<T>();
     }
 
-    public void Create(T entity)
+    public async Task Create(T entity)
     {
-        _SnowFlakeDbContext.Add<T>(entity);
+        _snowFlakeDbContext.Add<T>(entity);
     }
 
-    public void Delete(T entity)
+    public async Task Delete(T entity)
     {
-        _SnowFlakeDbContext.Remove<T>(entity);
+        _snowFlakeDbContext.Remove<T>(entity);
     }
 
-    public IEnumerable<T> GetAll()
+    public async Task<IEnumerable<T>> GetAll()
     {
         return _dbSet.AsNoTracking().AsEnumerable();
     }
 
-    public IEnumerable<T> GetBy(Expression<Func<T, bool>> expression)
+    public async Task<IEnumerable<T>> GetBy(Expression<Func<T, bool>> expression)
     {
         return _dbSet.AsNoTracking().Where(expression).AsEnumerable();
     }
 
-    public void Update(T entity)
+    public async Task Update(T entity)
     {
-        _SnowFlakeDbContext.Update<T>(entity);
+        _snowFlakeDbContext.Update<T>(entity);
     }
 }

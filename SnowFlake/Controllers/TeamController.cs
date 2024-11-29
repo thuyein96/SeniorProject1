@@ -19,7 +19,7 @@ public class TeamController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Entry(CreateTeamRequest createTeamRequest)
+    public async Task<IActionResult> Entry(CreateTeamRequest createTeamRequest)
     {
         try
         {
@@ -27,7 +27,7 @@ public class TeamController : ControllerBase
             {
                 return BadRequest();
             }
-            var team = _teamService.Create(createTeamRequest);
+            var team = await _teamService.Create(createTeamRequest);
 
             if (team == null)
             {
@@ -51,9 +51,9 @@ public class TeamController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        var teams = _teamService.GetAll();
+        var teams = await _teamService.GetAll();
         if (teams == null || teams.Count == 0)
         {
             return NotFound(new GetTeamsResponse
@@ -71,11 +71,11 @@ public class TeamController : ControllerBase
     }
 
     [HttpGet("{teamId}")]
-    public IActionResult Edit(string teamId)
+    public async Task<IActionResult> Edit(string teamId)
     {
         if (string.IsNullOrWhiteSpace(teamId)) return BadRequest();
 
-        var player = _teamService.GetById(teamId);
+        var player = await _teamService.GetById(teamId);
 
         if (player == null)
         {
@@ -93,11 +93,11 @@ public class TeamController : ControllerBase
     }
 
     [HttpPut]
-    public IActionResult Update(UpdateTeamRequest updateTeamRequest)
+    public async Task<IActionResult> Update(UpdateTeamRequest updateTeamRequest)
     {
         if (updateTeamRequest == null) return BadRequest();
 
-        var updateMessage = _teamService.Update(updateTeamRequest);
+        var updateMessage = await _teamService.Update(updateTeamRequest);
 
         if (updateMessage == string.Empty)
         {
@@ -116,11 +116,11 @@ public class TeamController : ControllerBase
     }
 
     [HttpDelete("{teamId}")]
-    public IActionResult Delete(string teamId)
+    public async Task<IActionResult> Delete(string teamId)
     {
         if (string.IsNullOrWhiteSpace(teamId)) return BadRequest();
 
-        var deleteMessage = _teamService.Delete(teamId);
+        var deleteMessage = await _teamService.Delete(teamId);
 
         if (deleteMessage == string.Empty) return NotFound(new DeleteTeamResponse
         {

@@ -40,7 +40,7 @@ public class PlayerService : IPlayerService
 
     public async Task<List<PlayerItem>> GetAll()
     {
-        var players = _unitOfWork.PlayerRepository.GetAll().Take(50).Select(p => new PlayerItem
+        var players = (await _unitOfWork.PlayerRepository.GetAll()).Take(50).Select(p => new PlayerItem
         {
             Id = p.Id,
             Name = p.Name,
@@ -58,7 +58,7 @@ public class PlayerService : IPlayerService
         if (string.IsNullOrWhiteSpace(playerId)) return null;
         if (!Utils.IsValidObjectId(playerId)) return null;
 
-        var player = _unitOfWork.PlayerRepository.GetBy(t => t.Id == playerId).Select(p => new PlayerItem
+        var player = (await _unitOfWork.PlayerRepository.GetBy(t => t.Id == playerId)).Select(p => new PlayerItem
         {
             Id = p.Id,
             Name = p.Name,
@@ -76,7 +76,7 @@ public class PlayerService : IPlayerService
         if (string.IsNullOrWhiteSpace(teamId)) return null;
         if (!Utils.IsValidObjectId(teamId)) return null;
 
-        var players = _unitOfWork.PlayerRepository.GetBy(t => t.TeamId == teamId).Select(p => new PlayerItem
+        var players = (await _unitOfWork.PlayerRepository.GetBy(t => t.TeamId == teamId)).Select(p => new PlayerItem
         {
             Id = p.Id,
             Name = p.Name,
@@ -95,7 +95,7 @@ public class PlayerService : IPlayerService
             if (!Utils.IsValidObjectId(updatePlayerRequest.TeamId))
                 return string.Empty;
 
-        var existingPlayer = _unitOfWork.PlayerRepository.GetBy(w => w.Id == updatePlayerRequest.Id).SingleOrDefault();
+        var existingPlayer = (await _unitOfWork.PlayerRepository.GetBy(w => w.Id == updatePlayerRequest.Id)).SingleOrDefault();
 
         if (existingPlayer is null || existingPlayer.Id != updatePlayerRequest.Id) return string.Empty;
 
@@ -115,7 +115,7 @@ public class PlayerService : IPlayerService
         if (string.IsNullOrWhiteSpace(playerId)) return string.Empty;
         if (!Utils.IsValidObjectId(playerId)) return string.Empty;
 
-        var player = _unitOfWork.PlayerRepository.GetBy(w => w.Id == playerId).SingleOrDefault();
+        var player = (await _unitOfWork.PlayerRepository.GetBy(w => w.Id == playerId)).SingleOrDefault();
 
         if (player is null) return string.Empty;
 

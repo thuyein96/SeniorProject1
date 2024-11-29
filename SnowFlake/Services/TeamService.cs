@@ -18,7 +18,7 @@ public class TeamService : ITeamService
     {
         _unitOfWork = unitOfWork;
     }
-    public TeamEntity Create(CreateTeamRequest createTeamRequest)
+    public async Task<TeamEntity> Create(CreateTeamRequest createTeamRequest)
     {
         try
         {
@@ -45,20 +45,20 @@ public class TeamService : ITeamService
         }
     }
 
-    public List<TeamEntity> GetAll()
+    public async Task<List<TeamEntity>> GetAll()
     {
         // TODO: change dynamic for bucket size
-        var teams = _unitOfWork.TeamRepository.GetAll().Take(50).ToList();
+        var teams = (await _unitOfWork.TeamRepository.GetAll()).Take(50).ToList();
         return teams;
     }
 
-    public TeamEntity? GetById(string TeamId)
+    public async Task<TeamEntity?> GetById(string TeamId)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(TeamId)) return null;
 
-            return _unitOfWork.TeamRepository.GetBy(t => t.Id == TeamId).FirstOrDefault();
+            return (await _unitOfWork.TeamRepository.GetBy(t => t.Id == TeamId)).FirstOrDefault();
         }
         catch (Exception)
         {
@@ -67,7 +67,7 @@ public class TeamService : ITeamService
         
     }
 
-    public string Update(UpdateTeamRequest updateTeamRequest)
+    public async Task<string> Update(UpdateTeamRequest updateTeamRequest)
     {
         try
         {
@@ -95,13 +95,13 @@ public class TeamService : ITeamService
         
     }
 
-    public string Delete(string TeamId)
+    public async Task<string> Delete(string TeamId)
     {
         try
         {
             if(string.IsNullOrWhiteSpace(TeamId)) return string.Empty;
             
-            var team = _unitOfWork.TeamRepository.GetBy(w => w.Id == TeamId).SingleOrDefault();
+            var team = (await _unitOfWork.TeamRepository.GetBy(w => w.Id == TeamId)).SingleOrDefault();
             if(team is null) return string.Empty;
             
             _unitOfWork.TeamRepository.Delete(team);
