@@ -6,7 +6,6 @@ namespace SnowFlake.Dtos;
 public class PlayerEntity : BaseEntity
 {
     public string Name { get; set; }
-    public string Email { get; set; }
-    public string? FirebaseId { get; set; }
-    public ObjectId TeamId { get; set; }
+    public string? Email { get; set; }
+    public string? TeamId { get; set; }
 }

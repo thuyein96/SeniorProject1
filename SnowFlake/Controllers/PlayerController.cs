@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using SnowFlake.Dtos.APIs;
+using SnowFlake.Dtos.APIs.Player.DeletePlayer;
+using SnowFlake.Dtos.APIs.Player.GetPlayer;
+using SnowFlake.Dtos.APIs.Player.GetPlayerList;
 using SnowFlake.Dtos.APIs.Player.UpdatePlayer;
 using SnowFlake.Services;
 
@@ -17,44 +20,185 @@ public class PlayerController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Entry(CreatePlayerRequest request)
+    public async Task<IActionResult> Entry(CreatePlayerRequest request)
     {
-        _playerService.Create(request);
-        return NoContent();
+        try
+        {
+            if (request == null) return BadRequest(new CreatePlayerResponse
+            {
+                Success = false,
+                Message = null
+            });
+
+            var createMessage = await _playerService.Create(request);
+            if (string.IsNullOrWhiteSpace(createMessage))
+            {
+                return NotFound(new CreatePlayerResponse
+                {
+                    Success = false,
+                    Message = null
+                });
+            }
+            return Ok(new CreatePlayerResponse
+            {
+                Success = true,
+                Message = createMessage
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+        
     }
     
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        var players = _playerService.GetAll();
-        return players == null ? (IActionResult)NotFound() : Ok(players);
+        try
+        {
+            var players = await _playerService.GetAll();
+            if (players == null)
+            {
+                return NotFound(new GetPlayersResponse
+                {
+                    Success = false,
+                    Message = null
+                });
+            }
+            return Ok(new GetPlayersResponse
+            {
+                Success = true,
+                Message = players
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
     }
     
     [HttpGet("search")]
-    public IActionResult GetTeamPlayers([FromQuery] string? teamId)
+    public async Task<IActionResult> GetTeamPlayers([FromQuery] string teamId)
     {
-        var players = _playerService.GetPlayersByTeamId(teamId);
-        return players == null ? (IActionResult)NotFound() : Ok(players);
+        try
+        {
+            if (string.IsNullOrWhiteSpace(teamId)) return BadRequest(new GetPlayersResponse
+            {
+                Success = false,
+                Message = null
+            });
+
+            var players = await _playerService.GetPlayersByTeamId(teamId);
+
+            if (players == null || players.Count == 0)
+            {
+                return NotFound(new GetPlayersResponse
+                {
+                    Success = false,
+                    Message = null
+                });
+            }
+
+            return Ok(new GetPlayersResponse
+            {
+                Success = true,
+                Message= players
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
     }
 
     [HttpGet("{playerId}")]
-    public IActionResult Edit(string playerId)
+    public async Task<IActionResult> Edit(string playerId)
     {
-        var player = _playerService.GetByPlayerId(playerId);
-        return player == null ? (IActionResult) NotFound() : Ok(player);
+        try
+        {
+            if (string.IsNullOrWhiteSpace(playerId)) return BadRequest();
+
+            var player = await _playerService.GetByPlayerId(playerId);
+
+            if (player == null) return NotFound(new GetPlayerResponse
+            {
+                Success = false,
+                Message = null
+            });
+            return Ok(new GetPlayerResponse
+            {
+                Success = true,
+                Message = player
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
     }
 
     [HttpPut]
-    public IActionResult Update(UpdatePlayerRequest request)
+    public async Task<IActionResult> Update(UpdatePlayerRequest request)
     {
-        _playerService.Update(request);
-        return NoContent();
+        try
+        {
+            if (request == null) return BadRequest(new UpdatePlayerResponse
+            {
+                Success = false,
+                Message = "Request body is empty."
+            });
+
+            var updateMessage = await _playerService.Update(request);
+
+            if (string.IsNullOrWhiteSpace(updateMessage))
+            {
+                return NotFound(new UpdatePlayerResponse
+                {
+                    Success = false,
+                    Message = $"[ID: {request.Id}] Failed to update player."
+                });
+            }
+            return Ok(new UpdatePlayerResponse
+            {
+                Success = true,
+                Message = updateMessage
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
     }
 
     [HttpDelete("{playerId}")]
-    public IActionResult Delete(string playerId)
+    public async Task<IActionResult> Delete(string playerId)
     {
-        var isDeleted = _playerService.Delete(playerId);
-        return isDeleted ? (IActionResult) Ok() : NotFound();
+        try
+        {
+            if (string.IsNullOrWhiteSpace(playerId)) return BadRequest(new DeletePlayerResponse
+            {
+                Success = false,
+                Message = "Input correct player Id."
+            });
+
+            var deleteMessage = await _playerService.Delete(playerId);
+
+            if (string.IsNullOrWhiteSpace(deleteMessage)) return NotFound(new DeletePlayerResponse
+            {
+                Success = false,
+                Message = $"[ID: {playerId}] Failed to delete player."
+            });
+
+            return Ok(new DeletePlayerResponse
+            {
+                Success = true,
+                Message = deleteMessage
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
     }
 }

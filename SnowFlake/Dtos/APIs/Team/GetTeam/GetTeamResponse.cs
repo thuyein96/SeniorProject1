@@ -5,10 +5,6 @@ namespace SnowFlake.Dtos.APIs.Team.GetTeam;
 
 public class GetTeamResponse
 {
-    public string Id { get; set; }
-    public int TeamNumber { get; set; }
-    public int MaxMembers { get; set; }
-    public int Tokens { get; set; }
-    public DateTime CreationDate { get; set; }
-    public DateTime? ModifiedDate { get; set; }
+    public bool Success { get; set; }
+    public TeamEntity Message { get; set; }
 }

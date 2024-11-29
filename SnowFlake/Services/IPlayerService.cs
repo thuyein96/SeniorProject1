@@ -1,5 +1,7 @@
 ﻿using MongoDB.Bson;
+using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs;
+using SnowFlake.Dtos.APIs.Player;
 using SnowFlake.Dtos.APIs.Player.GetPlayer;
 using SnowFlake.Dtos.APIs.Player.GetPlayerList;
 using SnowFlake.Dtos.APIs.Player.UpdatePlayer;
@@ -9,15 +11,15 @@ namespace SnowFlake.Services;
 public interface IPlayerService
 {
     //Create 
-    bool Create(CreatePlayerRequest createPlayerRequest);
+    Task<string> Create(CreatePlayerRequest createPlayerRequest);
     //Reterive
-    GetPlayersResponse GetAll();
+    Task<List<PlayerItem>> GetAll();
     //GetById
-    GetPlayerResponse GetByPlayerId(string playerId);
+    Task<PlayerItem> GetByPlayerId(string playerId);
 
-    GetPlayersResponse GetPlayersByTeamId(string teamId);
+    Task<List<PlayerItem>> GetPlayersByTeamId(string teamId);
     //Update 
-    void Update(UpdatePlayerRequest updatePlayerRequest);
+    Task<string> Update(UpdatePlayerRequest updatePlayerRequest);
     //delete 
-    bool Delete(string playerId);
+    Task<string> Delete(string playerId);
 }

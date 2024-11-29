@@ -17,16 +17,37 @@ namespace SnowFlake.Controllers
         }
 
         [HttpPost]
-        public IActionResult Entry(CreatePlaygroundRequest request)
+        public async Task<IActionResult> Entry(CreatePlaygroundRequest request)
         {
-            _playgroundService.Create(request);
-            return NoContent();
+            try
+            {
+                var playgroundResponse = await _playgroundService.Create(request);
+
+                if (playgroundResponse == null)
+                {
+                    return NotFound(new CreatePlaygroundResponse
+                    {
+                        Success = false,
+                        Message = null
+                    });
+                }
+                return Ok(new CreatePlaygroundResponse
+                {
+                    Success = true,
+                    Message = playgroundResponse
+                });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+            
         }
 
         [HttpPost("start-timeStartTimerr")]
-        public IActionResult StartTimer(int durationInSeconds)
+        public async Task<IActionResult> StartTimer(int durationInSeconds)
         {
-            _playgroundService.StartTimer(durationInSeconds);
+            await _playgroundService.StartTimer(durationInSeconds);
             return Ok("Timer completed");
         }
     }

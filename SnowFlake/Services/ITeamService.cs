@@ -12,11 +12,11 @@ public interface ITeamService
     //Create 
     TeamEntity Create(CreateTeamRequest createTeamRequest);
     //Reterive
-    GetTeamsResponse GetAll();
+    List<TeamEntity> GetAll();
     //GetById
-    GetTeamResponse GetById(string TeamId);
+    TeamEntity GetById(string TeamId);
     //Update 
-    void Update(UpdateTeamRequest updateTeamRequest);
+    string Update(UpdateTeamRequest updateTeamRequest);
     //delete 
-    bool Delete(string TeamId);
+    string Delete(string TeamId);
 }

@@ -45,71 +45,72 @@ public class TeamService : ITeamService
         }
     }
 
-    public GetTeamsResponse GetAll()
+    public List<TeamEntity> GetAll()
     {
-        var response = new GetTeamsResponse
-        {
-            Teams = new List<GetTeamResponse>()
-        };
-        response.Teams = _unitOfWork.TeamRepository.GetAll().Take(50).Select( t => new GetTeamResponse
-        {
-            Id = t.Id,
-            TeamNumber = t.TeamNumber,
-            MaxMembers = t.MaxMembers,
-            Tokens = t.Tokens,
-            CreationDate = t.CreationDate,
-            ModifiedDate = t.ModifiedDate
-        }).ToList();
-        return response;
+        // TODO: change dynamic for bucket size
+        var teams = _unitOfWork.TeamRepository.GetAll().Take(50).ToList();
+        return teams;
     }
 
-    public GetTeamResponse GetById(string TeamId)
-    {
-        if(string.IsNullOrWhiteSpace(TeamId)) return null;
-        
-        return _unitOfWork.TeamRepository.GetBy(t => t.Id == TeamId).Select(t => new GetTeamResponse
-        {
-            Id = t.Id,
-            TeamNumber = t.TeamNumber,
-            MaxMembers = t.MaxMembers,
-            Tokens = t.Tokens,
-            CreationDate = t.CreationDate,
-            ModifiedDate = t.ModifiedDate,
-        }).FirstOrDefault();
-    }
-
-    public void Update(UpdateTeamRequest updateTeamRequest)
-    {
-        if(updateTeamRequest is null) return;
-        
-        var team = new TeamEntity
-        {
-            Id = updateTeamRequest.Id,
-            TeamNumber = updateTeamRequest.TeamNumber,
-            MaxMembers = updateTeamRequest.MaxMembers,
-            Tokens = updateTeamRequest.Tokens,
-            CreationDate = updateTeamRequest.CreationDate,
-            ModifiedDate = DateTime.Now
-        };
-
-        _unitOfWork.TeamRepository.Update(team);
-        _unitOfWork.Commit();
-    }
-
-    public bool Delete(string TeamId)
+    public TeamEntity? GetById(string TeamId)
     {
         try
         {
-            TeamEntity team = _unitOfWork.TeamRepository.GetBy(w => w.Id == TeamId).SingleOrDefault();
-            
-            if(team is null) return false;
-            _unitOfWork.TeamRepository.Delete(team);
-            _unitOfWork.Commit();
-            return true;
+            if (string.IsNullOrWhiteSpace(TeamId)) return null;
+
+            return _unitOfWork.TeamRepository.GetBy(t => t.Id == TeamId).FirstOrDefault();
         }
         catch (Exception)
         {
-            return false;
+            return null;
+        }
+        
+    }
+
+    public string Update(UpdateTeamRequest updateTeamRequest)
+    {
+        try
+        {
+            if(updateTeamRequest is null) return string.Empty;
+        
+            var team = new TeamEntity
+            {
+                Id = updateTeamRequest.Id,
+                TeamNumber = updateTeamRequest.TeamNumber,
+                MaxMembers = updateTeamRequest.MaxMembers,
+                Tokens = updateTeamRequest.Tokens,
+                CreationDate = updateTeamRequest.CreationDate,
+                ModifiedDate = DateTime.Now
+            };
+
+            _unitOfWork.TeamRepository.Update(team);
+            _unitOfWork.Commit();
+        
+            return $"[ID: {team.Id}] Successfully Updated";
+        }
+        catch (Exception e)
+        {
+            return string.Empty;
+        }
+        
+    }
+
+    public string Delete(string TeamId)
+    {
+        try
+        {
+            if(string.IsNullOrWhiteSpace(TeamId)) return string.Empty;
+            
+            var team = _unitOfWork.TeamRepository.GetBy(w => w.Id == TeamId).SingleOrDefault();
+            if(team is null) return string.Empty;
+            
+            _unitOfWork.TeamRepository.Delete(team);
+            _unitOfWork.Commit();
+            return $"[ID: {team.Id}] Successfully Deleted";
+        }
+        catch (Exception)
+        {
+            return string.Empty;
         }
     }
 }

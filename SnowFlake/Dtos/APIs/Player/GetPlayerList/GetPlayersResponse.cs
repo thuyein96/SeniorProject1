@@ -4,5 +4,6 @@ namespace SnowFlake.Dtos.APIs.Player.GetPlayerList;
 
 public class GetPlayersResponse
 {
-    public List<GetPlayerResponse> Players { get; set; }
+    public bool Success { get; set; }
+    public List<PlayerItem> Message { get; set; }
 }

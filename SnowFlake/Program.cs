@@ -4,6 +4,7 @@ using SnowFlake.Dtos;
 using SnowFlake.Hubs;
 using SnowFlake.Services;
 using SnowFlake.UnitOfWork;
+using SnowFlake.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IPlayerService, PlayerService>();
 builder.Services.AddTransient<ITeamService, TeamService>();
 builder.Services.AddTransient<IPlaygroundService, PlaygroundService>();
+
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

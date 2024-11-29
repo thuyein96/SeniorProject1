@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.EntityFrameworkCore;
+﻿using MongoDB.EntityFrameworkCore;
 
 namespace SnowFlake.Dtos;
 

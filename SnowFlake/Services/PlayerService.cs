@@ -1,10 +1,10 @@
 ﻿using MongoDB.Bson;
 using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs;
-using SnowFlake.Dtos.APIs.Player.GetPlayer;
-using SnowFlake.Dtos.APIs.Player.GetPlayerList;
+using SnowFlake.Dtos.APIs.Player;
 using SnowFlake.Dtos.APIs.Player.UpdatePlayer;
 using SnowFlake.UnitOfWork;
+using SnowFlake.Utilities;
 
 namespace SnowFlake.Services;
 
@@ -15,127 +15,113 @@ public class PlayerService : IPlayerService
     {
         _unitOfWork = unitOfWork;
     }
-    public bool Create(CreatePlayerRequest createPlayerRequest)
+    public async Task<string> Create(CreatePlayerRequest createPlayerRequest)
     {
-        try
+        if (createPlayerRequest is null) return string.Empty;
+        if (!string.IsNullOrWhiteSpace(createPlayerRequest.TeamId))
+            if (!Utils.IsValidObjectId(createPlayerRequest.TeamId))
+                return string.Empty;
+
+        var player = new PlayerEntity
         {
-            if (createPlayerRequest is null) return false;
+            Id = createPlayerRequest.Id.ToString(),
+            Name = createPlayerRequest.Name,
+            Email = createPlayerRequest.Email,
+            TeamId = createPlayerRequest.TeamId,
+            CreationDate = DateTime.Now,
+            ModifiedDate = null
+        };
 
-            var player = new PlayerEntity
-            {
-                Id = createPlayerRequest.Id.ToString(),
-                Name = createPlayerRequest.Name,
-                Email = createPlayerRequest.Email,
-                FirebaseId = createPlayerRequest.FirebaseId,
-                TeamId = ObjectId.Parse(createPlayerRequest.TeamId),
-                CreationDate = DateTime.Now,
-                ModifiedDate = null
-            };
+        _unitOfWork.PlayerRepository.Create(player);
+        _unitOfWork.Commit();
 
-            _unitOfWork.PlayerRepository.Create(player);
-            _unitOfWork.Commit();
-            return true;
-        }
-        catch (Exception)
-        {
-
-            return false;
-        }
+        return $"[Name: {player.Name}] Successfully Created";
     }
 
-    public GetPlayersResponse GetAll()
+    public async Task<List<PlayerItem>> GetAll()
     {
-        var response = new GetPlayersResponse
-        {
-            Players = new List<GetPlayerResponse>()
-        };
-        response.Players = _unitOfWork.PlayerRepository.GetAll().Take(50).Select(p => new GetPlayerResponse
+        var players = _unitOfWork.PlayerRepository.GetAll().Take(50).Select(p => new PlayerItem
         {
             Id = p.Id,
             Name = p.Name,
             Email = p.Email,
-            FirebaseId = p.FirebaseId,
-            TeamId = p.TeamId.ToString(),
-            CreatedAt = p.CreationDate,
-            ModifiedAt = p.ModifiedDate
+            TeamId = p.TeamId,
+            CreationDate = p.CreationDate,
+            ModifiedDate = p.ModifiedDate
         }).ToList();
-        return response;
+
+        return players;
     }
 
-    public GetPlayerResponse GetByPlayerId(string playerId)
+    public async Task<PlayerItem> GetByPlayerId(string playerId)
     {
         if (string.IsNullOrWhiteSpace(playerId)) return null;
+        if (!Utils.IsValidObjectId(playerId)) return null;
 
-        var player = _unitOfWork.PlayerRepository.GetBy(t => t.Id == playerId).Select(p => new GetPlayerResponse
+        var player = _unitOfWork.PlayerRepository.GetBy(t => t.Id == playerId).Select(p => new PlayerItem
         {
             Id = p.Id,
             Name = p.Name,
             Email = p.Email,
-            FirebaseId = p.FirebaseId,
-            TeamId = p.TeamId.ToString(),
-            CreatedAt = p.CreationDate,
-            ModifiedAt = p.ModifiedDate
+            TeamId = p.TeamId,
+            CreationDate = p.CreationDate,
+            ModifiedDate = p.ModifiedDate
         }).FirstOrDefault()!;
+
         return player;
     }
-    
-    public GetPlayersResponse GetPlayersByTeamId(string teamId)
+
+    public async Task<List<PlayerItem>> GetPlayersByTeamId(string teamId)
     {
         if (string.IsNullOrWhiteSpace(teamId)) return null;
+        if (!Utils.IsValidObjectId(teamId)) return null;
 
-        var players = new GetPlayersResponse
-        {
-            Players = new List<GetPlayerResponse>()
-        };
-
-        players.Players = _unitOfWork.PlayerRepository.GetBy(t => t.TeamId == ObjectId.Parse(teamId)).Select(p => new GetPlayerResponse
+        var players = _unitOfWork.PlayerRepository.GetBy(t => t.TeamId == teamId).Select(p => new PlayerItem
         {
             Id = p.Id,
             Name = p.Name,
             Email = p.Email,
-            FirebaseId = p.FirebaseId,
-            TeamId = p.TeamId.ToString(),
-            CreatedAt = p.CreationDate,
-            ModifiedAt = p.ModifiedDate
+            TeamId = p.TeamId,
+            CreationDate = p.CreationDate,
+            ModifiedDate = p.ModifiedDate
         }).ToList()!;
         return players;
     }
 
-    public void Update(UpdatePlayerRequest updatePlayerRequest)
+    public async Task<string> Update(UpdatePlayerRequest updatePlayerRequest)
     {
-        if (updatePlayerRequest is null) return;
+        if (updatePlayerRequest is null) return string.Empty;
+        if (!string.IsNullOrWhiteSpace(updatePlayerRequest.TeamId))
+            if (!Utils.IsValidObjectId(updatePlayerRequest.TeamId))
+                return string.Empty;
 
-        var player = new PlayerEntity
-        {
-            Id = updatePlayerRequest.Id.ToString(),
-            Name = updatePlayerRequest.PlayerName,
-            Email = updatePlayerRequest.Email,
-            FirebaseId = updatePlayerRequest.FirebaseId,
-            TeamId = ObjectId.Parse(updatePlayerRequest.TeamId),
-            CreationDate = updatePlayerRequest.CreatedAt,
-            ModifiedDate = DateTime.Now
-        };
+        var existingPlayer = _unitOfWork.PlayerRepository.GetBy(w => w.Id == updatePlayerRequest.Id).SingleOrDefault();
 
-        _unitOfWork.PlayerRepository.Update(player);
+        if (existingPlayer is null || existingPlayer.Id != updatePlayerRequest.Id) return string.Empty;
+
+        existingPlayer.Name = updatePlayerRequest.PlayerName;
+        existingPlayer.Email = updatePlayerRequest.Email;
+        existingPlayer.TeamId = updatePlayerRequest.TeamId;
+        existingPlayer.ModifiedDate = DateTime.Now;
+
+        _unitOfWork.PlayerRepository.Update(existingPlayer);
         _unitOfWork.Commit();
+
+        return $"[ID: {existingPlayer.Id}][Name: {existingPlayer.Name}] Successfully Updated";
     }
 
-    public bool Delete(string playerId)
+    public async Task<string> Delete(string playerId)
     {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(playerId)) return false;
+        if (string.IsNullOrWhiteSpace(playerId)) return string.Empty;
+        if (!Utils.IsValidObjectId(playerId)) return string.Empty;
 
-            var player = _unitOfWork.PlayerRepository.GetBy(w => w.Id == playerId).SingleOrDefault();
+        var player = _unitOfWork.PlayerRepository.GetBy(w => w.Id == playerId).SingleOrDefault();
 
-            if (player is null) return false;
-            _unitOfWork.PlayerRepository.Delete(player);
-            _unitOfWork.Commit();
-            return true;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
+        if (player is null) return string.Empty;
+
+        _unitOfWork.PlayerRepository.Delete(player);
+        _unitOfWork.Commit();
+
+        return $"[ID: {player.Id}][Name: {player.Name}] Successfully Deleted";
     }
 }

@@ -4,5 +4,6 @@ namespace SnowFlake.Dtos.APIs.Team.GetTeams;
 
 public class GetTeamsResponse
 {
-    public List<GetTeamResponse> Teams { get; set; }
+    public bool Success { get; set; }
+    public List<TeamEntity> Message { get; set; }
 }
