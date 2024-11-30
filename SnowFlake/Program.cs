@@ -1,4 +1,8 @@
+using Azure.Identity;
+using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using SnowFlake.Azure.BlobsStorageService;
 using SnowFlake.DAO;
 using SnowFlake.Dtos;
 using SnowFlake.Hubs;
@@ -9,9 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetValue<string>("AzureBlobStorageConnectionString")));
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 //get the configuration 
 // var connectionString = builder.Configuration.GetConnectionString("SnowFlakeDbContext");
-
 var mongoDBSettings = builder.Configuration.GetSection("MongoDBSettings").Get<MongoDBSettings>();
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDBSettings"));
 

@@ -8,6 +8,8 @@
 
     <ItemGroup>
 		<PackageReference Include="Ardalis.SmartEnum" Version="8.2.0" />
+		<PackageReference Include="Azure.Identity" Version="1.13.1" />
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.2" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.4" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10" />

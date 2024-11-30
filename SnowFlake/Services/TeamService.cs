@@ -72,21 +72,21 @@ public class TeamService : ITeamService
         try
         {
             if(updateTeamRequest is null) return string.Empty;
-        
-            var team = new TeamEntity
-            {
-                Id = updateTeamRequest.Id,
-                TeamNumber = updateTeamRequest.TeamNumber,
-                MaxMembers = updateTeamRequest.MaxMembers,
-                Tokens = updateTeamRequest.Tokens,
-                CreationDate = updateTeamRequest.CreationDate,
-                ModifiedDate = DateTime.Now
-            };
+            
+            var existingTeam = (await _unitOfWork.TeamRepository.GetBy(w => w.Id == updateTeamRequest.Id)).SingleOrDefault();
 
-            _unitOfWork.TeamRepository.Update(team);
+            if (existingTeam is null || existingTeam.Id != updateTeamRequest.Id) return string.Empty;
+            
+            existingTeam.TeamNumber = updateTeamRequest.TeamNumber;
+            existingTeam.MaxMembers = updateTeamRequest.MaxMembers;
+            existingTeam.Tokens = updateTeamRequest.Tokens;
+            existingTeam.SnowFlakeImageUrls = updateTeamRequest.SnowFlakeImageUrls;
+            existingTeam.ModifiedDate = DateTime.Now;
+
+            _unitOfWork.TeamRepository.Update(existingTeam);
             _unitOfWork.Commit();
         
-            return $"[ID: {team.Id}] Successfully Updated";
+            return $"[ID: {existingTeam.Id}] Successfully Updated";
         }
         catch (Exception e)
         {
