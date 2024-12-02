@@ -8,9 +8,9 @@ public class PlaygroundEntity : BaseEntity
     public string HostRoomCode { get; set; }
     public string PlayerRoomCode { get; set; }
     public string HostId { get; set; }
-    public int MaxTeam { get; set; }
-    public int TeamToken   { get; set; }
-
+    public int NumberOfTeam { get; set; }
+    public int MaxTeamMember { get; set; }
+    public int TeamToken { get; set; }
     public List<RoundEntity> Rounds { get; set; }
 
 }

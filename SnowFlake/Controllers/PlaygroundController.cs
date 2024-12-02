@@ -41,7 +41,6 @@ namespace SnowFlake.Controllers
             {
                 return StatusCode(500, e.Message);
             }
-
         }
 
         [HttpGet]
@@ -68,7 +67,6 @@ namespace SnowFlake.Controllers
             {
                 return StatusCode(500, e.Message);
             }
-            
         }
     }
 }

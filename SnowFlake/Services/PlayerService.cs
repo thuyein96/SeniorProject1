@@ -15,19 +15,20 @@ public class PlayerService : IPlayerService
     {
         _unitOfWork = unitOfWork;
     }
-    public async Task<string> Create(CreatePlayerRequest createPlayerRequest)
+    public async Task<PlayerEntity> Create(CreatePlayerRequest createPlayerRequest)
     {
-        if (createPlayerRequest is null) return string.Empty;
+        if (createPlayerRequest is null) return null;
         if (!string.IsNullOrWhiteSpace(createPlayerRequest.TeamId))
             if (!Utils.IsValidObjectId(createPlayerRequest.TeamId))
-                return string.Empty;
+                return null;
 
         var player = new PlayerEntity
         {
-            Id = createPlayerRequest.Id.ToString(),
+            Id = ObjectId.GenerateNewId().ToString(),
             Name = createPlayerRequest.Name,
             Email = createPlayerRequest.Email,
             TeamId = createPlayerRequest.TeamId,
+            PlaygroundId = createPlayerRequest.PlaygroundId,
             CreationDate = DateTime.Now,
             ModifiedDate = null
         };
@@ -35,7 +36,7 @@ public class PlayerService : IPlayerService
         _unitOfWork.PlayerRepository.Create(player);
         _unitOfWork.Commit();
 
-        return $"[Name: {player.Name}] Successfully Created";
+        return player;
     }
 
     public async Task<List<PlayerItem>> GetAll()
@@ -46,6 +47,8 @@ public class PlayerService : IPlayerService
             Name = p.Name,
             Email = p.Email,
             TeamId = p.TeamId,
+            PlaygroundId = p.PlaygroundId,
+            RoomCode = p.RoomCode,
             CreationDate = p.CreationDate,
             ModifiedDate = p.ModifiedDate
         }).ToList();
@@ -64,6 +67,8 @@ public class PlayerService : IPlayerService
             Name = p.Name,
             Email = p.Email,
             TeamId = p.TeamId,
+            PlaygroundId = p.PlaygroundId,
+            RoomCode = p.RoomCode,
             CreationDate = p.CreationDate,
             ModifiedDate = p.ModifiedDate
         }).FirstOrDefault()!;
@@ -82,6 +87,8 @@ public class PlayerService : IPlayerService
             Name = p.Name,
             Email = p.Email,
             TeamId = p.TeamId,
+            PlaygroundId = p.PlaygroundId,
+            RoomCode = p.RoomCode,
             CreationDate = p.CreationDate,
             ModifiedDate = p.ModifiedDate
         }).ToList()!;
@@ -102,12 +109,14 @@ public class PlayerService : IPlayerService
         existingPlayer.Name = updatePlayerRequest.PlayerName;
         existingPlayer.Email = updatePlayerRequest.Email;
         existingPlayer.TeamId = updatePlayerRequest.TeamId;
+        existingPlayer.PlaygroundId = updatePlayerRequest.PlaygroundId;
+        existingPlayer.RoomCode = updatePlayerRequest.RoomCode;
         existingPlayer.ModifiedDate = DateTime.Now;
 
         _unitOfWork.PlayerRepository.Update(existingPlayer);
         _unitOfWork.Commit();
 
-        return $"[ID: {existingPlayer.Id}][Name: {existingPlayer.Name}] Successfully Updated";
+        return $"[ID: {existingPlayer.Id}] Successfully Updated";
     }
 
 

@@ -8,4 +8,6 @@ public class UpdatePlayerRequest
     public string PlayerName { get; set; }
     public string Email { get; set; }
     public string TeamId { get; set; }
+    public string RoomCode { get; set; }
+    public string PlaygroundId { get; set; }
 }

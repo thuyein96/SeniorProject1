@@ -11,7 +11,7 @@ namespace SnowFlake.Services;
 public interface IPlayerService
 {
     //Create 
-    Task<string> Create(CreatePlayerRequest createPlayerRequest);
+    Task<PlayerEntity> Create(CreatePlayerRequest createPlayerRequest);
     //Reterive
     Task<List<PlayerItem>> GetAll();
     //GetById

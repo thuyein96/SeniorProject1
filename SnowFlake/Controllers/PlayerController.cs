@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 using SnowFlake.Dtos.APIs;
 using SnowFlake.Dtos.APIs.Player.DeletePlayer;
 using SnowFlake.Dtos.APIs.Player.GetPlayer;
@@ -30,8 +29,8 @@ public class PlayerController : ControllerBase
                 Message = null
             });
 
-            var createMessage = await _playerService.Create(request);
-            if (string.IsNullOrWhiteSpace(createMessage))
+            var player = await _playerService.Create(request);
+            if (player is null)
             {
                 return NotFound(new CreatePlayerResponse
                 {
@@ -42,16 +41,16 @@ public class PlayerController : ControllerBase
             return Ok(new CreatePlayerResponse
             {
                 Success = true,
-                Message = createMessage
+                Message = player
             });
         }
         catch (Exception e)
         {
             return StatusCode(500, e.Message);
         }
-        
+
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -77,7 +76,7 @@ public class PlayerController : ControllerBase
             return StatusCode(500, e.Message);
         }
     }
-    
+
     [HttpGet("search")]
     public async Task<IActionResult> GetTeamPlayers([FromQuery] string teamId)
     {
@@ -103,7 +102,7 @@ public class PlayerController : ControllerBase
             return Ok(new GetPlayersResponse
             {
                 Success = true,
-                Message= players
+                Message = players
             });
         }
         catch (Exception e)

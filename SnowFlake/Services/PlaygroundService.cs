@@ -104,12 +104,30 @@ namespace SnowFlake.Services
                     HostRoomCode = createPlaygroundRequest.HostRoomCode,
                     PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
                     HostId = createPlaygroundRequest.HostId,
-                    MaxTeam = createPlaygroundRequest.MaxTeam,
+                    NumberOfTeam = createPlaygroundRequest.NumberOfTeam,
+                    MaxTeamMember = createPlaygroundRequest.MaxTeamMember,
                     TeamToken = createPlaygroundRequest.TeamToken,
                     Rounds = rounds,
                     CreationDate = DateTime.Now,
                     ModifiedDate = null
                 };
+
+                for (int i = 1; i < createPlaygroundRequest.NumberOfTeam + 1; i++)
+                {
+                    var team = new TeamEntity
+                    {
+                        Id = ObjectId.GenerateNewId().ToString(),
+                        TeamNumber = i,
+                        Tokens = createPlaygroundRequest.TeamToken,
+                        MaxMembers = createPlaygroundRequest.MaxTeamMember,
+                        PlaygroundId = playground.Id,
+                        CreationDate = DateTime.Now,
+                        ModifiedDate = null
+                    };
+
+                    _unitOfWork.TeamRepository.Create(team);
+                    _unitOfWork.Commit();
+                }
 
                 _unitOfWork.PlaygroundRepository.Create(playground);
                 _unitOfWork.Commit();
