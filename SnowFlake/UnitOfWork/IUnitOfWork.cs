@@ -8,7 +8,9 @@ public interface IUnitOfWork
     IPlayerRepository PlayerRepository { get; }
     ITeamRepository TeamRepository { get; }
     IPlaygroundRepository PlaygroundRepository { get; } 
-    
+    IImageRepository ImageRepository { get; }
+    IRoundRepository RoundRepository { get; }
+
     //Commit stages (insert, update, delete)
     Task Commit();
     //Rollback transaction

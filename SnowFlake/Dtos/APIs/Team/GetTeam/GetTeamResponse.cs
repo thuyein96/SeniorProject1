@@ -1,7 +1,4 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-
-namespace SnowFlake.Dtos.APIs.Team.GetTeam;
+﻿namespace SnowFlake.Dtos.APIs.Team.GetTeam;
 
 public class GetTeamResponse
 {

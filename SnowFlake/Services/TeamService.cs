@@ -80,7 +80,6 @@ public class TeamService : ITeamService
             existingTeam.TeamNumber = updateTeamRequest.TeamNumber;
             existingTeam.MaxMembers = updateTeamRequest.MaxMembers;
             existingTeam.Tokens = updateTeamRequest.Tokens;
-            existingTeam.SnowFlakeImageUrls = updateTeamRequest.SnowFlakeImageUrls;
             existingTeam.ModifiedDate = DateTime.Now;
 
             _unitOfWork.TeamRepository.Update(existingTeam);

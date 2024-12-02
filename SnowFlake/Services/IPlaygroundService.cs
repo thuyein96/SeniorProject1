@@ -7,5 +7,5 @@ namespace SnowFlake.Services;
 public interface IPlaygroundService
 {
     Task<PlaygroundEntity> Create(CreatePlaygroundRequest createPlaygroundRequest);
-    Task<bool> StartTimer(int durationInSeconds);
+    Task<PlaygroundEntity> GetPlayground(string user, string roomcode);
 }

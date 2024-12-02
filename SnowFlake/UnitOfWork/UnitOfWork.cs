@@ -42,6 +42,26 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
+    private IImageRepository _imageRepository;
+
+    public IImageRepository ImageRepository
+    {
+        get
+        {
+            return _imageRepository = _imageRepository ?? new ImageRepository(_snowFlakeDbContext);
+        }
+    }
+
+    private IRoundRepository _roundRepository;
+
+    public IRoundRepository RoundRepository
+    {
+        get
+        {
+            return _roundRepository = _roundRepository ?? new RoundRepository(_snowFlakeDbContext);
+        }
+    }
+
     public async Task Commit()
     {
         _snowFlakeDbContext.SaveChanges();

@@ -1,6 +1,4 @@
-﻿using SnowFlake.Dtos.APIs.Team.GetTeam;
-
-namespace SnowFlake.Dtos.APIs.Team.GetTeams;
+﻿namespace SnowFlake.Dtos.APIs.Team.GetTeams;
 
 public class GetTeamsResponse
 {

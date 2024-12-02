@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SnowFlake.Azure.BlobsStorageService;
+using SnowFlake.Dtos.APIs.Image.CreateImage;
+using SnowFlake.Dtos.APIs.Image.DeleteImage;
+using SnowFlake.Dtos.APIs.Image.UpdateImage;
 using SnowFlake.Dtos.APIs.Image.UploadImage;
+using SnowFlake.Services;
 
 namespace SnowFlake.Controllers
 {
@@ -8,48 +12,63 @@ namespace SnowFlake.Controllers
     [ApiController]
     public class ImageController : ControllerBase
     {
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IImageService _imageService;
 
-        public ImageController(IBlobStorageService blobStorageService)
+        public ImageController(IImageService imageService)
         {
-            _blobStorageService = blobStorageService;
+            _imageService = imageService;
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadImage(IFormFile file)
+        public async Task<IActionResult> UploadImage(CreateImageRequest createImageRequest)
         {
-            if (file == null || file.Length == 0)
+            try
             {
-                return BadRequest(new UploadImageResponse
+                if (createImageRequest is null)
                 {
-                    Success = false,
-                    Message = "File is empty"
+                    return BadRequest(new CreateImageResponse
+                    {
+                        Success = false,
+                        Message = null
+                    });
+                }
+
+                var image = await _imageService.AddImage(createImageRequest);
+
+                if (image is null)
+                {
+                    return NotFound(new CreateImageResponse
+                    {
+                        Success = false,
+                        Message = null
+                    });
+                }
+
+                return Ok(new CreateImageResponse
+                {
+                    Success = true,
+                    Message = image
                 });
             }
-
-            using var stream = file.OpenReadStream();
-            var imageurl = await _blobStorageService.UploadBlobAsync("images", file.FileName, stream);
-
-            return Ok(new UploadImageResponse
+            catch (Exception e)
             {
-                Success = true,
-                Message = imageurl
-            });
+                return StatusCode(500, e);
+            }
         }
 
-        [HttpDelete("delete")]
-        public async Task<IActionResult> DeleteImage(string imageName)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateImage(UpdateImageRequest updateImageRequest)
         {
-            if (string.IsNullOrWhiteSpace(imageName))
+            if (updateImageRequest is null)
             {
                 return BadRequest(new UploadImageResponse
                 {
                     Success = false,
-                    Message = "Image name is empty"
+                    Message = "Request body is not valid"
                 });
             }
-            var result = await _blobStorageService.DeleteBlobAsync("images", imageName);
-            if (!result)
+            var result = await _imageService.UpdateImage(updateImageRequest);
+            if (string.IsNullOrWhiteSpace(result))
             {
                 return NotFound(new UploadImageResponse
                 {
@@ -60,7 +79,35 @@ namespace SnowFlake.Controllers
             return Ok(new UploadImageResponse
             {
                 Success = true,
-                Message = "Image deleted"
+                Message = result
+            });
+        }
+
+        [HttpDelete("delete")]
+        public async Task<IActionResult> DeleteImage(DeleteImageRequest deleteImageRequest)
+        {
+            if (deleteImageRequest is null)
+            {
+                return BadRequest(new UploadImageResponse
+                {
+                    Success = false,
+                    Message = "Request body is not valid"
+                });
+            }
+            var result = await _imageService.DeleteImage(deleteImageRequest.Id, "images", deleteImageRequest.BlobName);
+
+            if (string.IsNullOrWhiteSpace(result))
+            {
+                return NotFound(new DeleteImageResponse
+                {
+                    Success = false,
+                    Message = "Image not found"
+                });
+            }
+            return Ok(new DeleteImageResponse
+            {
+                Success = true,
+                Message = result
             });
         }
     }

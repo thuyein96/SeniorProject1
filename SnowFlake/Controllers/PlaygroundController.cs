@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SnowFlake.Dtos.APIs.Playground;
+using SnowFlake.Dtos.APIs.Playground.GetPlayground;
 using SnowFlake.Services;
 
 namespace SnowFlake.Controllers
@@ -43,11 +44,31 @@ namespace SnowFlake.Controllers
 
         }
 
-        [HttpPost("start-timeStartTimerr")]
-        public async Task<IActionResult> StartTimer(int durationInSeconds)
+        [HttpGet]
+        public async Task<IActionResult> GetByRoomCode(string user, string roomCode)
         {
-            await _playgroundService.StartTimer(durationInSeconds);
-            return Ok("Timer completed");
+            try
+            {
+                var playgroundResponse = await _playgroundService.GetPlayground(user, roomCode);
+                if (playgroundResponse == null)
+                {
+                    return NotFound(new GetPlaygroundByRoomCodeResponse
+                    {
+                        Success = false,
+                        Message = null
+                    });
+                }
+                return Ok(new GetPlaygroundByRoomCodeResponse
+                {
+                    Success = true,
+                    Message = playgroundResponse
+                });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+            
         }
     }
 }

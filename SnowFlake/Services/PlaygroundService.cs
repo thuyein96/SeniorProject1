@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Azure;
+using MongoDB.Bson;
 using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Playground;
 using SnowFlake.Hubs;
@@ -86,22 +88,25 @@ namespace SnowFlake.Services
                 if (createPlaygroundRequest is null) return null;
 
                 var rounds = new List<RoundEntity>();
-                foreach(var round in createPlaygroundRequest.Rounds)
+                foreach (var round in createPlaygroundRequest.Rounds)
                 {
                     rounds.Add(new RoundEntity
                     {
                         RoundNumber = round.Key,
                         Duration = round.Value,
-                        Progress = GameProgress.Pending.Name
+                        Progress = GameProgress.Pending.Name,
                     });
                 }
+
                 var playground = new PlaygroundEntity
                 {
-                    Id = createPlaygroundRequest.Id.ToString(),
-                    RoomCode = createPlaygroundRequest.RoomCode,
-                    Rounds = rounds,
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    HostRoomCode = createPlaygroundRequest.HostRoomCode,
+                    PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
+                    HostId = createPlaygroundRequest.HostId,
                     MaxTeam = createPlaygroundRequest.MaxTeam,
                     TeamToken = createPlaygroundRequest.TeamToken,
+                    Rounds = rounds,
                     CreationDate = DateTime.Now,
                     ModifiedDate = null
                 };
@@ -117,17 +122,25 @@ namespace SnowFlake.Services
             }
         }
 
-        [HttpPost("start-timer")]
-        public async Task<bool> StartTimer(int durationInSeconds)
+        public async Task<PlaygroundEntity> GetPlayground(string user, string roomcode)
         {
-            for (int i = durationInSeconds; i >= 0; i--)
+            try
             {
-                // Send timer updates to all clients
-                await _hubContext.Clients.All.SendAsync("ReceiveTimerUpdate", i);
-                Thread.Sleep(1000);
+                if (string.IsNullOrWhiteSpace(roomcode)) return null;
+                if(user == "Host")
+                {
+                    return (await _unitOfWork.PlaygroundRepository.GetBy(p => p.HostRoomCode == roomcode)).FirstOrDefault();
+                }
+                if(user == "Player")
+                {
+                    return (await _unitOfWork.PlaygroundRepository.GetBy(p => p.PlayerRoomCode == roomcode)).FirstOrDefault();
+                }
+                return null;
             }
-
-            return true;
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }
