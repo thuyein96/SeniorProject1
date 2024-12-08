@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Azure;
+﻿using Microsoft.AspNetCore.SignalR;
 using MongoDB.Bson;
 using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Playground;
@@ -145,11 +143,11 @@ namespace SnowFlake.Services
             try
             {
                 if (string.IsNullOrWhiteSpace(roomcode)) return null;
-                if(user == "Host")
+                if (user == "Host")
                 {
                     return (await _unitOfWork.PlaygroundRepository.GetBy(p => p.HostRoomCode == roomcode)).FirstOrDefault();
                 }
-                if(user == "Player")
+                if (user == "Player")
                 {
                     return (await _unitOfWork.PlaygroundRepository.GetBy(p => p.PlayerRoomCode == roomcode)).FirstOrDefault();
                 }

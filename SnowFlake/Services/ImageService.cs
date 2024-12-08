@@ -1,6 +1,9 @@
 ﻿using SnowFlake.Azure.BlobsStorageService;
 using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Image.CreateImage;
+using SnowFlake.Dtos.APIs.Image.DeleteImage;
+using SnowFlake.Dtos.APIs.Image.GetImage;
+using SnowFlake.Dtos.APIs.Image.GetImages;
 using SnowFlake.Dtos.APIs.Image.UpdateImage;
 using SnowFlake.Dtos.APIs.Team.UpdateTeam;
 using SnowFlake.UnitOfWork;
@@ -38,9 +41,53 @@ public class ImageService : IImageService
         return imageEntity;
     }
 
-    public Task<string> DeleteImage(string id, string containerName, string BlogName)
+    public async Task<List<ImageEntity>> GetImages()
     {
-        throw new NotImplementedException();
+        var images = (await _unitOfWork.ImageRepository.GetAll()).Take(50).ToList();
+        return images;
+    }
+
+    public async Task<ImageEntity> GetImage(GetImageRequest getImageRequest)
+    {
+        if (string.IsNullOrWhiteSpace(getImageRequest.Id))
+        {
+            return null;
+        }
+        var image = (await _unitOfWork.ImageRepository.GetBy(i => i.Id == getImageRequest.Id)).FirstOrDefault();
+
+        if (image == null) 
+        {
+            return null;
+        }
+
+        return image;
+    }
+
+    public async Task<string> DeleteImage(DeleteImageRequest deleteImageRequest)
+    {
+        if(string.IsNullOrWhiteSpace(deleteImageRequest.Id) || string.IsNullOrWhiteSpace(deleteImageRequest.ContainerName) || string.IsNullOrWhiteSpace(deleteImageRequest.BlobName))
+        {
+            return string.Empty;
+        }
+
+        var isDeleted = await _blobStorageService.DeleteBlobAsync(deleteImageRequest.ContainerName, deleteImageRequest.BlobName);
+
+        if (!isDeleted)
+        {
+            return string.Empty;
+        }
+
+
+        var existingImage = (await _unitOfWork.ImageRepository.GetBy(i => i.Id == deleteImageRequest.Id)).FirstOrDefault();
+
+        if (existingImage is null)
+        {
+            return string.Empty;
+        }
+
+        await _unitOfWork.ImageRepository.Delete(existingImage);
+
+        return $"[ID: {deleteImageRequest.Id}] Successfully Deleted";
     }
 
     public async Task<string> UpdateImage(UpdateImageRequest updateImageRequest)
@@ -77,4 +124,6 @@ public class ImageService : IImageService
 
         return $"[ID: {existingImage.Id}] Successfully Updated";
     }
+
+    
 }

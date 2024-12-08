@@ -94,7 +94,7 @@ namespace SnowFlake.Controllers
                     Message = "Request body is not valid"
                 });
             }
-            var result = await _imageService.DeleteImage(deleteImageRequest.Id, "images", deleteImageRequest.BlobName);
+            var result = await _imageService.DeleteImage(deleteImageRequest);
 
             if (string.IsNullOrWhiteSpace(result))
             {
