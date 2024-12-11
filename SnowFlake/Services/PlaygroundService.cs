@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using MongoDB.Bson;
 using SnowFlake.Dtos;
+using SnowFlake.Dtos.APIs.Player.UpdatePlayer;
 using SnowFlake.Dtos.APIs.Playground;
+using SnowFlake.Dtos.APIs.Playground.UpdatePlayground;
 using SnowFlake.Hubs;
 using SnowFlake.UnitOfWork;
 using SnowFlake.Utilities;
@@ -156,6 +158,53 @@ namespace SnowFlake.Services
             catch (Exception)
             {
                 return null;
+            }
+        }
+
+        public async Task<string> UpdatePlaygroundRoundStatus(UpdatePlaygroundRequest updatePlaygroundRequest)
+        {
+            try
+            {
+                if (updatePlaygroundRequest is null) return string.Empty;
+                if (!string.IsNullOrWhiteSpace(updatePlaygroundRequest.HostId))
+                    if (!Utils.IsValidObjectId(updatePlaygroundRequest.HostId))
+                        return string.Empty;
+
+                var existingPlayground = (await _unitOfWork.PlaygroundRepository.GetBy(w => w.HostRoomCode == updatePlaygroundRequest.HostRoomCode)).SingleOrDefault();
+
+                if (existingPlayground is null || existingPlayground.Id != updatePlaygroundRequest.Id) return string.Empty;
+                
+                existingPlayground.Rounds = updatePlaygroundRequest.Rounds;
+                existingPlayground.ModifiedDate = DateTime.Now;
+
+                await _unitOfWork.PlaygroundRepository.Update(existingPlayground);
+                await _unitOfWork.Commit();
+
+                return $"[ID: {existingPlayground.Id}] Successfully Updated";
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
+        public async Task<bool> UpdateRoundStatusToFinished(string roomCode, int roundNumber)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(roomCode) || roundNumber <= 0) return false;
+
+                var playground = (await _unitOfWork.PlaygroundRepository.GetBy(w => w.HostRoomCode == roomCode)).SingleOrDefault();
+                playground.Rounds[roundNumber].Progress = GameProgress.Finished.Name;
+                playground.ModifiedDate = DateTime.Now;
+
+                await _unitOfWork.PlaygroundRepository.Update(playground);
+                await _unitOfWork.Commit();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
     }

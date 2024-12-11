@@ -1,14 +1,16 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using SnowFlake.Hubs;
 using SnowFlake.Services;
+using SnowFlake.UnitOfWork;
 using SnowFlake.Utilities;
-using System.Diagnostics;
 
 public class TimerService : ITimerService
 {
     // Dictionary to store timer information for different connections
     private Dictionary<string, TimerState> _timerStates = new Dictionary<string, TimerState>();
     private readonly IHubContext<TimerHub> _hubContext;
+    private Dictionary<string, Queue<int>> _timerQueues = new Dictionary<string, Queue<int>>();
+    private int _currentRoundNumber = 0;
 
     public TimerService(IHubContext<TimerHub> hubContext)
     {
@@ -17,53 +19,83 @@ public class TimerService : ITimerService
 
 
     // Method to start the timer
-    public async Task StartTimer(string connectionId, int seconds)
+    public async Task StartTimer(string connectionId, List<int> durations, int intervalPeriod)
     {
-        // Stop any existing timer for this connection
         StopTimer(connectionId);
 
-        // Create a new timer state
-        var timerState = new TimerState
+        // Initialize queue for the connection
+        var timerQueue = new Queue<int>();
+        AddIntervalPeriodInBetween(durations, intervalPeriod, timerQueue);
+        _timerQueues[connectionId] = timerQueue;
+
+        // Initialize timer state
+        if (timerQueue.TryDequeue(out var duration))
         {
-            TotalSeconds = seconds,
-            RemainingSeconds = seconds,
-            Status = TimerStatus.Running,
-            CancellationTokenSource = new CancellationTokenSource()
-        };
+            var timerState = new TimerState
+            {
+                TotalSeconds = duration,
+                RemainingSeconds = duration,
+                Status = TimerStatus.Running,
+                CancellationTokenSource = new CancellationTokenSource()
+            };
+            _timerStates[connectionId] = timerState;
+            // Start the first timer
+            RunTimer(connectionId);
+        }
+    }
 
-        // Store the timer state
-        _timerStates[connectionId] = timerState;
-
-        // Start the timer in the background
-        RunTimer(connectionId);
+    private static void AddIntervalPeriodInBetween(List<int> durations, int intervalPeriod, Queue<int> timerQueue)
+    {
+        for (int i = 0; i < durations.Count; i++)
+        {
+            timerQueue.Enqueue(durations[i]);
+            timerQueue.Enqueue(intervalPeriod);
+        }
     }
 
     // Background method to run the timer
     private async void RunTimer(string connectionId)
     {
-        // Get the timer state for this connection
-        var timerState = _timerStates[connectionId];
+        if (!_timerStates.TryGetValue(connectionId, out var timerState)) return;
 
-        // Continue until time is up or timer is stopped
         while (timerState.RemainingSeconds > 0 && !timerState.CancellationTokenSource.IsCancellationRequested)
         {
-            // Wait for 1 second
+            var time = Utils.SecondsToString(timerState.RemainingSeconds);
+            await _hubContext.Clients.Client(connectionId).SendAsync("TimerUpdate", time);
             await Task.Delay(1000);
-
-            // Reduce remaining time
             timerState.RemainingSeconds--;
+        }
 
-            // You would typically broadcast the update to the client here
-            await _hubContext.Clients.Client(connectionId).SendAsync("TimerUpdate", timerState.RemainingSeconds);
-
-            // Check if timer is complete
-            if (timerState.RemainingSeconds <= 0)
+        if (timerState.RemainingSeconds <= 0)
+        {
+            _currentRoundNumber++;
+            // Check for the next duration in the queue
+            if (_timerQueues.TryGetValue(connectionId, out var timerQueue) && timerQueue.TryDequeue(out var nextDuration))
             {
+                if (_currentRoundNumber % 2 == 0)
+                {
+                    await _hubContext.Clients.Client(connectionId).SendAsync("TimerUpdate", "Interval Period");
+                }
+                else
+                {
+                    await _hubContext.Clients.Client(connectionId).SendAsync("TimerUpdate", $"Finished Round {_currentRoundNumber}");
+                }
+
+                timerState.TotalSeconds = nextDuration;
+                timerState.RemainingSeconds = nextDuration;
+                timerState.CancellationTokenSource = new CancellationTokenSource();
+                RunTimer(connectionId);
+            }
+            else
+            {
+                // No more durations, stop the timer
                 _timerStates.Remove(connectionId);
-                break;
+                _timerQueues.Remove(connectionId);
+                await _hubContext.Clients.Client(connectionId).SendAsync("TimerFinished");
             }
         }
     }
+
 
     // Method to pause the timer
     public async Task PauseTimer(string connectionId)
@@ -112,4 +144,31 @@ public class TimerService : ITimerService
             await _hubContext.Clients.Client(connectionId).SendAsync("TimerStopped");
         }
     }
+
+    public async Task SkipTimer(string connectionId)
+    {
+        if (_timerStates.TryGetValue(connectionId, out var timerState))
+        {
+            timerState.CancellationTokenSource.Cancel();
+            _currentRoundNumber++;
+
+            // Start the next round if available
+            if (_timerQueues.TryGetValue(connectionId, out var timerQueue) && timerQueue.TryDequeue(out var nextDuration))
+            {
+                timerState.TotalSeconds = nextDuration;
+                timerState.RemainingSeconds = nextDuration;
+                timerState.Status = TimerStatus.Running;
+                timerState.CancellationTokenSource = new CancellationTokenSource();
+                RunTimer(connectionId);
+            }
+            else
+            {
+                // No more rounds, end the timer
+                _timerStates.Remove(connectionId);
+                _timerQueues.Remove(connectionId);
+                await _hubContext.Clients.Client(connectionId).SendAsync("TimerFinished");
+            }
+        }
+    }
+
 }

@@ -33,8 +33,8 @@ public class PlayerService : IPlayerService
             ModifiedDate = null
         };
 
-        _unitOfWork.PlayerRepository.Create(player);
-        _unitOfWork.Commit();
+        await _unitOfWork.PlayerRepository.Create(player);
+        await _unitOfWork.Commit();
 
         return player;
     }
@@ -113,8 +113,8 @@ public class PlayerService : IPlayerService
         existingPlayer.RoomCode = updatePlayerRequest.RoomCode;
         existingPlayer.ModifiedDate = DateTime.Now;
 
-        _unitOfWork.PlayerRepository.Update(existingPlayer);
-        _unitOfWork.Commit();
+        await _unitOfWork.PlayerRepository.Update(existingPlayer);
+        await _unitOfWork.Commit();
 
         return $"[ID: {existingPlayer.Id}] Successfully Updated";
     }
@@ -129,8 +129,8 @@ public class PlayerService : IPlayerService
 
         if (player is null) return string.Empty;
 
-        _unitOfWork.PlayerRepository.Delete(player);
-        _unitOfWork.Commit();
+        await _unitOfWork.PlayerRepository.Delete(player);
+        await _unitOfWork.Commit();
 
         return $"[ID: {player.Id}][Name: {player.Name}] Successfully Deleted";
     }

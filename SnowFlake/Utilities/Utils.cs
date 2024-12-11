@@ -14,4 +14,10 @@ public static class Utils
         var time = duration.Split(':');
         return int.Parse(time[0]) * 60 + int.Parse(time[1]);
     }
+
+    public static string SecondsToString(int second)
+    {
+        var timer = TimeOnly.FromTimeSpan(TimeSpan.FromSeconds(second));
+        return timer.ToString("mm:ss");
+    }
 }
