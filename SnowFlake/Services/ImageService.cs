@@ -35,8 +35,8 @@ public class ImageService : IImageService
             CreationDate = DateTime.Now
         };
 
-        _unitOfWork.ImageRepository.Create(imageEntity);
-        _unitOfWork.Commit();
+        await _unitOfWork.ImageRepository.Create(imageEntity);
+        await _unitOfWork.Commit();
 
         return imageEntity;
     }
@@ -94,6 +94,7 @@ public class ImageService : IImageService
     {
         var existingImage = (await _unitOfWork.ImageRepository.GetBy(i => i.Id == updateImageRequest.Id)).FirstOrDefault();
 
+        // Override with new image
         if (!string.IsNullOrWhiteSpace(updateImageRequest.NewImageFileName) &&  (updateImageRequest.NewImageByteData != null))
         {
             if(string.IsNullOrWhiteSpace(updateImageRequest.OldImageFileName))
@@ -112,6 +113,12 @@ public class ImageService : IImageService
             existingImage.SnowFlakeImageUrl = imageUploadUrl;
         }
 
+        // Update Image Price
+        if(updateImageRequest.Price > 0)
+        {
+            existingImage.Price = updateImageRequest.Price;
+        }
+
         if(!string.IsNullOrWhiteSpace(updateImageRequest.ImageBuyingStatus))
         {
             existingImage.ImageBuyingStatus = updateImageRequest.ImageBuyingStatus;
@@ -119,7 +126,7 @@ public class ImageService : IImageService
 
         existingImage.ModifiedDate = DateTime.Now;
 
-        _unitOfWork.ImageRepository.Create(existingImage);
+        _unitOfWork.ImageRepository.Update(existingImage);
         _unitOfWork.Commit();
 
         return $"[ID: {existingImage.Id}] Successfully Updated";

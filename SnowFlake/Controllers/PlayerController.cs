@@ -77,7 +77,7 @@ public class PlayerController : ControllerBase
         }
     }
 
-    [HttpGet("search")]
+    [HttpGet("{teamid}/search")]
     public async Task<IActionResult> GetTeamPlayers([FromQuery] string teamId)
     {
         try
@@ -111,14 +111,14 @@ public class PlayerController : ControllerBase
         }
     }
 
-    [HttpGet("{playerId}")]
-    public async Task<IActionResult> Edit(string playerId)
+    [HttpGet("{playerid}")]
+    public async Task<IActionResult> GetPlayerAsync(string playerid)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(playerId)) return BadRequest();
+            if (string.IsNullOrWhiteSpace(playerid)) return BadRequest();
 
-            var player = await _playerService.GetByPlayerId(playerId);
+            var player = await _playerService.GetByPlayerId(playerid);
 
             if (player == null) return NotFound(new GetPlayerResponse
             {
@@ -170,23 +170,23 @@ public class PlayerController : ControllerBase
         }
     }
 
-    [HttpDelete("{playerId}")]
-    public async Task<IActionResult> Delete(string playerId)
+    [HttpDelete("{playerid}")]
+    public async Task<IActionResult> Delete(string playerid)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(playerId)) return BadRequest(new DeletePlayerResponse
+            if (string.IsNullOrWhiteSpace(playerid)) return BadRequest(new DeletePlayerResponse
             {
                 Success = false,
                 Message = "Input correct player Id."
             });
 
-            var deleteMessage = await _playerService.Delete(playerId);
+            var deleteMessage = await _playerService.Delete(playerid);
 
             if (string.IsNullOrWhiteSpace(deleteMessage)) return NotFound(new DeletePlayerResponse
             {
                 Success = false,
-                Message = $"[ID: {playerId}] Failed to delete player."
+                Message = $"[ID: {playerid}] Failed to delete player."
             });
 
             return Ok(new DeletePlayerResponse

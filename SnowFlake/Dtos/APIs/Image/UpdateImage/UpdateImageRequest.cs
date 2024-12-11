@@ -9,6 +9,7 @@ public class UpdateImageRequest
     public string? NewImageFileName { get; set; }
     public Stream? NewImageByteData { get; set; }
     public string? ImageBuyingStatus { get; set; }
+    public int? Price { get; set; }
     public string TeamId { get; set; }
     public DateTime CreationDate { get; set; }
 }

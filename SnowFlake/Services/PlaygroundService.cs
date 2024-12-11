@@ -94,7 +94,7 @@ namespace SnowFlake.Services
                     {
                         RoundNumber = round.Key,
                         Duration = round.Value,
-                        Progress = GameProgress.Pending.Name,
+                        Progress = RoundState.Pending.Name,
                     });
                 }
 
@@ -195,7 +195,7 @@ namespace SnowFlake.Services
                 if (string.IsNullOrWhiteSpace(roomCode) || roundNumber <= 0) return false;
 
                 var playground = (await _unitOfWork.PlaygroundRepository.GetBy(w => w.HostRoomCode == roomCode)).SingleOrDefault();
-                playground.Rounds[roundNumber].Progress = GameProgress.Finished.Name;
+                playground.Rounds[roundNumber].Progress = RoundState.Finished.Name;
                 playground.ModifiedDate = DateTime.Now;
 
                 await _unitOfWork.PlaygroundRepository.Update(playground);

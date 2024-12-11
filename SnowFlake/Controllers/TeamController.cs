@@ -70,12 +70,12 @@ public class TeamController : ControllerBase
         });
     }
 
-    [HttpGet("{teamId}")]
-    public async Task<IActionResult> Edit(string teamId)
+    [HttpGet("{teamid}")]
+    public async Task<IActionResult> Edit(string teamid)
     {
-        if (string.IsNullOrWhiteSpace(teamId)) return BadRequest();
+        if (string.IsNullOrWhiteSpace(teamid)) return BadRequest();
 
-        var player = await _teamService.GetById(teamId);
+        var player = await _teamService.GetById(teamid);
 
         if (player == null)
         {
@@ -115,12 +115,12 @@ public class TeamController : ControllerBase
         });
     }
 
-    [HttpDelete("{teamId}")]
-    public async Task<IActionResult> Delete(string teamId)
+    [HttpDelete("{teamid}")]
+    public async Task<IActionResult> Delete(string teamid)
     {
-        if (string.IsNullOrWhiteSpace(teamId)) return BadRequest();
+        if (string.IsNullOrWhiteSpace(teamid)) return BadRequest();
 
-        var deleteMessage = await _teamService.Delete(teamId);
+        var deleteMessage = await _teamService.Delete(teamid);
 
         if (deleteMessage == string.Empty) return NotFound(new DeleteTeamResponse
         {

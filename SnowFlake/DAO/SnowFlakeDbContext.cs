@@ -15,5 +15,6 @@ public class SnowFlakeDbContext : DbContext
     public DbSet<Dtos.TeamEntity> Teams { get; set; }
     public DbSet<Dtos.PlaygroundEntity> Playgrounds { get; set; }
     public DbSet<Dtos.ImageEntity> Images { get; set; }
+    public DbSet<Dtos.GameStateEntity> GameStates { get; set; }
     
 }

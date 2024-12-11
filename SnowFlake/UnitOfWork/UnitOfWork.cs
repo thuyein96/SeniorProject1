@@ -62,6 +62,15 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
+    private IGameStateRepository _gameStateRepository;
+    public IGameStateRepository GameStateRepository
+    {
+        get
+        {
+            return _gameStateRepository = _gameStateRepository ?? new GameStateRepository(_snowFlakeDbContext);
+        }
+    }
+
     public async Task Commit()
     {
         _snowFlakeDbContext.SaveChanges();

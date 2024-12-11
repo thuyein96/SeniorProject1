@@ -10,6 +10,7 @@ public interface IUnitOfWork
     IPlaygroundRepository PlaygroundRepository { get; } 
     IImageRepository ImageRepository { get; }
     IRoundRepository RoundRepository { get; }
+    IGameStateRepository GameStateRepository { get; }
 
     //Commit stages (insert, update, delete)
     Task Commit();
