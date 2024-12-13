@@ -16,9 +16,9 @@ namespace SnowFlake.Hubs
             await Clients.Caller.SendAsync("ReceivedMessage", $"{Context.ConnectionId} is connected");
         }
 
-        public async Task StartTimer(List<int> durationSeconds, int intervalPeriod)
+        public async Task StartTimer(int durationSeconds)
         {
-            await _timerService.StartTimer(Context.ConnectionId, durationSeconds, intervalPeriod);
+            await _timerService.StartTimer(Context.ConnectionId, durationSeconds);
         }
 
         public async Task PauseTimer()
@@ -38,7 +38,12 @@ namespace SnowFlake.Hubs
 
         public async Task SkipTimer()
         {
-            await _timerService.SkipTimer(Context.ConnectionId);
+            await _timerService.StopTimer(Context.ConnectionId);
+        }
+
+        public async Task AddSeconds(int seconds)
+        {
+            await _timerService.ModifyTimer(Context.ConnectionId, seconds);
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
