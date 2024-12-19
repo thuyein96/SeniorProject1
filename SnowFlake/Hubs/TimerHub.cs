@@ -43,9 +43,9 @@ namespace SnowFlake.Hubs
             await _timerService.StopTimer(Context.ConnectionId);
         }
 
-        public async Task AddSeconds(string seconds)
+        public async Task AddTimer(string extraDuration)
         {
-            var timer = Utils.ConvertToSeconds(seconds);
+            var timer = Utils.ConvertToSeconds(extraDuration);
             await _timerService.ModifyTimer(Context.ConnectionId, timer);
         }
 
