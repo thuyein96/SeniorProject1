@@ -51,7 +51,7 @@ namespace SnowFlake.Controllers
             }
         }
 
-        [HttpGet("{gamestateid}")]
+        [HttpGet]
         public async Task<IActionResult> GetGameStateAsync(GetGameStateRequest getGameStateRequest)
         {
             try
