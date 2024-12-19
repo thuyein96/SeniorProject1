@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using SnowFlake.Services;
+using SnowFlake.Utilities;
 
 namespace SnowFlake.Hubs
 {
@@ -16,9 +17,10 @@ namespace SnowFlake.Hubs
             await Clients.Caller.SendAsync("ReceivedMessage", $"{Context.ConnectionId} is connected");
         }
 
-        public async Task StartTimer(int durationSeconds)
+        public async Task StartTimer(string durationSeconds)
         {
-            await _timerService.StartTimer(Context.ConnectionId, durationSeconds);
+            var timer = Utils.ConvertToSeconds(durationSeconds);
+            await _timerService.StartTimer(Context.ConnectionId, timer);
         }
 
         public async Task PauseTimer()
@@ -41,9 +43,10 @@ namespace SnowFlake.Hubs
             await _timerService.StopTimer(Context.ConnectionId);
         }
 
-        public async Task AddSeconds(int seconds)
+        public async Task AddSeconds(string seconds)
         {
-            await _timerService.ModifyTimer(Context.ConnectionId, seconds);
+            var timer = Utils.ConvertToSeconds(seconds);
+            await _timerService.ModifyTimer(Context.ConnectionId, timer);
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)

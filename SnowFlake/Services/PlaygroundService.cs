@@ -140,20 +140,12 @@ namespace SnowFlake.Services
             }
         }
 
-        public async Task<PlaygroundEntity> GetPlayground(string user, string roomcode)
+        public async Task<PlaygroundEntity> GetPlayground(string roomcode)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(roomcode)) return null;
-                if (user == "Host")
-                {
-                    return (await _unitOfWork.PlaygroundRepository.GetBy(p => p.HostRoomCode == roomcode)).FirstOrDefault();
-                }
-                if (user == "Player")
-                {
-                    return (await _unitOfWork.PlaygroundRepository.GetBy(p => p.PlayerRoomCode == roomcode)).FirstOrDefault();
-                }
-                return null;
+                return (await _unitOfWork.PlaygroundRepository.GetBy(p => p.HostRoomCode == roomcode)).FirstOrDefault();
             }
             catch (Exception)
             {

@@ -2,6 +2,7 @@
 
 public class CreateGameStateRequest
 {
-    public string? HostRoomCode { get; set; }
-    public string? PlayerRoomCode { get; set; }
+    public string HostRoomCode { get; set; }
+    public string PlayerRoomCode { get; set; }
+    public string CurrentGameState { get; set; }
 }

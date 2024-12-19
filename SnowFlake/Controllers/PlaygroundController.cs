@@ -44,11 +44,11 @@ namespace SnowFlake.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetByRoomCode(string user, string roomCode)
+        public async Task<IActionResult> GetByRoomCode(GetPlaygroundByRoomCodeRequest getPlaygroundByRoomCodeRequest)
         {
             try
             {
-                var playgroundResponse = await _playgroundService.GetPlayground(user, roomCode);
+                var playgroundResponse = await _playgroundService.GetPlayground(getPlaygroundByRoomCodeRequest.RoomCode);
                 if (playgroundResponse == null)
                 {
                     return NotFound(new GetPlaygroundByRoomCodeResponse

@@ -9,5 +9,5 @@ public interface IGameStateService
 {
     Task<GameStateEntity> AddGameState(CreateGameStateRequest createGameStateRequest);
     Task<string> UpdateGameState(UpdateGameStateRequest updateGameStateRequest);
-    Task<GameStateEntity> GetGameState(string gameStateId);
+    Task<GameStateEntity> GetGameState(GetGameStateRequest getGameStateRequest);
 }

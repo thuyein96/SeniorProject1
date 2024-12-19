@@ -50,8 +50,9 @@ public class TimerService : ITimerService
             // Reduce remaining time
             timerState.RemainingSeconds--;
 
+            var remainingSeconds = Utils.SecondsToString(timerState.RemainingSeconds);
             // You would typically broadcast the update to the client here
-            await _timerHubContext.Clients.Client(connectionId).SendAsync("TimerUpdate", timerState.RemainingSeconds);
+            await _timerHubContext.Clients.Client(connectionId).SendAsync("TimerUpdate", remainingSeconds);
 
             // Check if timer is complete
             if (timerState.RemainingSeconds <= 0)
@@ -120,7 +121,8 @@ public class TimerService : ITimerService
                 // Update the remaining time
                 timerState.RemainingSeconds += secondsToModify;
                 // Notify the client about the updated time
-                await _timerHubContext.Clients.Client(connectionId).SendAsync("TimerUpdated", timerState.RemainingSeconds);
+                var remainingSeconds = Utils.SecondsToString(timerState.RemainingSeconds);
+                await _timerHubContext.Clients.Client(connectionId).SendAsync("TimerUpdated", remainingSeconds);
             }
             else
             {

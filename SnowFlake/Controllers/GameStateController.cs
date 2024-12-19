@@ -52,17 +52,17 @@ namespace SnowFlake.Controllers
         }
 
         [HttpGet("{gamestateid}")]
-        public async Task<IActionResult> GetGameStateAsync(string gamestateid)
+        public async Task<IActionResult> GetGameStateAsync(GetGameStateRequest getGameStateRequest)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(gamestateid)) return BadRequest(new GetGameStateResponse
+                if (getGameStateRequest is null) return BadRequest(new GetGameStateResponse
                 {
                     Success = false,
                     Message = null
                 });
 
-                var gameState = await _gameStateService.GetGameState(gamestateid);
+                var gameState = await _gameStateService.GetGameState(getGameStateRequest);
 
                 if (gameState is null)
                 {

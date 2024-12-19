@@ -3,7 +3,6 @@ using SnowFlake.Dtos.APIs.GameState.CreateGameState;
 using SnowFlake.Dtos.APIs.GameState.GetGameState;
 using SnowFlake.Dtos.APIs.GameState.UpdateGameState;
 using SnowFlake.UnitOfWork;
-using SnowFlake.Utilities;
 
 namespace SnowFlake.Services;
 
@@ -33,19 +32,23 @@ public class GameStateService : IGameStateService
 
 
 
-    public async Task<GameStateEntity> GetGameState(string gameStateId)
+    public async Task<GameStateEntity> GetGameState(GetGameStateRequest getGameStateRequest)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(gameStateId)) return null;
-            var gameStateEntity = (await _unitOfWork.GameStateRepository.GetBy(g => g.Id == gameStateId)).FirstOrDefault();
+            var gameStateEntity = new GameStateEntity();
+            if (!string.IsNullOrWhiteSpace(getGameStateRequest.PlayerRoomCode))
+                gameStateEntity = (await _unitOfWork.GameStateRepository.GetBy(g => g.PlayerRoomCode == getGameStateRequest.PlayerRoomCode)).FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(getGameStateRequest.HostRoomCode))
+                gameStateEntity = (await _unitOfWork.GameStateRepository.GetBy(g => g.HostRoomCode == getGameStateRequest.HostRoomCode)).FirstOrDefault();
+
             return gameStateEntity;
         }
         catch (Exception)
         {
             return null;
         }
-        
+
     }
 
     public async Task<string> UpdateGameState(UpdateGameStateRequest updateGameStateRequest)
@@ -56,7 +59,7 @@ public class GameStateService : IGameStateService
 
             if (existingGameState == null) return string.Empty;
 
-            existingGameState.CurrentState = updateGameStateRequest.CurrentState;
+            existingGameState.CurrentState = updateGameStateRequest.CurrentGameState;
 
             await _unitOfWork.GameStateRepository.Update(existingGameState);
             await _unitOfWork.Commit();
@@ -67,6 +70,6 @@ public class GameStateService : IGameStateService
         {
             return string.Empty;
         }
-        
+
     }
 }
