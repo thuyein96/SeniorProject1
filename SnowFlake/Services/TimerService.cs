@@ -47,10 +47,10 @@ public class TimerService : ITimerService
             var remainingSeconds = Utils.SecondsToString(timerState.RemainingSeconds);
             // You would typically broadcast the update to the client here
             await _timerHubContext.Clients.Client(connectionId).SendAsync("TimerUpdate", remainingSeconds);
-            // Reduce remaining time
-            timerState.RemainingSeconds--;
             // Wait for 1 second
             await Task.Delay(1000);
+            // Reduce remaining time
+            timerState.RemainingSeconds--;
 
             // Check if timer is complete
             if (timerState.RemainingSeconds <= 0)
