@@ -1,8 +1,11 @@
 ﻿using MongoDB.Bson;
 using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Team.CreateTeam;
+using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
+using SnowFlake.Dtos.APIs.Team.SearchPlayerInTeam;
 using SnowFlake.Dtos.APIs.Team.UpdateTeam;
 using SnowFlake.UnitOfWork;
+using SnowFlake.Utilities;
 
 namespace SnowFlake.Services;
 
@@ -24,9 +27,9 @@ public class TeamService : ITeamService
             {
                 Id = ObjectId.GenerateNewId().ToString(),
                 TeamNumber = createTeamRequest.TeamNumber,
-                MaxMembers = createTeamRequest.MaxMembers,
                 Tokens = createTeamRequest.Tokens,
-                PlaygroundId = createTeamRequest.PlaygroundId,
+                HostRoomCode = createTeamRequest.HostRoomCode,
+                PlayerRoomCode = createTeamRequest.PlayerRoomCode,
                 CreationDate = DateTime.Now,
                 ModifiedDate = null
             };
@@ -44,24 +47,43 @@ public class TeamService : ITeamService
 
     public async Task<List<TeamEntity>> GetAll()
     {
-        // TODO: change dynamic for bucket size
-        var teams = (await _unitOfWork.TeamRepository.GetAll()).Take(50).ToList();
+        var teams = (await _unitOfWork.TeamRepository.GetAll()).Take(Utils.BatchSize).ToList();
         return teams;
     }
 
-    public async Task<TeamEntity?> GetById(string TeamId)
-    {
+    public async Task<List<TeamEntity>> GetTeamsByRoomCode(GetTeamsByRoomCodeRequest getTeamsByRoomCodeRequest)
+     {
         try
         {
-            if (string.IsNullOrWhiteSpace(TeamId)) return null;
-
-            return (await _unitOfWork.TeamRepository.GetBy(t => t.Id == TeamId)).FirstOrDefault();
+            if(!string.IsNullOrWhiteSpace(getTeamsByRoomCodeRequest.HostRoomCode))
+                return (await _unitOfWork.TeamRepository.GetBy(t => t.HostRoomCode == getTeamsByRoomCodeRequest.HostRoomCode)).ToList();
+            if(!string.IsNullOrWhiteSpace(getTeamsByRoomCodeRequest.PlayerRoomCode))
+                return (await _unitOfWork.TeamRepository.GetBy(t => t.PlayerRoomCode == getTeamsByRoomCodeRequest.PlayerRoomCode)).ToList();
+            return null;
         }
         catch (Exception)
         {
             return null;
         }
 
+    }
+
+    public async Task<string> IsTeamHasPlayer(SearchPlayerRequest searchPlayerRequest)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(searchPlayerRequest.PlayerRoomCode)) return string.Empty;
+
+            var hasPlayer = (await _unitOfWork.TeamRepository.GetBy(t => t.PlayerRoomCode == searchPlayerRequest.PlayerRoomCode))
+                            .Any(t => t.Members != null && t.Members.Contains(searchPlayerRequest.PlayerName));
+
+            return hasPlayer ? "Player already exists in the team" : string.Empty;
+        }
+        catch (Exception)
+        {
+
+            return string.Empty;
+        }
     }
 
     public async Task<string> Update(UpdateTeamRequest updateTeamRequest)
@@ -73,10 +95,15 @@ public class TeamService : ITeamService
             var existingTeam = (await _unitOfWork.TeamRepository.GetBy(w => w.Id == updateTeamRequest.Id)).SingleOrDefault();
 
             if (existingTeam is null || existingTeam.Id != updateTeamRequest.Id) return string.Empty;
-
-            existingTeam.TeamNumber = updateTeamRequest.TeamNumber;
-            existingTeam.MaxMembers = updateTeamRequest.MaxMembers;
-            existingTeam.Tokens = updateTeamRequest.Tokens;
+            if(updateTeamRequest.Tokens is not null)
+                 existingTeam.Tokens = updateTeamRequest.Tokens;
+            if(updateTeamRequest.Member is not null && existingTeam.Members is not null)
+                existingTeam.Members.Add(updateTeamRequest.Member);
+            if(updateTeamRequest.Member is not null && existingTeam.Members is null)
+            {
+                existingTeam.Members = new List<string>();
+                existingTeam.Members.Add(updateTeamRequest.Member);
+            }
             existingTeam.ModifiedDate = DateTime.Now;
 
             _unitOfWork.TeamRepository.Update(existingTeam);
@@ -84,7 +111,7 @@ public class TeamService : ITeamService
 
             return $"[ID: {existingTeam.Id}] Successfully Updated";
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return string.Empty;
         }

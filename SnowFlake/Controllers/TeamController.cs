@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SnowFlake.Dtos.APIs.Team.CreateTeam;
 using SnowFlake.Dtos.APIs.Team.DeleteTeam;
-using SnowFlake.Dtos.APIs.Team.GetTeam;
 using SnowFlake.Dtos.APIs.Team.GetTeams;
+using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
+using SnowFlake.Dtos.APIs.Team.SearchPlayerInTeam;
 using SnowFlake.Dtos.APIs.Team.UpdateTeam;
 using SnowFlake.Services;
 
@@ -56,36 +57,68 @@ public class TeamController : ControllerBase
         var teams = await _teamService.GetAll();
         if (teams == null || teams.Count == 0)
         {
-            return NotFound(new GetTeamsResponse
+            return base.NotFound(new GetTeamsResponse
             {
                 Success = false,
                 Message = null
             });
         }
 
-        return Ok(new GetTeamsResponse
+        return base.Ok(new GetTeamsResponse
         {
             Success = true,
             Message = teams
         });
     }
 
-    [HttpGet("{teamid}")]
-    public async Task<IActionResult> Edit(string teamid)
+    [HttpGet("search")]
+    public async Task<IActionResult> GetTeamByRoomCode([FromQuery] string? hostRoomCode, [FromQuery] string? playerRoomCode)
     {
-        if (string.IsNullOrWhiteSpace(teamid)) return BadRequest();
+        if (string.IsNullOrWhiteSpace(hostRoomCode) && string.IsNullOrWhiteSpace(playerRoomCode)) return BadRequest();
 
-        var player = await _teamService.GetById(teamid);
-
-        if (player == null)
+        var getTeamByRoomCodeRequest = new GetTeamsByRoomCodeRequest
         {
-            return NotFound(new GetTeamResponse
+            HostRoomCode = hostRoomCode,
+            PlayerRoomCode = playerRoomCode
+        };
+
+        var teams = await _teamService.GetTeamsByRoomCode(getTeamByRoomCodeRequest);
+
+        if (teams == null)
+        {
+            return base.NotFound(new GetTeamsByRoomCodeResponse
             {
                 Success = false,
                 Message = null
             });
         }
-        return Ok(new GetTeamResponse
+        return base.Ok(new GetTeamsByRoomCodeResponse
+        {
+            Success = true,
+            Message = teams
+        });
+    }
+
+    [HttpGet("players/search")]
+    public async Task<IActionResult> SearchPlayer([FromQuery] string? playerRoomCode, [FromQuery] string? playerName)
+    {
+        if (string.IsNullOrWhiteSpace(playerRoomCode) || string.IsNullOrWhiteSpace(playerName)) return BadRequest();
+        var searchPlayerRequest = new SearchPlayerRequest
+        {
+            PlayerRoomCode = playerRoomCode,
+            PlayerName = playerName
+        };
+        var player = await _teamService.IsTeamHasPlayer(searchPlayerRequest);
+
+        if (string.IsNullOrWhiteSpace(player))
+        {
+            return NotFound(new SearchPlayerResponse
+            {
+                Success = false,
+                Message = player
+            });
+        }
+        return Ok(new SearchPlayerResponse
         {
             Success = true,
             Message = player
@@ -95,7 +128,11 @@ public class TeamController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> Update(UpdateTeamRequest updateTeamRequest)
     {
-        if (updateTeamRequest == null) return BadRequest();
+        if (updateTeamRequest == null) return BadRequest(new UpdateTeamResponse
+        {
+            Success = false,
+            Message = "Incorrect request body format."
+        });
 
         var updateMessage = await _teamService.Update(updateTeamRequest);
 

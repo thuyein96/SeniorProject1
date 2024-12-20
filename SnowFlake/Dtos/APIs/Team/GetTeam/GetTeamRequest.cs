@@ -4,5 +4,5 @@ namespace SnowFlake.Dtos.APIs.Team.GetTeam;
 
 public class GetTeamRequest
 {
-    public ObjectId TeamId { get; set; }
+    public string TeamId { get; set; }
 }

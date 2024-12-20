@@ -41,7 +41,7 @@ public class PlayerService : IPlayerService
 
     public async Task<List<PlayerItem>> GetAll()
     {
-        var players = (await _unitOfWork.PlayerRepository.GetAll()).Take(50).Select(p => new PlayerItem
+        var players = (await _unitOfWork.PlayerRepository.GetAll()).Take(Utils.BatchSize).Select(p => new PlayerItem
         {
             Id = p.Id,
             Name = p.Name,

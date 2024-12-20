@@ -77,7 +77,7 @@ public class PlayerController : ControllerBase
         }
     }
 
-    [HttpGet("{teamid}/search")]
+    [HttpGet("search")]
     public async Task<IActionResult> GetTeamPlayers([FromQuery] string teamId)
     {
         try

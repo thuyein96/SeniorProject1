@@ -103,9 +103,7 @@ namespace SnowFlake.Services
                     Id = ObjectId.GenerateNewId().ToString(),
                     HostRoomCode = createPlaygroundRequest.HostRoomCode,
                     PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
-                    HostId = createPlaygroundRequest.HostId,
                     NumberOfTeam = createPlaygroundRequest.NumberOfTeam,
-                    MaxTeamMember = createPlaygroundRequest.MaxTeamMember,
                     TeamToken = createPlaygroundRequest.TeamToken,
                     Rounds = rounds,
                     CreationDate = DateTime.Now,
@@ -119,8 +117,8 @@ namespace SnowFlake.Services
                         Id = ObjectId.GenerateNewId().ToString(),
                         TeamNumber = i,
                         Tokens = createPlaygroundRequest.TeamToken,
-                        MaxMembers = createPlaygroundRequest.MaxTeamMember,
-                        PlaygroundId = playground.Id,
+                        HostRoomCode = createPlaygroundRequest.HostRoomCode,
+                        PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
                         CreationDate = DateTime.Now,
                         ModifiedDate = null
                     };
