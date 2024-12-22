@@ -43,12 +43,12 @@ namespace SnowFlake.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetByRoomCode(GetPlaygroundByRoomCodeRequest getPlaygroundByRoomCodeRequest)
+        [HttpGet("HostRoomCode")]
+        public async Task<IActionResult> GetByRoomCode(string hostRoomCode)
         {
             try
             {
-                var playgroundResponse = await _playgroundService.GetPlayground(getPlaygroundByRoomCodeRequest.RoomCode);
+                var playgroundResponse = await _playgroundService.GetPlayground(hostRoomCode);
                 if (playgroundResponse == null)
                 {
                     return NotFound(new GetPlaygroundByRoomCodeResponse
