@@ -88,7 +88,7 @@ namespace SnowFlake.Services
                     {
                         RoundNumber = round.Key,
                         Duration = round.Value,
-                        Progress = RoundState.Pending.Name,
+                        Progress = RoundState.Pending.Name
                     });
                 }
 
@@ -106,6 +106,27 @@ namespace SnowFlake.Services
 
                 for (int i = 1; i < createPlaygroundRequest.NumberOfTeam + 1; i++)
                 {
+                    var products = new List<Product>
+                    {
+                        new Product
+                        {
+                            ProductName = "Scissor",
+                            Price = 5,
+                            RemainingStock = 1
+                        },
+                        new Product
+                        {
+                            ProductName = "Paper",
+                            Price = 2,
+                            RemainingStock = 10
+                        },
+                        new Product
+                        {
+                            ProductName = "Pen",
+                            Price = 5,
+                            RemainingStock = 1
+                        }
+                    };
                     var team = new TeamEntity
                     {
                         Id = ObjectId.GenerateNewId().ToString(),
@@ -113,7 +134,7 @@ namespace SnowFlake.Services
                         Tokens = createPlaygroundRequest.TeamToken,
                         HostRoomCode = createPlaygroundRequest.HostRoomCode,
                         PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
-                        TeamStocks = new List<Product>(),
+                        TeamStocks = products,
                         CreationDate = DateTime.Now,
                         ModifiedDate = null
                     };
