@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using MongoDB.Bson;
 using SnowFlake.Dtos;
-using SnowFlake.Dtos.APIs.Player.UpdatePlayer;
 using SnowFlake.Dtos.APIs.Playground;
 using SnowFlake.Dtos.APIs.Playground.UpdatePlayground;
 using SnowFlake.Hubs;
@@ -120,7 +119,7 @@ namespace SnowFlake.Services
                 var existingPlayground = (await _unitOfWork.PlaygroundRepository.GetBy(w => w.HostRoomCode == updatePlaygroundRequest.HostRoomCode)).SingleOrDefault();
 
                 if (existingPlayground is null || existingPlayground.Id != updatePlaygroundRequest.Id) return string.Empty;
-                
+
                 existingPlayground.Rounds = updatePlaygroundRequest.Rounds;
                 existingPlayground.ModifiedDate = DateTime.Now;
 
