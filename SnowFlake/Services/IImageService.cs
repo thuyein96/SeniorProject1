@@ -1,9 +1,8 @@
-﻿using SnowFlake.Dtos.APIs.Image.CreateImage;
-using SnowFlake.Dtos;
-using SnowFlake.Dtos.APIs.Image.UpdateImage;
+﻿using SnowFlake.Dtos;
+using SnowFlake.Dtos.APIs.Image.CreateImage;
 using SnowFlake.Dtos.APIs.Image.DeleteImage;
 using SnowFlake.Dtos.APIs.Image.GetImage;
-using SnowFlake.Dtos.APIs.Image.GetImages;
+using SnowFlake.Dtos.APIs.Image.UpdateImage;
 
 namespace SnowFlake.Services;
 

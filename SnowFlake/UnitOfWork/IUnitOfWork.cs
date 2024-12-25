@@ -11,6 +11,7 @@ public interface IUnitOfWork
     IImageRepository ImageRepository { get; }
     IRoundRepository RoundRepository { get; }
     IGameStateRepository GameStateRepository { get; }
+    IShopRepository ShopRepository { get; }
 
     //Commit stages (insert, update, delete)
     Task Commit();

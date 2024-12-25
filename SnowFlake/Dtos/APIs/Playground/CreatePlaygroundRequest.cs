@@ -9,4 +9,7 @@ public class CreatePlaygroundRequest
     public Dictionary<int, string> Rounds { get; set; }
     public int NumberOfTeam { get; set; }
     public int TeamToken { get; set; }
+    public int ShopToken { get; set; }
+    public List<Product> Shop { get; set; }
+
 }

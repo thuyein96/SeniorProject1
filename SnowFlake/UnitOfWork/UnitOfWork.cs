@@ -71,6 +71,15 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
+    private IShopRepository _shopRepository;
+    public IShopRepository ShopRepository
+    {
+        get
+        {
+            return _shopRepository = _shopRepository ?? new ShopRepository(_snowFlakeDbContext);
+        }
+    }
+
     public async Task Commit()
     {
         _snowFlakeDbContext.SaveChanges();

@@ -75,12 +75,6 @@ namespace SnowFlake.Services
         //}
 
 
-
-
-
-
-
-
         public async Task<PlaygroundEntity> Create(CreatePlaygroundRequest createPlaygroundRequest)
         {
             try
@@ -119,16 +113,27 @@ namespace SnowFlake.Services
                         Tokens = createPlaygroundRequest.TeamToken,
                         HostRoomCode = createPlaygroundRequest.HostRoomCode,
                         PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
+                        TeamStocks = new List<Product>(),
                         CreationDate = DateTime.Now,
                         ModifiedDate = null
                     };
 
-                    _unitOfWork.TeamRepository.Create(team);
-                    _unitOfWork.Commit();
+                    await _unitOfWork.TeamRepository.Create(team);
+                    await _unitOfWork.Commit();
                 }
 
-                _unitOfWork.PlaygroundRepository.Create(playground);
-                _unitOfWork.Commit();
+                var shop = new ShopEntity
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    HostRoomCode = createPlaygroundRequest.HostRoomCode,
+                    PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
+                    Tokens = createPlaygroundRequest.ShopToken,
+                    ShopStocks = createPlaygroundRequest.Shop
+                };
+                await _unitOfWork.ShopRepository.Create(shop);
+
+                await _unitOfWork.PlaygroundRepository.Create(playground);
+                await _unitOfWork.Commit();
                 return playground;
             }
             catch (Exception)

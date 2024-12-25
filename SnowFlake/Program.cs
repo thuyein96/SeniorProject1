@@ -1,7 +1,5 @@
-using Azure.Identity;
 using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using SnowFlake.Azure.BlobsStorageService;
 using SnowFlake.DAO;
 using SnowFlake.Dtos;
@@ -26,6 +24,7 @@ builder.Services.AddTransient<IPlayerService, PlayerService>();
 builder.Services.AddTransient<ITeamService, TeamService>();
 builder.Services.AddTransient<IPlaygroundService, PlaygroundService>();
 builder.Services.AddSingleton<ITimerService, TimerService>();
+builder.Services.AddTransient<IShopService, ShopService>();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
