@@ -21,60 +21,6 @@ namespace SnowFlake.Services
             _hubContext = hubContext;
         }
 
-        //public async Task StartGame(string playerId, string roomCode)
-        //{
-        //    var gameRules = _unitOfWork.PlaygroundRepository.GetBy(p => p.PlayerId == playerId && p.RoomCode == roomCode).FirstOrDefault();
-        //    if (gameRules == null) return;
-
-        //    if (gameRules.Rounds[0].Progress == GameProgress.Pending.ToString())
-        //        gameRules.Rounds[0].Progress = GameProgress.OnGoing.ToString();
-
-
-        //    _unitOfWork.PlaygroundRepository.Update(gameRules);
-        //    _unitOfWork.Commit();
-
-        //    await RunCountdown(gameRules.Rounds[0].Id, gameRules.Rounds[0].Duration);
-        //}
-
-        //private async Task RunCountdown(string roundId, string duration)
-        //{
-        //    var remainingTime = Utils.ConvertToSeconds(duration);
-
-        //    // Send the initial countdown time to all clients
-        //    await _hubContext.Clients.All.SendAsync("SendTimerUpdate", remainingTime);
-
-        //    // Countdown loop
-        //    while (remainingTime > 0)
-        //    {
-        //        // Broadcast the updated time to all connected clients
-        //        await _hubContext.Clients.All.SendAsync("SendTimerUpdate", remainingTime);
-
-        //        await Task.Delay(1000); // Wait for 1 second
-        //        remainingTime--;
-        //    }
-
-        //    // Round has ended, notify clients
-        //    await EndRound(roundId);
-        //}
-
-        //public async Task EndRound(string playgroundId, string roundId)
-        //{
-        //    var round = _unitOfWork.PlaygroundRepository.GetBy(p => p.Id == playgroundId).FirstOrDefault();
-        //    if (round != null)
-        //    {
-        //        var progress = round.Rounds.Where(r => r.Id == roundId).FirstOrDefault().Progress;
-        //        if(string.IsNullOrWhiteSpace(progress) || progress != GameProgress.Finished.Name)
-        //        {
-        //            progress = GameProgress.Finished.Name;
-        //        }
-        //        await _context.SaveChangesAsync();
-        //    }
-
-        //    // Notify all clients that the round has ended
-        //    await _hubContext.Clients.All.SendAsync("RoundEnded", roundId);
-        //}
-
-
         public async Task<PlaygroundEntity> Create(CreatePlaygroundRequest createPlaygroundRequest)
         {
             try
@@ -92,41 +38,8 @@ namespace SnowFlake.Services
                     });
                 }
 
-                var playground = new PlaygroundEntity
-                {
-                    Id = ObjectId.GenerateNewId().ToString(),
-                    HostRoomCode = createPlaygroundRequest.HostRoomCode,
-                    PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
-                    NumberOfTeam = createPlaygroundRequest.NumberOfTeam,
-                    TeamToken = createPlaygroundRequest.TeamToken,
-                    Rounds = rounds,
-                    CreationDate = DateTime.Now,
-                    ModifiedDate = null
-                };
-
                 for (int i = 1; i < createPlaygroundRequest.NumberOfTeam + 1; i++)
                 {
-                    var products = new List<Product>
-                    {
-                        new Product
-                        {
-                            ProductName = "Scissor",
-                            Price = 5,
-                            RemainingStock = 1
-                        },
-                        new Product
-                        {
-                            ProductName = "Paper",
-                            Price = 2,
-                            RemainingStock = 10
-                        },
-                        new Product
-                        {
-                            ProductName = "Pen",
-                            Price = 5,
-                            RemainingStock = 1
-                        }
-                    };
                     var team = new TeamEntity
                     {
                         Id = ObjectId.GenerateNewId().ToString(),
@@ -134,7 +47,12 @@ namespace SnowFlake.Services
                         Tokens = createPlaygroundRequest.TeamToken,
                         HostRoomCode = createPlaygroundRequest.HostRoomCode,
                         PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
-                        TeamStocks = products,
+                        TeamStocks = createPlaygroundRequest.Shop.Select(p => new Product
+                        {
+                            ProductName = p.ProductName,
+                            Price = p.Price,
+                            RemainingStock = 0
+                        }).ToList(),
                         CreationDate = DateTime.Now,
                         ModifiedDate = null
                     };
@@ -151,10 +69,23 @@ namespace SnowFlake.Services
                     Tokens = createPlaygroundRequest.ShopToken,
                     ShopStocks = createPlaygroundRequest.Shop
                 };
-                await _unitOfWork.ShopRepository.Create(shop);
 
+                var playground = new PlaygroundEntity
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    HostRoomCode = createPlaygroundRequest.HostRoomCode,
+                    PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
+                    NumberOfTeam = createPlaygroundRequest.NumberOfTeam,
+                    TeamToken = createPlaygroundRequest.TeamToken,
+                    Rounds = rounds,
+                    CreationDate = DateTime.Now,
+                    ModifiedDate = null
+                };
+
+                await _unitOfWork.ShopRepository.Create(shop);
                 await _unitOfWork.PlaygroundRepository.Create(playground);
                 await _unitOfWork.Commit();
+
                 return playground;
             }
             catch (Exception)
