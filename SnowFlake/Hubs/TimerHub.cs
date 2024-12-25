@@ -8,7 +8,7 @@ namespace SnowFlake.Hubs
     {
         private readonly ITimerService _timerService;
 
-        public TimerHub(ITimerService timerService)
+        public TimerHub(ITimerService timerService, IPlaygroundService playgroundService)
         {
             _timerService = timerService;
         }

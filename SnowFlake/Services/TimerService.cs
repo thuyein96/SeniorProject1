@@ -24,8 +24,8 @@ public class TimerService : ITimerService
         {
             TotalSeconds = seconds,
             RemainingSeconds = seconds,
-            Status = TimerStatus.Running,
-            CancellationTokenSource = new CancellationTokenSource()
+            Status = TimerStatus.Running
+            //CancellationTokenSource = new CancellationTokenSource()
         };
 
         // Store the timer state
@@ -42,14 +42,15 @@ public class TimerService : ITimerService
         var timerState = _timerStates[connectionId];
 
         // Continue until time is up or timer is stopped
-        while (timerState.RemainingSeconds > 0 && !timerState.CancellationTokenSource.IsCancellationRequested)
+        while (timerState.RemainingSeconds > 0 && timerState.Status == TimerStatus.Running)
         {
             var remainingSeconds = Utils.SecondsToString(timerState.RemainingSeconds);
 
+            // Reduce remaining time
+            timerState.RemainingSeconds--;
             // You would typically broadcast the update to the client here
             await _timerHubContext.Clients.Client(connectionId).SendAsync("TimerUpdate", remainingSeconds);
-            // Reduce remaining time
-            if (timerState.Status == TimerStatus.Running) timerState.RemainingSeconds--;
+            
             // Wait for 1 second
             await Task.Delay(1000);
 
@@ -70,7 +71,7 @@ public class TimerService : ITimerService
             timerState.Status == TimerStatus.Running)
         {
             // Cancel the current timer
-            timerState.CancellationTokenSource.Cancel();
+            // timerState.CancellationTokenSource.Cancel();
             timerState.Status = TimerStatus.Paused;
 
             await _timerHubContext.Clients.Client(connectionId).SendAsync("TimerPaused");
@@ -84,8 +85,9 @@ public class TimerService : ITimerService
         if (_timerStates.TryGetValue(connectionId, out var timerState) &&
             timerState.Status == TimerStatus.Paused)
         {
+            timerState.RemainingSeconds++;
             // Reset cancellation token and status
-            timerState.CancellationTokenSource = new CancellationTokenSource();
+            // timerState.CancellationTokenSource = new CancellationTokenSource();
             timerState.Status = TimerStatus.Running;
 
             // Restart the timer
@@ -100,7 +102,7 @@ public class TimerService : ITimerService
         if (_timerStates.TryGetValue(connectionId, out var timerState))
         {
             // Cancel the timer
-            timerState.CancellationTokenSource.Cancel();
+            //timerState.CancellationTokenSource.Cancel();
             timerState.Status = TimerStatus.Stopped;
 
             // Remove the timer state
