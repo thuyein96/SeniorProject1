@@ -22,7 +22,7 @@ public class GameStateService : IGameStateService
         {
             HostRoomCode = createGameStateRequest.HostRoomCode,
             PlayerRoomCode = createGameStateRequest.PlayerRoomCode,
-            CurrentState = GameState.TeamCreation.Value
+            CurrentGameState = GameState.TeamCreation.Value
         };
 
         _unitOfWork.GameStateRepository.Create(gameStateEntity);
@@ -60,7 +60,7 @@ public class GameStateService : IGameStateService
 
             if (existingGameState == null) return string.Empty;
 
-            existingGameState.CurrentState = updateGameStateRequest.CurrentGameState;
+            existingGameState.CurrentGameState = updateGameStateRequest.CurrentGameState;
 
             await _unitOfWork.GameStateRepository.Update(existingGameState);
             await _unitOfWork.Commit();
