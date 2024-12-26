@@ -22,6 +22,7 @@ options.UseMongoDB(mongoDBSettings.AtlasUrl ?? "", mongoDBSettings.DatabaseName 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IPlayerService, PlayerService>();
 builder.Services.AddTransient<ITeamService, TeamService>();
+builder.Services.AddTransient<IGameStateService, GameStateService>();
 builder.Services.AddTransient<IPlaygroundService, PlaygroundService>();
 builder.Services.AddSingleton<ITimerService, TimerService>();
 builder.Services.AddTransient<IShopService, ShopService>();
