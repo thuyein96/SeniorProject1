@@ -3,6 +3,7 @@ using SnowFlake.Dtos.APIs.GameState.CreateGameState;
 using SnowFlake.Dtos.APIs.GameState.GetGameState;
 using SnowFlake.Dtos.APIs.GameState.UpdateGameState;
 using SnowFlake.UnitOfWork;
+using SnowFlake.Utilities;
 
 namespace SnowFlake.Services;
 
@@ -21,7 +22,7 @@ public class GameStateService : IGameStateService
         {
             HostRoomCode = createGameStateRequest.HostRoomCode,
             PlayerRoomCode = createGameStateRequest.PlayerRoomCode,
-            CurrentState = string.Empty
+            CurrentState = GameState.TeamCreation.Value
         };
 
         _unitOfWork.GameStateRepository.Create(gameStateEntity);
