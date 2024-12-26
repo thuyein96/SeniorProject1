@@ -1,4 +1,5 @@
-﻿using SnowFlake.Dtos;
+﻿using MongoDB.Bson;
+using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.GameState.CreateGameState;
 using SnowFlake.Dtos.APIs.GameState.GetGameState;
 using SnowFlake.Dtos.APIs.GameState.UpdateGameState;
@@ -18,15 +19,19 @@ public class GameStateService : IGameStateService
     public async Task<GameStateEntity> AddGameState(CreateGameStateRequest createGameStateRequest)
     {
         if (createGameStateRequest == null) return null;
+
+        if (createGameStateRequest.CurrentGameState != GameState.TeamCreation.Value) return null;
         var gameStateEntity = new GameStateEntity
         {
+            Id = ObjectId.GenerateNewId().ToString(),
             HostRoomCode = createGameStateRequest.HostRoomCode,
             PlayerRoomCode = createGameStateRequest.PlayerRoomCode,
-            CurrentGameState = GameState.TeamCreation.Value
+            CurrentGameState = createGameStateRequest.CurrentGameState,
+            CreationDate = DateTime.Now
         };
 
-        _unitOfWork.GameStateRepository.Create(gameStateEntity);
-        _unitOfWork.Commit();
+        await _unitOfWork.GameStateRepository.Create(gameStateEntity);
+        await _unitOfWork.Commit();
 
         return gameStateEntity;
     }
@@ -61,6 +66,7 @@ public class GameStateService : IGameStateService
             if (existingGameState == null) return string.Empty;
 
             existingGameState.CurrentGameState = updateGameStateRequest.CurrentGameState;
+            existingGameState.ModifiedDate = DateTime.Now;
 
             await _unitOfWork.GameStateRepository.Update(existingGameState);
             await _unitOfWork.Commit();
