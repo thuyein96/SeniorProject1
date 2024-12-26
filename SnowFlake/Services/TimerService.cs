@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using SnowFlake.Hubs;
 using SnowFlake.Services;
-using SnowFlake.Utilities;
+using SnowFlake.Utilities;                                                                                                                                                                                                                                                                                                                                                     
 
 public class TimerService : ITimerService
 {
-    private Dictionary<string, TimerState> _timerStates = new Dictionary<string, TimerState>();
+    private TimerState _timerStates = new TimerState();
     private readonly IHubContext<TimerHub> _timerHubContext;
+    public static HashSet<string> _connectedIds = new HashSet<string>();
+
 
     public TimerService(IHubContext<TimerHub> timerHubContext)
     {
@@ -14,41 +16,49 @@ public class TimerService : ITimerService
     }
 
     // Method to start the timer
-    public async Task StartTimer(string connectionId, int seconds)
+    public async Task CreateTimer(string connectionId, int seconds)
     {
+        if (await ContainUserId(connectionId) == false) return;
+
         // Stop any existing timer for this connection
         StopTimer(connectionId);
 
         // Create a new timer state
-        var timerState = new TimerState
+        _timerStates = new TimerState
         {
             TotalSeconds = seconds,
             RemainingSeconds = seconds,
             Status = TimerStatus.Running,
             CancellationTokenSource = new CancellationTokenSource()
         };
+    }
 
-        // Store the timer state
-        _timerStates[connectionId] = timerState;
+    public async Task JoinUserGroup(string connectionId)
+    {
+        if (await ContainUserId(connectionId) == true) return;
+        _connectedIds.Add(connectionId);
+    }
 
-        // Start the timer in the background
-        RunTimer(connectionId);
+    public async Task LeaveUserGroup(string connectionId)
+    {
+        if (await ContainUserId(connectionId) == false) return;
+        _connectedIds.Remove(connectionId);
     }
 
     // Background method to run the timer
-    private async void RunTimer(string connectionId)
+    public async Task StartTimer(string connectionId)
     {
+        if (await ContainUserId(connectionId) == false) return;
         // Get the timer state for this connection
-        var timerState = _timerStates[connectionId];
+        var timerState = _timerStates;
 
         // Continue until time is up or timer is stopped
         while (timerState.RemainingSeconds > 0 && timerState.Status == TimerStatus.Running)
         {
             var remainingSeconds = Utils.SecondsToString(timerState.RemainingSeconds);
 
-            
             // You would typically broadcast the update to the client here
-            await _timerHubContext.Clients.Client(connectionId).SendAsync("TimerUpdate", remainingSeconds);
+            await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("TimerUpdate", remainingSeconds);
 
             // Wait for 1 second
             await Task.Delay(1000);
@@ -59,7 +69,7 @@ public class TimerService : ITimerService
             // Check if timer is complete
             if (timerState.RemainingSeconds <= 0)
             {
-                _timerStates.Remove(connectionId);
+                _timerStates = new TimerState();
                 break;
             }
         }
@@ -68,77 +78,95 @@ public class TimerService : ITimerService
     // Method to pause the timer
     public async Task PauseTimer(string connectionId)
     {
+        if (await ContainUserId(connectionId) == false) return;
+
         // Check if timer exists and is running
-        if (_timerStates.TryGetValue(connectionId, out var timerState) &&
-            timerState.Status == TimerStatus.Running)
+        if (_timerStates is not null &&
+            _timerStates.Status == TimerStatus.Running)
         {
             // Cancel the current timer
-            timerState.CancellationTokenSource.Cancel();
-            timerState.CancellationTokenSource = new CancellationTokenSource();
-            timerState.Status = TimerStatus.Paused;
+            _timerStates.CancellationTokenSource.Cancel();
+            _timerStates.CancellationTokenSource = new CancellationTokenSource();
+            _timerStates.Status = TimerStatus.Paused;
 
-            await _timerHubContext.Clients.Client(connectionId).SendAsync("TimerPaused");
+            await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("TimerPaused");
         }
     }
 
     // Method to resume the timer
     public async Task ResumeTimer(string connectionId)
     {
+        if (await ContainUserId(connectionId) == false) return;
+
         // Check if timer exists and is paused
-        if (_timerStates.TryGetValue(connectionId, out var timerState) &&
-            timerState.Status == TimerStatus.Paused)
+        if (_timerStates is not null &&
+            _timerStates.Status == TimerStatus.Paused)
         {
-            timerState.RemainingSeconds++;
+            _timerStates.RemainingSeconds++;
             // Reset cancellation token and status
-            timerState.CancellationTokenSource.Cancel();
-            timerState.CancellationTokenSource = new CancellationTokenSource();
-            timerState.Status = TimerStatus.Running;
+            _timerStates.CancellationTokenSource.Cancel();
+            _timerStates.CancellationTokenSource = new CancellationTokenSource();
+            _timerStates.Status = TimerStatus.Running;
 
             // Restart the timer
-            RunTimer(connectionId);
+            StartTimer(connectionId);
         }
     }
 
     // Method to stop the timer
     public async Task StopTimer(string connectionId)
     {
+        if (await ContainUserId(connectionId) == false) return;
+
         // Check if timer exists
-        if (_timerStates.TryGetValue(connectionId, out var timerState))
+        if (_timerStates is not null && _timerStates.CancellationTokenSource is not null)
         {
             // Cancel the timer
-            timerState.CancellationTokenSource.Cancel();
-            timerState.Status = TimerStatus.Stopped;
+            _timerStates.CancellationTokenSource.Cancel();
+            _timerStates.CancellationTokenSource = new CancellationTokenSource();
+            _timerStates.Status = TimerStatus.Stopped;
 
             // Remove the timer state
-            _timerStates.Remove(connectionId);
+            _timerStates = new TimerState();
 
-            await _timerHubContext.Clients.Client(connectionId).SendAsync("TimerStopped");
+            await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("TimerStopped");
         }
     }
 
     public async Task ModifyTimer(string connectionId, int secondsToModify)
     {
+        if (await ContainUserId(connectionId) == false) return;
+
         // Check if the timer exists
-        if (_timerStates.TryGetValue(connectionId, out var timerState))
+        if (_timerStates is not null && _timerStates.CancellationTokenSource is not null)
         {
-            if (timerState.RemainingSeconds > 0)
+            if (_timerStates.RemainingSeconds > 0)
             {
                 // Update the remaining time
-                timerState.RemainingSeconds += secondsToModify;
+                _timerStates.RemainingSeconds += secondsToModify;
                 // Notify the client about the updated time
-                var remainingSeconds = Utils.SecondsToString(timerState.RemainingSeconds);
-                await _timerHubContext.Clients.Client(connectionId).SendAsync("TimerUpdated", remainingSeconds);
+                var remainingSeconds = Utils.SecondsToString(_timerStates.RemainingSeconds);
+                await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("TimerUpdated", remainingSeconds);
             }
             else
             {
                 // Handle the case where the timer has already expired
-                await _timerHubContext.Clients.Client(connectionId).SendAsync("Error", "Timer has already expired.");
+                await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("Error", "Timer has already expired.");
             }
         }
         else
         {
             // Handle the case where the timer does not exist
-            await _timerHubContext.Clients.Client(connectionId).SendAsync("Error", "Timer not found.");
+            await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("Error", "Timer not found.");
         }
+    }
+
+    private async Task<bool> ContainUserId(string connectionId)
+    {
+        if (_connectedIds.Contains(connectionId))
+        {
+            return true;
+        }
+        return false;
     }
 }

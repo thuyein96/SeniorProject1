@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using SnowFlake.Hubs.ConnectIDHandler;
 using SnowFlake.Services;
 using SnowFlake.Utilities;
 
@@ -17,21 +18,25 @@ namespace SnowFlake.Hubs
             await Clients.Caller.SendAsync("ReceivedMessage", $"{Context.ConnectionId} is connected");
         }
 
-        public async Task JoinRoom(string roomName)
+        public async Task JoinUser()
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
-            await Clients.Group(roomName).SendAsync("ReceivedMessage", Context.User.Identity.Name + " joined.");
+            await _timerService.JoinUserGroup(Context.ConnectionId);
         }
 
-        public async Task LeaveRoom(string roomName)
+        public async Task LeaveUser()
         {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomName);
+            await _timerService.LeaveUserGroup(Context.ConnectionId);
         }
 
-        public async Task StartTimer(string durationSeconds)
+        public async Task CreateTimer(string durationSeconds)
         {
             var timer = Utils.ConvertToSeconds(durationSeconds);
-            await _timerService.StartTimer(Context.ConnectionId, timer);
+            await _timerService.CreateTimer(Context.ConnectionId, timer);
+        }
+
+        public async Task StartTimer()
+        {
+            await _timerService.StartTimer(Context.ConnectionId);
         }
 
         public async Task PauseTimer()
