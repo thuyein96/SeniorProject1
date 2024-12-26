@@ -55,7 +55,7 @@ public class GameStateService : IGameStateService
     {
         try
         {
-            var existingGameState = (await _unitOfWork.GameStateRepository.GetBy(g => g.Id == updateGameStateRequest.Id)).FirstOrDefault();
+            var existingGameState = (await _unitOfWork.GameStateRepository.GetBy(g => g.HostRoomCode == updateGameStateRequest.HostRoomCode)).FirstOrDefault();
 
             if (existingGameState == null) return string.Empty;
 
