@@ -2,8 +2,8 @@
 
 public interface ITimerService
 {
-    Task JoinUserGroup(string connectionId);
-    Task LeaveUserGroup(string connectionId);
+    Task JoinUserGroup(string connectionId, string roomCode);
+    Task LeaveUserGroup(string connectionId, string roomCode);
     Task CreateTimer(string connectionId, int seconds); 
     Task StartTimer(string connectionId);
     Task PauseTimer(string connectionId);

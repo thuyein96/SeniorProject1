@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using SnowFlake.Hubs;
 using SnowFlake.Services;
-using SnowFlake.Utilities;                                                                                                                                                                                                                                                                                                                                                     
+using SnowFlake.Utilities;
+using System.Text.RegularExpressions;
 
 public class TimerService : ITimerService
 {
     private TimerState _timerStates = new TimerState();
     private readonly IHubContext<TimerHub> _timerHubContext;
-    public static HashSet<string> _connectedIds = new HashSet<string>();
-
+    public HashSet<string> _connectedIds = new HashSet<string>();
+    public string _roomCode;
 
     public TimerService(IHubContext<TimerHub> timerHubContext)
     {
@@ -21,7 +22,7 @@ public class TimerService : ITimerService
         if (await ContainUserId(connectionId) == false) return;
 
         // Stop any existing timer for this connection
-        StopTimer(connectionId);
+        await StopTimer(connectionId);
 
         // Create a new timer state
         _timerStates = new TimerState
@@ -31,18 +32,26 @@ public class TimerService : ITimerService
             Status = TimerStatus.Running,
             CancellationTokenSource = new CancellationTokenSource()
         };
+
+        var timer = Utils.SecondsToString(seconds);
+        await _timerHubContext.Clients.Group(_roomCode).SendAsync("CreateTimer", $"{timer} Timer is created");
     }
 
-    public async Task JoinUserGroup(string connectionId)
+    public async Task JoinUserGroup(string connectionId, string roomCode)
     {
         if (await ContainUserId(connectionId) == true) return;
         _connectedIds.Add(connectionId);
+        _roomCode = roomCode;
+        await _timerHubContext.Groups.AddToGroupAsync(connectionId, roomCode);
+        await _timerHubContext.Clients.Group(roomCode).SendAsync("JoinUserGroup", $"{connectionId} joined the '{roomCode}' group.");
+        //await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("JoinUserGroup", $"{connectionId} joined the user group.");
     }
 
-    public async Task LeaveUserGroup(string connectionId)
+    public async Task LeaveUserGroup(string connectionId, string roomCode)
     {
         if (await ContainUserId(connectionId) == false) return;
         _connectedIds.Remove(connectionId);
+        await _timerHubContext.Groups.RemoveFromGroupAsync(connectionId, roomCode);
     }
 
     // Background method to run the timer
@@ -55,10 +64,13 @@ public class TimerService : ITimerService
         // Continue until time is up or timer is stopped
         while (timerState.RemainingSeconds > 0 && timerState.Status == TimerStatus.Running)
         {
+            timerState.CancellationTokenSource.Token.ThrowIfCancellationRequested();
+
             var remainingSeconds = Utils.SecondsToString(timerState.RemainingSeconds);
 
             // You would typically broadcast the update to the client here
-            await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("TimerUpdate", remainingSeconds);
+            await _timerHubContext.Clients.Group(_roomCode).SendAsync("TimerUpdate", remainingSeconds);
+            //await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("TimerUpdate", remainingSeconds);
 
             // Wait for 1 second
             await Task.Delay(1000);
@@ -89,7 +101,7 @@ public class TimerService : ITimerService
             _timerStates.CancellationTokenSource = new CancellationTokenSource();
             _timerStates.Status = TimerStatus.Paused;
 
-            await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("TimerPaused");
+            await _timerHubContext.Clients.Group(_roomCode).SendAsync("TimerPaused");
         }
     }
 
@@ -109,7 +121,7 @@ public class TimerService : ITimerService
             _timerStates.Status = TimerStatus.Running;
 
             // Restart the timer
-            StartTimer(connectionId);
+            await StartTimer(connectionId);
         }
     }
 
@@ -129,7 +141,7 @@ public class TimerService : ITimerService
             // Remove the timer state
             _timerStates = new TimerState();
 
-            await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("TimerStopped");
+            await _timerHubContext.Clients.Group(_roomCode).SendAsync("TimerStopped");
         }
     }
 
@@ -151,7 +163,7 @@ public class TimerService : ITimerService
             else
             {
                 // Handle the case where the timer has already expired
-                await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("Error", "Timer has already expired.");
+                await _timerHubContext.Clients.Group(_roomCode).SendAsync("Error", "Timer has already expired.");
             }
         }
         else
