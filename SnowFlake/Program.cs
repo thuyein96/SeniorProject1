@@ -4,6 +4,7 @@ using SnowFlake.Azure.BlobsStorageService;
 using SnowFlake.DAO;
 using SnowFlake.Dtos;
 using SnowFlake.Hubs;
+using SnowFlake.Managers;
 using SnowFlake.Services;
 using SnowFlake.UnitOfWork;
 
@@ -21,6 +22,7 @@ options.UseMongoDB(mongoDBSettings.AtlasUrl ?? "", mongoDBSettings.DatabaseName 
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IPlayerService, PlayerService>();
+builder.Services.AddTransient<IPlayerManager, PlayerManager>();
 builder.Services.AddTransient<ITeamService, TeamService>();
 builder.Services.AddTransient<IGameStateService, GameStateService>();
 builder.Services.AddTransient<IPlaygroundService, PlaygroundService>();

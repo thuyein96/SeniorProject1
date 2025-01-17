@@ -5,6 +5,7 @@ using SnowFlake.Dtos.APIs.Player;
 using SnowFlake.Dtos.APIs.Player.UpdatePlayer;
 using SnowFlake.UnitOfWork;
 using SnowFlake.Utilities;
+using System.Runtime.InteropServices;
 
 namespace SnowFlake.Services;
 
@@ -26,9 +27,8 @@ public class PlayerService : IPlayerService
         {
             Id = ObjectId.GenerateNewId().ToString(),
             Name = createPlayerRequest.Name,
-            Email = createPlayerRequest.Email,
             TeamId = createPlayerRequest.TeamId,
-            PlaygroundId = createPlayerRequest.PlaygroundId,
+            RoomCode = createPlayerRequest.RoomdCode,
             CreationDate = DateTime.Now,
             ModifiedDate = null
         };
@@ -45,9 +45,7 @@ public class PlayerService : IPlayerService
         {
             Id = p.Id,
             Name = p.Name,
-            Email = p.Email,
             TeamId = p.TeamId,
-            PlaygroundId = p.PlaygroundId,
             RoomCode = p.RoomCode,
             CreationDate = p.CreationDate,
             ModifiedDate = p.ModifiedDate
@@ -65,9 +63,7 @@ public class PlayerService : IPlayerService
         {
             Id = p.Id,
             Name = p.Name,
-            Email = p.Email,
             TeamId = p.TeamId,
-            PlaygroundId = p.PlaygroundId,
             RoomCode = p.RoomCode,
             CreationDate = p.CreationDate,
             ModifiedDate = p.ModifiedDate
@@ -75,6 +71,26 @@ public class PlayerService : IPlayerService
 
         return player;
     }
+
+    public async Task<PlayerEntity> GetPlayerByName(string playerName, [Optional] string? teamId, [Optional] string? playerRoomCode)
+    {
+        if (string.IsNullOrWhiteSpace(playerName)) return null;
+        if (string.IsNullOrWhiteSpace(teamId) &&
+            string.IsNullOrWhiteSpace(playerRoomCode))
+        {
+            return (await _unitOfWork.PlayerRepository.GetBy(p => p.Name == playerName && p.TeamId == null)).FirstOrDefault();
+        }
+        return (await _unitOfWork.PlayerRepository.GetBy(p => p.Name == playerName && p.TeamId == teamId && p.RoomCode == playerRoomCode)).FirstOrDefault();
+    }
+
+    //public async Task<PlayerEntity> GetPlayerByName(string playerName)
+    //{
+    //    if (string.IsNullOrWhiteSpace(playerName)) return null;
+
+    //    var player = (await _unitOfWork.PlayerRepository.GetBy(p => p.Name == playerName && p.TeamId == null)).FirstOrDefault();
+
+    //    return player;
+    //}
 
     public async Task<List<PlayerItem>> GetPlayersByTeamId(string teamId)
     {
@@ -85,9 +101,7 @@ public class PlayerService : IPlayerService
         {
             Id = p.Id,
             Name = p.Name,
-            Email = p.Email,
             TeamId = p.TeamId,
-            PlaygroundId = p.PlaygroundId,
             RoomCode = p.RoomCode,
             CreationDate = p.CreationDate,
             ModifiedDate = p.ModifiedDate
@@ -98,25 +112,23 @@ public class PlayerService : IPlayerService
     public async Task<string> Update(UpdatePlayerRequest updatePlayerRequest)
     {
         if (updatePlayerRequest is null) return string.Empty;
-        if (!string.IsNullOrWhiteSpace(updatePlayerRequest.TeamId))
-            if (!Utils.IsValidObjectId(updatePlayerRequest.TeamId))
-                return string.Empty;
+        //if (!string.IsNullOrWhiteSpace(updatePlayerRequest.TeamId))
+        //    if (!Utils.IsValidObjectId(updatePlayerRequest.TeamId))
+        //        return string.Empty;
 
         var existingPlayer = (await _unitOfWork.PlayerRepository.GetBy(w => w.Id == updatePlayerRequest.Id)).SingleOrDefault();
 
         if (existingPlayer is null || existingPlayer.Id != updatePlayerRequest.Id) return string.Empty;
 
         existingPlayer.Name = updatePlayerRequest.PlayerName;
-        existingPlayer.Email = updatePlayerRequest.Email;
         existingPlayer.TeamId = updatePlayerRequest.TeamId;
-        existingPlayer.PlaygroundId = updatePlayerRequest.PlaygroundId;
         existingPlayer.RoomCode = updatePlayerRequest.RoomCode;
         existingPlayer.ModifiedDate = DateTime.Now;
 
         await _unitOfWork.PlayerRepository.Update(existingPlayer);
         await _unitOfWork.Commit();
 
-        return $"[ID: {existingPlayer.Id}] Successfully Updated";
+        return $"Player {existingPlayer.Name} is successfully updated";
     }
 
 

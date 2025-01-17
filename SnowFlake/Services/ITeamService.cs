@@ -12,6 +12,7 @@ public interface ITeamService
     Task<TeamEntity> Create(CreateTeamRequest createTeamRequest);
     //Reterive
     Task<List<TeamEntity>> GetAll();
+    Task<TeamEntity> GetTeam(int teamNumber, string playerRoomCode);
     //GetByRoomCode
     Task<List<TeamEntity>> GetTeamsByRoomCode(GetTeamsByRoomCodeRequest getTeamsByRoomCodeRequest);
     Task<string> IsTeamHasPlayer(SearchPlayerRequest searchPlayerRequest);

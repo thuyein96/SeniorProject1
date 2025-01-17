@@ -50,6 +50,20 @@ public class TeamService : ITeamService
         var teams = (await _unitOfWork.TeamRepository.GetAll()).Take(Utils.BatchSize).ToList();
         return teams;
     }
+    public async Task<TeamEntity> GetTeam(int teamNumber, string playerRoomCode)
+    {
+        try
+        {
+            if (teamNumber > 0)
+                return (await _unitOfWork.TeamRepository.GetBy(t => t.TeamNumber == teamNumber && t.PlayerRoomCode == playerRoomCode)).SingleOrDefault();
+            return null;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+
+    }
 
     public async Task<List<TeamEntity>> GetTeamsByRoomCode(GetTeamsByRoomCodeRequest getTeamsByRoomCodeRequest)
      {
@@ -68,6 +82,7 @@ public class TeamService : ITeamService
 
     }
 
+    // search player in team member list
     public async Task<string> IsTeamHasPlayer(SearchPlayerRequest searchPlayerRequest)
     {
         try
@@ -81,7 +96,6 @@ public class TeamService : ITeamService
         }
         catch (Exception)
         {
-
             return string.Empty;
         }
     }

@@ -80,6 +80,16 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
+    private ILeaderboardRepository _leaderboardRepository;
+
+    public ILeaderboardRepository LeaderboardRepository
+    {
+        get
+        {
+            return _leaderboardRepository = _leaderboardRepository ?? new LeaderboardRepository(_snowFlakeDbContext);
+        }
+    }
+
     public async Task Commit()
     {
         _snowFlakeDbContext.SaveChanges();

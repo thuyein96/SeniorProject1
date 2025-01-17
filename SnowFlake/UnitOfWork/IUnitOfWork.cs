@@ -12,6 +12,7 @@ public interface IUnitOfWork
     IRoundRepository RoundRepository { get; }
     IGameStateRepository GameStateRepository { get; }
     IShopRepository ShopRepository { get; }
+    ILeaderboardRepository LeaderboardRepository { get; }
 
     //Commit stages (insert, update, delete)
     Task Commit();

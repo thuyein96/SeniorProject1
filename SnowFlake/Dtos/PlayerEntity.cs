@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using MongoDB.Bson;
 using MongoDB.EntityFrameworkCore;
 
 namespace SnowFlake.Dtos;
@@ -6,8 +7,6 @@ namespace SnowFlake.Dtos;
 public class PlayerEntity : BaseEntity
 {
     public string Name { get; set; }
-    public string? Email { get; set; }
     public string? TeamId { get; set; }
     public string? RoomCode { get; set; }
-    public string? PlaygroundId { get; set; } 
 }

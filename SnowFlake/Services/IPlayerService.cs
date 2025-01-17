@@ -1,10 +1,8 @@
-﻿using MongoDB.Bson;
-using SnowFlake.Dtos;
+﻿using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs;
 using SnowFlake.Dtos.APIs.Player;
-using SnowFlake.Dtos.APIs.Player.GetPlayer;
-using SnowFlake.Dtos.APIs.Player.GetPlayerList;
 using SnowFlake.Dtos.APIs.Player.UpdatePlayer;
+using System.Runtime.InteropServices;
 
 namespace SnowFlake.Services;
 
@@ -16,6 +14,7 @@ public interface IPlayerService
     Task<List<PlayerItem>> GetAll();
     //GetById
     Task<PlayerItem> GetByPlayerId(string playerId);
+    Task<PlayerEntity> GetPlayerByName(string playerName, [Optional] string? teamId, [Optional] string? playerRoomCode);
 
     Task<List<PlayerItem>> GetPlayersByTeamId(string teamId);
     //Update 

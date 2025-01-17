@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SnowFlake.Dtos.APIs;
+using SnowFlake.Dtos.APIs.Player.AddPlayerToTeam;
 using SnowFlake.Dtos.APIs.Player.DeletePlayer;
 using SnowFlake.Dtos.APIs.Player.GetPlayer;
 using SnowFlake.Dtos.APIs.Player.GetPlayerList;
 using SnowFlake.Dtos.APIs.Player.UpdatePlayer;
+using SnowFlake.Managers;
 using SnowFlake.Services;
 
 namespace SnowFlake.Controllers;
@@ -12,10 +14,13 @@ namespace SnowFlake.Controllers;
 public class PlayerController : ControllerBase
 {
     private readonly IPlayerService _playerService;
+    private readonly IPlayerManager _playerManager;
 
-    public PlayerController(IPlayerService playerService)
+    public PlayerController(IPlayerService playerService,
+                            IPlayerManager playerManager)
     {
         _playerService = playerService;
+        _playerManager = playerManager;
     }
 
     [HttpPost]
@@ -162,6 +167,37 @@ public class PlayerController : ControllerBase
             {
                 Success = true,
                 Message = updateMessage
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    [HttpPut("status")]
+    public async Task<IActionResult> ManagePlayer(ManagePlayerRequest managePlayerRequest)
+    {
+        try
+        {
+            if (managePlayerRequest == null) return BadRequest(new ManagePlayerResponse
+            {
+                Success = false,
+                Message = "Request body is empty."
+            });
+            var addMessage = await _playerManager.ManagePlayer(managePlayerRequest);
+            if (string.IsNullOrWhiteSpace(addMessage))
+            {
+                return NotFound(new ManagePlayerResponse
+                {
+                    Success = false,
+                    Message = $"[Team: {managePlayerRequest.TeamNumber}][Player: {managePlayerRequest.PlayerName}] Failed to {managePlayerRequest.Status}."
+                });
+            }
+            return Ok(new ManagePlayerResponse
+            {
+                Success = true,
+                Message = addMessage
             });
         }
         catch (Exception e)
