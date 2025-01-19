@@ -83,17 +83,17 @@ public class PlayerController : ControllerBase
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> GetTeamPlayers([FromQuery] string teamId)
+    public async Task<IActionResult> GetTeamPlayers([FromQuery] string roomCode, [FromQuery] int teamNumber)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(teamId)) return BadRequest(new GetPlayersResponse
+            if (string.IsNullOrWhiteSpace(roomCode) || teamNumber == null) return BadRequest(new GetPlayersResponse
             {
                 Success = false,
                 Message = null
             });
 
-            var players = await _playerService.GetPlayersByTeamId(teamId);
+            var players = await _playerManager.SearchPlayersByTeamNumber(teamNumber, roomCode);
 
             if (players == null || players.Count == 0)
             {

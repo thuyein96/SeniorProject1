@@ -1,4 +1,5 @@
 ﻿using SnowFlake.Dtos;
+using SnowFlake.Dtos.APIs.Player;
 using SnowFlake.Dtos.APIs.Player.AddPlayerToTeam;
 using SnowFlake.Dtos.APIs.Player.UpdatePlayer;
 using SnowFlake.Services;
@@ -17,6 +18,20 @@ public class PlayerManager : IPlayerManager
         _teamService = teamService;
     }
 
+    public async Task<List<PlayerItem>> SearchPlayersByTeamNumber(int teamNumber, string playerRoomCode)
+    {
+        var team = await _teamService.GetTeam(teamNumber, playerRoomCode);
+        if (team is null)
+        {
+            return null;
+        }
+        var players = await _playerService.GetPlayersByTeamId(team.Id);
+        if (players is null)
+        {
+            return null;
+        }
+        return players;
+    }
     public async Task<string> ManagePlayer(ManagePlayerRequest managePlayerRequest)
     {
         try
