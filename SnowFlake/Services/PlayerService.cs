@@ -44,9 +44,9 @@ public class PlayerService : IPlayerService
         var players = (await _unitOfWork.PlayerRepository.GetAll()).Take(Utils.BatchSize).Select(p => new PlayerItem
         {
             Id = p.Id,
-            Name = p.Name,
+            PlayerName = p.Name,
             TeamId = p.TeamId,
-            RoomCode = p.RoomCode,
+            PlayerRoomCode = p.RoomCode,
             CreationDate = p.CreationDate,
             ModifiedDate = p.ModifiedDate
         }).ToList();
@@ -62,9 +62,9 @@ public class PlayerService : IPlayerService
         var player = (await _unitOfWork.PlayerRepository.GetBy(t => t.Id == playerId)).Select(p => new PlayerItem
         {
             Id = p.Id,
-            Name = p.Name,
+            PlayerName = p.Name,
             TeamId = p.TeamId,
-            RoomCode = p.RoomCode,
+            PlayerRoomCode = p.RoomCode,
             CreationDate = p.CreationDate,
             ModifiedDate = p.ModifiedDate
         }).FirstOrDefault()!;
@@ -101,9 +101,9 @@ public class PlayerService : IPlayerService
         var players = (await _unitOfWork.PlayerRepository.GetBy(t => t.TeamId == teamId)).Select(p => new PlayerItem
         {
             Id = p.Id,
-            Name = p.Name,
+            PlayerName = p.Name,
             TeamId = p.TeamId,
-            RoomCode = p.RoomCode,
+            PlayerRoomCode = p.RoomCode,
             CreationDate = p.CreationDate,
             ModifiedDate = p.ModifiedDate
         }).ToList()!;

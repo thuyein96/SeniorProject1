@@ -5,11 +5,10 @@ namespace SnowFlake.Dtos.APIs.Player;
 public class PlayerItem
 {
     public string Id { get; set; }
-    public string Name { get; set; }
-    public string? Email { get; set; }
+    public string PlayerName { get; set; }
     public string? TeamId { get; set; }
-    public string RoomCode { get; set; }
-    public string PlaygroundId { get; set; }
+    public int? TeamNumber { get; set; }
+    public string PlayerRoomCode { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime? ModifiedDate { get; set; }
 }

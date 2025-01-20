@@ -19,12 +19,21 @@ public class PlayerManager : IPlayerManager
         _teamService = teamService;
     }
 
-    public async Task<PlayerEntity> SearchPlayer(SearchPlayerRequest searchPlayerRequest)
+    public async Task<PlayerItem> SearchPlayer(SearchPlayerRequest searchPlayerRequest)
     {
         var player = new PlayerEntity();
+
         if (searchPlayerRequest.TeamNumber == null || searchPlayerRequest.TeamNumber <= 0)
         {
-            return await _playerService.GetPlayerByRoomCode(searchPlayerRequest.PlayerName, searchPlayerRequest.PlayerRoomCode);
+            player = await _playerService.GetPlayerByRoomCode(searchPlayerRequest.PlayerName, searchPlayerRequest.PlayerRoomCode);
+
+            return new PlayerItem
+            {
+                Id = player.Id,
+                PlayerName = player.Name,
+                PlayerRoomCode = player.RoomCode,
+                TeamId = player.TeamId
+            };
         }
 
         var team = await _teamService.GetTeam(searchPlayerRequest.TeamNumber.Value, searchPlayerRequest.PlayerRoomCode);
@@ -33,7 +42,16 @@ public class PlayerManager : IPlayerManager
             return null;
         }
 
-        return await _playerService.GetPlayerByName(searchPlayerRequest.PlayerName, team.Id, searchPlayerRequest.PlayerRoomCode);
+        player = await _playerService.GetPlayerByName(searchPlayerRequest.PlayerName, team.Id, searchPlayerRequest.PlayerRoomCode);
+
+        return new PlayerItem
+        {
+            Id = player.Id,
+            PlayerName = player.Name,
+            PlayerRoomCode = player.RoomCode,
+            TeamId = player.TeamId,
+            TeamNumber = team.TeamNumber
+        };
     }
     public async Task<string> ManagePlayer(ManagePlayerRequest managePlayerRequest)
     {

@@ -2,5 +2,5 @@
 
 public class SearchPlayerResponse : BaseResponse
 {
-    public PlayerEntity Message { get; set; }
+    public PlayerItem Message { get; set; }
 }
