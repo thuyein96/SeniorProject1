@@ -2,183 +2,103 @@
 using SnowFlake.Hubs;
 using SnowFlake.Services;
 using SnowFlake.Utilities;
-using System.Text.RegularExpressions;
+using System.Collections.Concurrent;
 
 public class TimerService : ITimerService
 {
-    private TimerState _timerStates = new TimerState();
-    private readonly IHubContext<TimerHub> _timerHubContext;
-    public HashSet<string> _connectedIds = new HashSet<string>();
-    public string _roomCode;
+    private readonly IHubContext<TimerHub> _hubContext;
+    private static readonly ConcurrentDictionary<string, TimerState> _timers = new();
 
-    public TimerService(IHubContext<TimerHub> timerHubContext)
+    public TimerService(IHubContext<TimerHub> hubContext)
     {
-        _timerHubContext = timerHubContext;
+        _hubContext = hubContext;
     }
 
-    // Method to start the timer
-    public async Task CreateTimer(string connectionId, int seconds)
+    public async Task AddClientToGroup(string groupName, string connectionId)
     {
-        if (await ContainUserId(connectionId) == false) return;
+        await _hubContext.Groups.AddToGroupAsync(connectionId, groupName);
+        await _hubContext.Clients.Group(groupName).SendAsync("JoinUserGroup", $"{connectionId} joined the '{groupName}' group.");
+    }
 
-        // Stop any existing timer for this connection
-        await StopTimer(connectionId);
+    public async Task RemoveClientFromGroup(string groupName, string connectionId)
+    {
+        await _hubContext.Groups.RemoveFromGroupAsync(connectionId, groupName);
+        await _hubContext.Clients.Group(groupName).SendAsync("LeaveUserGroup", $"{connectionId} leaved the '{groupName}' group.");
+    }
 
-        // Create a new timer state
-        _timerStates = new TimerState
+    public async Task CreateCountdown(string groupName, string duration)
+    {
+        var seconds = Utils.ConvertToSeconds(duration);
+        if (_timers.ContainsKey(groupName))
         {
+            StopCountdown(groupName);
+        }
+
+        _timers[groupName] = new TimerState
+        {
+            RemainingSeconds = seconds+1,
             TotalSeconds = seconds,
-            RemainingSeconds = seconds,
-            Status = TimerStatus.Running,
-            CancellationTokenSource = new CancellationTokenSource()
         };
+        await _hubContext.Clients.Group(groupName).SendAsync("CreateTimer", $"{duration} Timer is created");
 
-        var timer = Utils.SecondsToString(seconds);
-        await _timerHubContext.Clients.Group(_roomCode).SendAsync("CreateTimer", $"{timer} Timer is created");
     }
 
-    public async Task JoinUserGroup(string connectionId, string roomCode)
+    public Task StartCountdown(string groupName)
     {
-        if (await ContainUserId(connectionId) == true) return;
-        _connectedIds.Add(connectionId);
-        _roomCode = roomCode;
-        await _timerHubContext.Groups.AddToGroupAsync(connectionId, roomCode);
-        await _timerHubContext.Clients.Group(roomCode).SendAsync("JoinUserGroup", $"{connectionId} joined the '{roomCode}' group.");
-        //await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("JoinUserGroup", $"{connectionId} joined the user group.");
-    }
+        _timers[groupName].Status = TimerStatus.Running;
 
-    public async Task LeaveUserGroup(string connectionId, string roomCode)
-    {
-        if (await ContainUserId(connectionId) == false) return;
-        _connectedIds.Remove(connectionId);
-        await _timerHubContext.Groups.RemoveFromGroupAsync(connectionId, roomCode);
-    }
-
-    // Background method to run the timer
-    public async Task StartTimer(string connectionId)
-    {
-        if (await ContainUserId(connectionId) == false) return;
-        // Get the timer state for this connection
-        var timerState = _timerStates;
-
-        // Continue until time is up or timer is stopped
-        while (timerState.RemainingSeconds > 0 && timerState.Status == TimerStatus.Running)
+        _timers[groupName].Timer = new Timer(async _ =>
         {
-            timerState.CancellationTokenSource.Token.ThrowIfCancellationRequested();
-
-            var remainingSeconds = Utils.SecondsToString(timerState.RemainingSeconds);
-
-            // You would typically broadcast the update to the client here
-            await _timerHubContext.Clients.Group(_roomCode).SendAsync("TimerUpdate", remainingSeconds);
-            //await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("TimerUpdate", remainingSeconds);
-
-            // Wait for 1 second
-            await Task.Delay(1000);
-
-            // Reduce remaining time
-            timerState.RemainingSeconds--;
-
-            // Check if timer is complete
-            if (timerState.RemainingSeconds <= 0)
+            if (_timers.TryGetValue(groupName, out var timerState) && timerState.RemainingSeconds > 0 && timerState.Status == TimerStatus.Running)
             {
-                _timerStates = new TimerState();
-                break;
+                _timers[groupName].RemainingSeconds--;
+
+                var time = Utils.SecondsToString(timerState.RemainingSeconds);
+                await _hubContext.Clients.Group(groupName).SendAsync("TimerUpdate", time);
+
+                if (timerState.RemainingSeconds == 0)
+                {
+                    StopCountdown(groupName);
+                    await _hubContext.Clients.Group(groupName).SendAsync("CountdownFinished");
+                }
             }
+        }, null, 0, 1000);
+
+        return _hubContext.Clients.Group(groupName).SendAsync("TimerStarted");
+    }
+
+    public async Task PauseCountdown(string groupName)
+    {
+        if (_timers.TryGetValue(groupName, out var timerState) && timerState.Status == TimerStatus.Running)
+        {
+            timerState.RemainingSeconds++;
+            timerState.Status = TimerStatus.Paused;
+
+            // Notify the group
+            await _hubContext.Clients.Group(groupName).SendAsync("TimerPaused");
         }
     }
 
-    // Method to pause the timer
-    public async Task PauseTimer(string connectionId)
+    public async Task ResumeCountdown(string groupName)
     {
-        if (await ContainUserId(connectionId) == false) return;
-
-        // Check if timer exists and is running
-        if (_timerStates is not null &&
-            _timerStates.Status == TimerStatus.Running)
+        if (_timers.TryGetValue(groupName, out var timerState) && timerState.Status == TimerStatus.Paused)
         {
-            // Cancel the current timer
-            _timerStates.CancellationTokenSource.Cancel();
-            _timerStates.CancellationTokenSource = new CancellationTokenSource();
-            _timerStates.Status = TimerStatus.Paused;
+            timerState.Status = TimerStatus.Running;
 
-            await _timerHubContext.Clients.Group(_roomCode).SendAsync("TimerPaused");
+            // Notify the group
+            await _hubContext.Clients.Group(groupName).SendAsync("TimerResume");
         }
     }
 
-    // Method to resume the timer
-    public async Task ResumeTimer(string connectionId)
+    public async Task StopCountdown(string groupName)
     {
-        if (await ContainUserId(connectionId) == false) return;
-
-        // Check if timer exists and is paused
-        if (_timerStates is not null &&
-            _timerStates.Status == TimerStatus.Paused)
+        if (_timers.TryRemove(groupName, out var timer))
         {
-            _timerStates.RemainingSeconds++;
-            // Reset cancellation token and status
-            _timerStates.CancellationTokenSource.Cancel();
-            _timerStates.CancellationTokenSource = new CancellationTokenSource();
-            _timerStates.Status = TimerStatus.Running;
-
-            // Restart the timer
-            await StartTimer(connectionId);
+            timer.Timer.Dispose();
         }
-    }
 
-    // Method to stop the timer
-    public async Task StopTimer(string connectionId)
-    {
-        if (await ContainUserId(connectionId) == false) return;
+        _timers.TryRemove(groupName, out _);
 
-        // Check if timer exists
-        if (_timerStates is not null && _timerStates.CancellationTokenSource is not null)
-        {
-            // Cancel the timer
-            _timerStates.CancellationTokenSource.Cancel();
-            _timerStates.CancellationTokenSource = new CancellationTokenSource();
-            _timerStates.Status = TimerStatus.Stopped;
-
-            // Remove the timer state
-            _timerStates = new TimerState();
-
-            await _timerHubContext.Clients.Group(_roomCode).SendAsync("TimerStopped");
-        }
-    }
-
-    public async Task ModifyTimer(string connectionId, int secondsToModify)
-    {
-        if (await ContainUserId(connectionId) == false) return;
-
-        // Check if the timer exists
-        if (_timerStates is not null && _timerStates.CancellationTokenSource is not null)
-        {
-            if (_timerStates.RemainingSeconds > 0)
-            {
-                // Update the remaining time
-                _timerStates.RemainingSeconds += secondsToModify;
-                // Notify the client about the updated time
-                var remainingSeconds = Utils.SecondsToString(_timerStates.RemainingSeconds);
-                await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("TimerUpdated", remainingSeconds);
-            }
-            else
-            {
-                // Handle the case where the timer has already expired
-                await _timerHubContext.Clients.Group(_roomCode).SendAsync("Error", "Timer has already expired.");
-            }
-        }
-        else
-        {
-            // Handle the case where the timer does not exist
-            await _timerHubContext.Clients.Clients(_connectedIds).SendAsync("Error", "Timer not found.");
-        }
-    }
-
-    private async Task<bool> ContainUserId(string connectionId)
-    {
-        if (_connectedIds.Contains(connectionId))
-        {
-            return true;
-        }
-        return false;
+        await _hubContext.Clients.Group(groupName).SendAsync("TimerStopped");
     }
 }

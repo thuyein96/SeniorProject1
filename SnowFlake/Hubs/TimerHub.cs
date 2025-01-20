@@ -2,71 +2,39 @@
 using SnowFlake.Services;
 using SnowFlake.Utilities;
 
-namespace SnowFlake.Hubs
+namespace SnowFlake.Hubs;
+
+public class TimerHub : Hub
 {
-    public class TimerHub : Hub
+    private readonly ITimerService _countdownService;
+
+    public TimerHub(ITimerService countdownService)
     {
-        private readonly ITimerService _timerService;
-
-        public TimerHub(ITimerService timerService, IPlaygroundService playgroundService)
-        {
-            _timerService = timerService;
-        }
-        public override async Task OnConnectedAsync()
-        {
-            await Clients.Caller.SendAsync("ReceivedMessage", $"{Context.ConnectionId} is connected");
-        }
-
-        public async Task JoinUser(string roomCode)
-        {
-            await _timerService.JoinUserGroup(Context.ConnectionId, roomCode);
-        }
-
-        public async Task LeaveUser(string roomCode)
-        {
-            await _timerService.LeaveUserGroup(Context.ConnectionId, roomCode);
-        }
-
-        public async Task CreateTimer(string durationSeconds)
-        {
-            var timer = Utils.ConvertToSeconds(durationSeconds);
-            await _timerService.CreateTimer(Context.ConnectionId, timer);
-        }
-
-        public async Task StartTimer()
-        {
-            await _timerService.StartTimer(Context.ConnectionId);
-        }
-
-        public async Task PauseTimer()
-        {
-            await _timerService.PauseTimer(Context.ConnectionId);
-        }
-
-        public async Task ResumeTimer()
-        {
-            await _timerService.ResumeTimer(Context.ConnectionId);
-        }
-
-        public async Task StopTimer()
-        {
-            await _timerService.StopTimer(Context.ConnectionId);
-        }
-
-        public async Task SkipTimer()
-        {
-            await _timerService.StopTimer(Context.ConnectionId);
-        }
-
-        public async Task AddTimer(string extraDuration)
-        {
-            var timer = Utils.ConvertToSeconds(extraDuration);
-            await _timerService.ModifyTimer(Context.ConnectionId, timer);
-        }
-
-        public override async Task OnDisconnectedAsync(Exception exception)
-        {
-            await base.OnDisconnectedAsync(exception);
-        }
+        _countdownService = countdownService;
     }
+    public override async Task OnConnectedAsync() 
+        => await Clients.Caller.SendAsync("ReceivedMessage", $"{Context.ConnectionId} is connected");
+
+    public async Task CreateTimer(string groupName, string durationSeconds)
+        => await _countdownService.CreateCountdown(groupName, durationSeconds);
+    public Task StartCountdown(string groupName)
+        => _countdownService.StartCountdown(groupName);
+
+    public Task PauseCountdown(string groupName)
+        => _countdownService.PauseCountdown(groupName);
+
+    public Task ResumeCountdown(string groupName)
+        => _countdownService.ResumeCountdown(groupName);
+
+    public Task StopCountdown(string groupName)
+        => _countdownService.StopCountdown(groupName);
+
+    public Task JoinGroup(string groupName)
+        => _countdownService.AddClientToGroup(groupName, Context.ConnectionId);
+
+    public Task LeaveGroup(string groupName)
+        => _countdownService.RemoveClientFromGroup(groupName, Context.ConnectionId);
+
+    public override async Task OnDisconnectedAsync(Exception exception) 
+        => await base.OnDisconnectedAsync(exception);
 }
