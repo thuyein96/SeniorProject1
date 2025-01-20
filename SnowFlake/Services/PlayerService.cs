@@ -83,14 +83,15 @@ public class PlayerService : IPlayerService
         return (await _unitOfWork.PlayerRepository.GetBy(p => p.Name == playerName && p.TeamId == teamId && p.RoomCode == playerRoomCode)).FirstOrDefault();
     }
 
-    //public async Task<PlayerEntity> GetPlayerByName(string playerName)
-    //{
-    //    if (string.IsNullOrWhiteSpace(playerName)) return null;
+    public async Task<PlayerEntity> GetPlayerByRoomCode(string playerName, string roomCode)
+    {
+        if (string.IsNullOrWhiteSpace(playerName)) return null;
+        if(string.IsNullOrWhiteSpace(roomCode)) return null;
 
-    //    var player = (await _unitOfWork.PlayerRepository.GetBy(p => p.Name == playerName && p.TeamId == null)).FirstOrDefault();
+        var player = (await _unitOfWork.PlayerRepository.GetBy(p => p.Name == playerName && p.RoomCode == roomCode)).FirstOrDefault();
 
-    //    return player;
-    //}
+        return player;
+    }
 
     public async Task<List<PlayerItem>> GetPlayersByTeamId(string teamId)
     {

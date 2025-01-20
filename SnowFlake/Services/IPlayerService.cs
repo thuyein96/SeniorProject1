@@ -15,6 +15,7 @@ public interface IPlayerService
     //GetById
     Task<PlayerItem> GetByPlayerId(string playerId);
     Task<PlayerEntity> GetPlayerByName(string playerName, [Optional] string? teamId, [Optional] string? playerRoomCode);
+    Task<PlayerEntity> GetPlayerByRoomCode(string playerName, string roomCode);
 
     Task<List<PlayerItem>> GetPlayersByTeamId(string teamId);
     //Update 

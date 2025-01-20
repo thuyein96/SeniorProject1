@@ -4,6 +4,7 @@ using SnowFlake.Dtos.APIs.Player.AddPlayerToTeam;
 using SnowFlake.Dtos.APIs.Player.DeletePlayer;
 using SnowFlake.Dtos.APIs.Player.GetPlayer;
 using SnowFlake.Dtos.APIs.Player.GetPlayerList;
+using SnowFlake.Dtos.APIs.Player.SearchPlayer;
 using SnowFlake.Dtos.APIs.Player.UpdatePlayer;
 using SnowFlake.Managers;
 using SnowFlake.Services;
@@ -83,31 +84,36 @@ public class PlayerController : ControllerBase
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> GetTeamPlayers([FromQuery] string roomCode, [FromQuery] int teamNumber)
+    public async Task<IActionResult> GetTeamPlayer([FromQuery] string playerName, [FromQuery] string? roomCode, [FromQuery] int? teamNumber)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(roomCode) || teamNumber == null) return BadRequest(new GetPlayersResponse
+            if (string.IsNullOrWhiteSpace(roomCode) && teamNumber == null) return BadRequest(new GetPlayersResponse
             {
                 Success = false,
                 Message = null
             });
 
-            var players = await _playerManager.SearchPlayersByTeamNumber(teamNumber, roomCode);
-
-            if (players == null || players.Count == 0)
+            var player = await _playerManager.SearchPlayer(new SearchPlayerRequest
             {
-                return NotFound(new GetPlayersResponse
+                PlayerName = playerName,
+                PlayerRoomCode = roomCode,
+                TeamNumber = teamNumber
+            });
+
+            if (player == null)
+            {
+                return NotFound(new SearchPlayerResponse
                 {
                     Success = false,
                     Message = null
                 });
             }
 
-            return Ok(new GetPlayersResponse
+            return Ok(new SearchPlayerResponse
             {
                 Success = true,
-                Message = players
+                Message = player
             });
         }
         catch (Exception e)
