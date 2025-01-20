@@ -27,7 +27,7 @@ public class PlayerManager : IPlayerManager
             return await _playerService.GetPlayerByRoomCode(searchPlayerRequest.PlayerName, searchPlayerRequest.PlayerRoomCode);
         }
 
-        var team = await _teamService.GetTeam(searchPlayerRequest.TeamNumber, searchPlayerRequest.PlayerRoomCode);
+        var team = await _teamService.GetTeam(searchPlayerRequest.TeamNumber.Value, searchPlayerRequest.PlayerRoomCode);
         if (team is null)
         {
             return null;
