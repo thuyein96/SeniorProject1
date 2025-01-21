@@ -29,12 +29,22 @@ public class TimerHub : Hub
     public Task StopCountdown(string groupName)
         => _countdownService.StopCountdown(groupName);
 
+    public Task AddCountdown(string groupName, string duration) 
+        => _countdownService.AddCountdown(groupName, duration);
+
+    public Task MinusCountdown(string groupName, string duration)
+        => _countdownService.MinusCountdown(groupName, duration);
+
     public Task JoinGroup(string groupName)
         => _countdownService.AddClientToGroup(groupName, Context.ConnectionId);
 
     public Task LeaveGroup(string groupName)
         => _countdownService.RemoveClientFromGroup(groupName, Context.ConnectionId);
 
-    public override async Task OnDisconnectedAsync(Exception exception) 
-        => await base.OnDisconnectedAsync(exception);
+    public override async Task OnDisconnectedAsync(Exception exception)
+    {
+        await Clients.Caller.SendAsync("ReceivedMessage", $"{Context.ConnectionId} is disconnected");
+        await base.OnDisconnectedAsync(exception);
+
+    }
 }

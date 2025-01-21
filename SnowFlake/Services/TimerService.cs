@@ -59,7 +59,7 @@ public class TimerService : ITimerService
                 if (timerState.RemainingSeconds == 0)
                 {
                     StopCountdown(groupName);
-                    await _hubContext.Clients.Group(groupName).SendAsync("CountdownFinished");
+                    await _hubContext.Clients.Group(groupName).SendAsync("CountdownCompleted");
                 }
             }
         }, null, 0, 1000);
@@ -100,5 +100,32 @@ public class TimerService : ITimerService
         _timers.TryRemove(groupName, out _);
 
         await _hubContext.Clients.Group(groupName).SendAsync("TimerStopped");
+    }
+
+    public async Task AddCountdown(string groupName, string duration)
+    {
+        if (_timers.TryGetValue(groupName, out var timer))
+        {
+            var seconds = Utils.ConvertToSeconds(duration);
+            timer.RemainingSeconds = timer.RemainingSeconds + seconds;
+            timer.TotalSeconds = timer.TotalSeconds + seconds;
+
+            var time = Utils.SecondsToString(timer.RemainingSeconds);
+            // Notify the group
+            await _hubContext.Clients.Group(groupName).SendAsync("TimerModify", time);
+        }
+    }
+
+    public async Task MinusCountdown(string groupName, string duration)
+    {
+        if (_timers.TryGetValue(groupName, out var timer))
+        {
+            var seconds = Utils.ConvertToSeconds(duration);
+            timer.RemainingSeconds = timer.RemainingSeconds - seconds;
+            timer.TotalSeconds = timer.TotalSeconds - seconds;
+            var time = Utils.SecondsToString(timer.RemainingSeconds);
+            // Notify the group
+            await _hubContext.Clients.Group(groupName).SendAsync("TimerModify", time);
+        }
     }
 }
