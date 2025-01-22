@@ -47,6 +47,8 @@ public class TimerService : ITimerService
     {
         _timers[groupName].Status = TimerStatus.Running;
 
+        _hubContext.Clients.Group(groupName).SendAsync("TimerStarted");
+
         _timers[groupName].Timer = new Timer(async _ =>
         {
             if (_timers.TryGetValue(groupName, out var timerState) && timerState.RemainingSeconds > 0 && timerState.Status == TimerStatus.Running)
@@ -64,7 +66,7 @@ public class TimerService : ITimerService
             }
         }, null, 0, 1000);
 
-        return _hubContext.Clients.Group(groupName).SendAsync("TimerStarted");
+        return Task.CompletedTask;
     }
 
     public async Task PauseCountdown(string groupName)
