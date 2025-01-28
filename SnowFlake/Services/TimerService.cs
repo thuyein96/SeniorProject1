@@ -43,7 +43,7 @@ public class TimerService : ITimerService
 
     }
 
-    public Task StartCountdown(string groupName)
+    public async Task StartCountdown(string groupName)
     {
         _timers[groupName].Status = TimerStatus.Running;
 
@@ -66,7 +66,6 @@ public class TimerService : ITimerService
             }
         }, null, 0, 1000);
 
-        return Task.CompletedTask;
     }
 
     public async Task PauseCountdown(string groupName)
