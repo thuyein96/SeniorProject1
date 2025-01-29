@@ -16,7 +16,7 @@ public class TimerHub : Hub
         => await Clients.Caller.SendAsync("ReceivedMessage", $"{Context.ConnectionId} is connected");
 
     public async Task CreateTimer(string groupName, string durationSeconds, string gameState)
-        => await _countdownService.CreateCountdown(groupName, durationSeconds);
+        => await _countdownService.CreateCountdown(groupName, durationSeconds, gameState);
     public Task StartCountdown(string groupName)
         => _countdownService.StartCountdown(groupName);
 
