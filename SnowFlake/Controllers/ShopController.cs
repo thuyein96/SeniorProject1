@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SnowFlake.Dtos.APIs.Product.UpdateShop;
 using SnowFlake.Dtos.APIs.Shop.CreateShop;
 using SnowFlake.Dtos.APIs.Shop.GetShop;
-using SnowFlake.Dtos.APIs.Shop.UpdateShop;
+using SnowFlake.Managers;
 using SnowFlake.Services;
 
 namespace SnowFlake.Controllers
@@ -11,10 +12,13 @@ namespace SnowFlake.Controllers
     public class ShopController : ControllerBase
     {
         private readonly IShopService _shopService;
+        private readonly IShopManager _shopManager;
 
-        public ShopController(IShopService shopService)
+        public ShopController(IShopService shopService,
+                              IShopManager shopManager)
         {
             _shopService = shopService;
+            _shopManager = shopManager;
         }
 
         [HttpPost]
@@ -52,7 +56,7 @@ namespace SnowFlake.Controllers
         {
             try
             {
-                var shop = await _shopService.GetShopByHostRoomCodeAsync(hostRoomCode);
+                var shop = await _shopService.GetShopByHostRoomCode(hostRoomCode);
                 if (shop == null)
                 {
                     return NotFound(new GetShopResponse
@@ -74,7 +78,7 @@ namespace SnowFlake.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateStock(UpdateStockRequest updateStockRequest)
+        public async Task<IActionResult> ManageShopOrder(UpdateStockRequest updateStockRequest)
         {
             try
             {
@@ -82,8 +86,8 @@ namespace SnowFlake.Controllers
                 {
                     return BadRequest();
                 }
-                var shop = await _shopService.UpdateStockAsync(updateStockRequest);
-                if (shop == null)
+                var orderResult = await _shopManager.ManageIncomingShopOrder(updateStockRequest);
+                if (orderResult == null)
                 {
                     return NotFound(new UpdateStockResponse
                     {
@@ -94,7 +98,7 @@ namespace SnowFlake.Controllers
                 return Ok(new UpdateStockResponse
                 {
                     Success = true,
-                    Message = shop
+                    Message = orderResult
                 });
             }
             catch (Exception e)

@@ -26,62 +26,62 @@ namespace SnowFlake.Services
             {
                 if (createPlaygroundRequest is null) return null;
 
-                var rounds = new List<RoundEntity>();
-                foreach (var round in createPlaygroundRequest.Rounds)
-                {
-                    rounds.Add(new RoundEntity
-                    {
-                        RoundNumber = round.Key,
-                        Duration = round.Value,
-                        Progress = RoundState.Pending.Name
-                    });
-                }
+                //var rounds = new List<RoundEntity>();
+                //foreach (var round in createPlaygroundRequest.Rounds)
+                //{
+                //    rounds.Add(new RoundEntity
+                //    {
+                //        RoundNumber = round.Key,
+                //        Duration = round.Value,
+                //        Progress = RoundState.Pending.Name
+                //    });
+                //}
 
-                for (int i = 1; i < createPlaygroundRequest.NumberOfTeam + 1; i++)
-                {
-                    var team = new TeamEntity
-                    {
-                        Id = ObjectId.GenerateNewId().ToString(),
-                        TeamNumber = i,
-                        Tokens = createPlaygroundRequest.TeamToken,
-                        HostRoomCode = createPlaygroundRequest.HostRoomCode,
-                        PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
-                        TeamStocks = createPlaygroundRequest.Shop.Select(p => new Product
-                        {
-                            ProductName = p.ProductName,
-                            Price = p.Price,
-                            RemainingStock = 0
-                        }).ToList(),
-                        CreationDate = DateTime.Now,
-                        ModifiedDate = null
-                    };
+                //for (int i = 1; i < createPlaygroundRequest.NumberOfTeam + 1; i++)
+                //{
+                //    var team = new TeamEntity
+                //    {
+                //        Id = ObjectId.GenerateNewId().ToString(),
+                //        TeamNumber = i,
+                //        Tokens = createPlaygroundRequest.TeamToken,
+                //        HostRoomCode = createPlaygroundRequest.HostRoomCode,
+                //        PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
+                //        TeamStocks = createPlaygroundRequest.Shop.Select(p => new ProductEntity
+                //        {
+                //            ProductName = p.ProductName,
+                //            Price = p.Price,
+                //            RemainingStock = 0
+                //        }).ToList(),
+                //        CreationDate = DateTime.Now,
+                //        ModifiedDate = null
+                //    };
 
-                    await _unitOfWork.TeamRepository.Create(team);
-                    await _unitOfWork.Commit();
-                }
+                //    await _unitOfWork.TeamRepository.Create(team);
+                //    await _unitOfWork.Commit();
+                //}
 
-                var shop = new ShopEntity
-                {
-                    Id = ObjectId.GenerateNewId().ToString(),
-                    HostRoomCode = createPlaygroundRequest.HostRoomCode,
-                    PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
-                    Tokens = createPlaygroundRequest.ShopToken,
-                    ShopStocks = createPlaygroundRequest.Shop
-                };
+                //var shop = new ShopEntity
+                //{
+                //    Id = ObjectId.GenerateNewId().ToString(),
+                //    HostRoomCode = createPlaygroundRequest.HostRoomCode,
+                //    PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
+                //    Tokens = createPlaygroundRequest.ShopToken,
+                //    ShopStocks = createPlaygroundRequest.Shop
+                //};
 
                 var playground = new PlaygroundEntity
                 {
                     Id = ObjectId.GenerateNewId().ToString(),
                     HostRoomCode = createPlaygroundRequest.HostRoomCode,
                     PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
-                    NumberOfTeam = createPlaygroundRequest.NumberOfTeam,
-                    TeamToken = createPlaygroundRequest.TeamToken,
-                    Rounds = rounds,
+                    //NumberOfTeam = createPlaygroundRequest.NumberOfTeam,
+                    //TeamToken = createPlaygroundRequest.TeamToken,
+                    Rounds = createPlaygroundRequest.Rounds,
                     CreationDate = DateTime.Now,
                     ModifiedDate = null
                 };
 
-                await _unitOfWork.ShopRepository.Create(shop);
+                //await _unitOfWork.ShopRepository.Create(shop);
                 await _unitOfWork.PlaygroundRepository.Create(playground);
                 await _unitOfWork.Commit();
 

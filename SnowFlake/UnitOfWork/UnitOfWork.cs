@@ -80,6 +80,15 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
+    private IProductRepository _productRepository;
+    public IProductRepository ProductRepository
+    {
+        get
+        {
+            return _productRepository = _productRepository ?? new ProductRepository(_snowFlakeDbContext);
+        }
+    }
+
     private ILeaderboardRepository _leaderboardRepository;
 
     public ILeaderboardRepository LeaderboardRepository

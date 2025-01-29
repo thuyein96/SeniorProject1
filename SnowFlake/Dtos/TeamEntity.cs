@@ -10,5 +10,4 @@ public class TeamEntity : BaseEntity
     public string? PlayerRoomCode { get; set; }
     public int? Tokens { get; set; }
     public List<string>? Members { get; set; }
-    public List<Product> TeamStocks { get; set; }
 }

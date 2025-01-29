@@ -9,9 +9,9 @@ public interface IUnitOfWork
     ITeamRepository TeamRepository { get; }
     IPlaygroundRepository PlaygroundRepository { get; } 
     IImageRepository ImageRepository { get; }
-    IRoundRepository RoundRepository { get; }
     IGameStateRepository GameStateRepository { get; }
     IShopRepository ShopRepository { get; }
+    IProductRepository ProductRepository { get; }
     ILeaderboardRepository LeaderboardRepository { get; }
 
     //Commit stages (insert, update, delete)

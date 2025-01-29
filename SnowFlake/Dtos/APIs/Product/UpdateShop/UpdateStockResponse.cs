@@ -1,4 +1,4 @@
-﻿namespace SnowFlake.Dtos.APIs.Shop.UpdateShop;
+﻿namespace SnowFlake.Dtos.APIs.Product.UpdateShop;
 
 public class UpdateStockResponse : BaseResponse
 {

@@ -36,7 +36,7 @@ public class PlayerManager : IPlayerManager
             };
         }
 
-        var team = await _teamService.GetTeam(searchPlayerRequest.TeamNumber.Value, searchPlayerRequest.PlayerRoomCode);
+        var team = await _teamService.GetTeam(searchPlayerRequest.TeamNumber.Value, searchPlayerRequest.PlayerRoomCode, null);
         if (team is null)
         {
             return null;
@@ -57,7 +57,7 @@ public class PlayerManager : IPlayerManager
     {
         try
         {
-            var team = await _teamService.GetTeam(managePlayerRequest.TeamNumber, managePlayerRequest.PlayerRoomCode);
+            var team = await _teamService.GetTeam(managePlayerRequest.TeamNumber, managePlayerRequest.PlayerRoomCode, null);
             if (team is null)
             {
                 return null;

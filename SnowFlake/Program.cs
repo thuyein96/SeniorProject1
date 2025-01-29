@@ -21,13 +21,21 @@ builder.Services.AddDbContext<SnowFlakeDbContext>(options =>
 options.UseMongoDB(mongoDBSettings.AtlasUrl ?? "", mongoDBSettings.DatabaseName ?? ""));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddTransient<IPlayerService, PlayerService>();
 builder.Services.AddTransient<IPlayerManager, PlayerManager>();
+builder.Services.AddTransient<ITeamManager, TeamManager>();
+builder.Services.AddTransient<IPlaygroundManager, PlaygroundManger>();
+builder.Services.AddTransient<IPlayerManager, PlayerManager>();
+builder.Services.AddTransient<IShopManager, ShopManager>();
+
+builder.Services.AddTransient<IPlayerService, PlayerService>();
 builder.Services.AddTransient<ITeamService, TeamService>();
 builder.Services.AddTransient<IGameStateService, GameStateService>();
 builder.Services.AddTransient<IPlaygroundService, PlaygroundService>();
 builder.Services.AddSingleton<ITimerService, TimerService>();
 builder.Services.AddTransient<IShopService, ShopService>();
+builder.Services.AddTransient<IImageService, ImageService>();
+builder.Services.AddTransient<IProductService, ProductService>();
+
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using SnowFlake.Dtos;
+using SnowFlake.Dtos.APIs.Product;
 using SnowFlake.Dtos.APIs.Team.CreateTeam;
 using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
 using SnowFlake.Dtos.APIs.Team.SearchPlayerInTeam;
@@ -50,12 +51,18 @@ public class TeamService : ITeamService
         var teams = (await _unitOfWork.TeamRepository.GetAll()).Take(Utils.BatchSize).ToList();
         return teams;
     }
-    public async Task<TeamEntity> GetTeam(int teamNumber, string playerRoomCode)
+    public async Task<TeamEntity> GetTeam(int teamNumber, string? playerRoomCode, string? hostRoomCode)
     {
         try
         {
-            if (teamNumber > 0)
-                return (await _unitOfWork.TeamRepository.GetBy(t => t.TeamNumber == teamNumber && t.PlayerRoomCode == playerRoomCode)).SingleOrDefault();
+            if (teamNumber <= 0) return null;
+
+            if (!string.IsNullOrWhiteSpace(playerRoomCode))
+                return (await _unitOfWork.TeamRepository.GetBy(t => t.TeamNumber == teamNumber && t.PlayerRoomCode == playerRoomCode)).FirstOrDefault();
+
+            if (!string.IsNullOrWhiteSpace(hostRoomCode))
+                return (await _unitOfWork.TeamRepository.GetBy(t => t.TeamNumber == teamNumber && t.HostRoomCode == hostRoomCode)).FirstOrDefault();
+
             return null;
         }
         catch (Exception)
@@ -66,12 +73,12 @@ public class TeamService : ITeamService
     }
 
     public async Task<List<TeamEntity>> GetTeamsByRoomCode(GetTeamsByRoomCodeRequest getTeamsByRoomCodeRequest)
-     {
+    {
         try
         {
-            if(!string.IsNullOrWhiteSpace(getTeamsByRoomCodeRequest.HostRoomCode))
+            if (!string.IsNullOrWhiteSpace(getTeamsByRoomCodeRequest.HostRoomCode))
                 return (await _unitOfWork.TeamRepository.GetBy(t => t.HostRoomCode == getTeamsByRoomCodeRequest.HostRoomCode)).ToList();
-            if(!string.IsNullOrWhiteSpace(getTeamsByRoomCodeRequest.PlayerRoomCode))
+            if (!string.IsNullOrWhiteSpace(getTeamsByRoomCodeRequest.PlayerRoomCode))
                 return (await _unitOfWork.TeamRepository.GetBy(t => t.PlayerRoomCode == getTeamsByRoomCodeRequest.PlayerRoomCode)).ToList();
             return null;
         }
@@ -100,6 +107,26 @@ public class TeamService : ITeamService
         }
     }
 
+    public async Task<bool> MinusTeamTokens(TeamEntity team, int totalCost)
+    {
+        try
+        {
+            if(team is null || totalCost <= 0) return false;
+
+            team.Tokens -= totalCost;
+            team.ModifiedDate = DateTime.Now;
+
+            _unitOfWork.TeamRepository.Update(team);
+            _unitOfWork.Commit();
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
     public async Task<string> Update(UpdateTeamRequest updateTeamRequest)
     {
         try
@@ -109,11 +136,11 @@ public class TeamService : ITeamService
             var existingTeam = (await _unitOfWork.TeamRepository.GetBy(w => w.Id == updateTeamRequest.Id)).SingleOrDefault();
 
             if (existingTeam is null || existingTeam.Id != updateTeamRequest.Id) return string.Empty;
-            if(updateTeamRequest.Tokens is not null)
-                 existingTeam.Tokens = updateTeamRequest.Tokens;
-            if(updateTeamRequest.Member is not null && existingTeam.Members is not null)
+            if (updateTeamRequest.Tokens is not null)
+                existingTeam.Tokens = updateTeamRequest.Tokens;
+            if (updateTeamRequest.Member is not null && existingTeam.Members is not null)
                 existingTeam.Members.Add(updateTeamRequest.Member);
-            if(updateTeamRequest.Member is not null && existingTeam.Members is null)
+            if (updateTeamRequest.Member is not null && existingTeam.Members is null)
             {
                 existingTeam.Members = new List<string>();
                 existingTeam.Members.Add(updateTeamRequest.Member);

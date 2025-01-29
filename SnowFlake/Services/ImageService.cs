@@ -3,9 +3,7 @@ using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Image.CreateImage;
 using SnowFlake.Dtos.APIs.Image.DeleteImage;
 using SnowFlake.Dtos.APIs.Image.GetImage;
-using SnowFlake.Dtos.APIs.Image.GetImages;
 using SnowFlake.Dtos.APIs.Image.UpdateImage;
-using SnowFlake.Dtos.APIs.Team.UpdateTeam;
 using SnowFlake.UnitOfWork;
 using SnowFlake.Utilities;
 
@@ -29,6 +27,7 @@ public class ImageService : IImageService
         var imageEntity = new ImageEntity
         {
             Id = createImageRequest.Id.ToString(),
+            FileName = createImageRequest.FileName,
             SnowFlakeImageUrl = imageUploadUrl,
             ImageBuyingStatus = ImageBuyingStatus.Pending.Name,
             TeamId = createImageRequest.TeamId,
@@ -43,7 +42,7 @@ public class ImageService : IImageService
 
     public async Task<List<ImageEntity>> GetImages()
     {
-        var images = (await _unitOfWork.ImageRepository.GetAll()).Take(50).ToList();
+        var images = (await _unitOfWork.ImageRepository.GetAll()).Take(Utils.BatchSize).ToList();
         return images;
     }
 
@@ -55,7 +54,7 @@ public class ImageService : IImageService
         }
         var image = (await _unitOfWork.ImageRepository.GetBy(i => i.Id == getImageRequest.Id)).FirstOrDefault();
 
-        if (image == null) 
+        if (image == null)
         {
             return null;
         }
@@ -65,7 +64,7 @@ public class ImageService : IImageService
 
     public async Task<string> DeleteImage(DeleteImageRequest deleteImageRequest)
     {
-        if(string.IsNullOrWhiteSpace(deleteImageRequest.Id) || string.IsNullOrWhiteSpace(deleteImageRequest.ContainerName) || string.IsNullOrWhiteSpace(deleteImageRequest.BlobName))
+        if (string.IsNullOrWhiteSpace(deleteImageRequest.Id) || string.IsNullOrWhiteSpace(deleteImageRequest.ContainerName) || string.IsNullOrWhiteSpace(deleteImageRequest.BlobName))
         {
             return string.Empty;
         }
@@ -95,15 +94,15 @@ public class ImageService : IImageService
         var existingImage = (await _unitOfWork.ImageRepository.GetBy(i => i.Id == updateImageRequest.Id)).FirstOrDefault();
 
         // Override with new image
-        if (!string.IsNullOrWhiteSpace(updateImageRequest.NewImageFileName) &&  (updateImageRequest.NewImageByteData != null))
+        if (!string.IsNullOrWhiteSpace(updateImageRequest.NewImageFileName) && (updateImageRequest.NewImageByteData != null))
         {
-            if(string.IsNullOrWhiteSpace(updateImageRequest.OldImageFileName))
+            if (string.IsNullOrWhiteSpace(updateImageRequest.OldImageFileName))
             {
                 return null;
             }
             var isDeleted = await _blobStorageService.DeleteBlobAsync("images", updateImageRequest.OldImageFileName);
 
-            if(!isDeleted)
+            if (!isDeleted)
             {
                 return null;
             }
@@ -114,12 +113,12 @@ public class ImageService : IImageService
         }
 
         // Update Image Price
-        if(updateImageRequest.Price > 0)
+        if (updateImageRequest.Price > 0)
         {
             existingImage.Price = updateImageRequest.Price;
         }
 
-        if(!string.IsNullOrWhiteSpace(updateImageRequest.ImageBuyingStatus))
+        if (!string.IsNullOrWhiteSpace(updateImageRequest.ImageBuyingStatus))
         {
             existingImage.ImageBuyingStatus = updateImageRequest.ImageBuyingStatus;
         }
@@ -132,5 +131,5 @@ public class ImageService : IImageService
         return $"[ID: {existingImage.Id}] Successfully Updated";
     }
 
-    
+
 }

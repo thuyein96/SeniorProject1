@@ -5,5 +5,5 @@ public class CreateShopRequest
     public string HostRoomCode { get; set; }
     public string PlayerRoomCode { get; set; }
     public int Tokens { get; set; }
-    public List<Product> ShopStocks { get; set; }
+    //public List<ProductEntity> ShopStocks { get; set; }
 }

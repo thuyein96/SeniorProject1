@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using SnowFlake.Dtos;
+using SnowFlake.Dtos.APIs.Product;
 using SnowFlake.Dtos.APIs.Shop.CreateShop;
-using SnowFlake.Dtos.APIs.Shop.UpdateShop;
 using SnowFlake.UnitOfWork;
 
 namespace SnowFlake.Services;
@@ -24,7 +24,8 @@ public class ShopService : IShopService
                 HostRoomCode = createShopRequest.HostRoomCode,
                 PlayerRoomCode = createShopRequest.PlayerRoomCode,
                 Tokens = createShopRequest.Tokens,
-                ShopStocks = createShopRequest.ShopStocks
+                CreationDate = DateTime.Now,
+                ModifiedDate = null
             };
             await _unitOfWork.ShopRepository.Create(shop);
             return shop;
@@ -36,7 +37,7 @@ public class ShopService : IShopService
         }
     }
 
-    public async Task<ShopEntity> GetShopByHostRoomCodeAsync(string hostRoomCode)
+    public async Task<ShopEntity> GetShopByHostRoomCode(string hostRoomCode)
     {
         try
         {
@@ -50,43 +51,48 @@ public class ShopService : IShopService
         }
     }
 
-    public async Task<string> UpdateStockAsync(UpdateStockRequest updateStockRequest)
+    public async Task<bool> AddShopTokens(ShopEntity shop, int totalCost)
     {
         try
         {
-            var existingShop = (await _unitOfWork.ShopRepository.GetBy(s => s.HostRoomCode == updateStockRequest.HostRoomCode)).FirstOrDefault();
+            if (shop is null || totalCost <= 0) return false;
 
-            if (existingShop is null) return string.Empty;
+            shop.Tokens += totalCost;
+            shop.ModifiedDate = DateTime.Now;
 
-            var shopStock = existingShop.ShopStocks.FirstOrDefault(s => s.ProductName == updateStockRequest.SoldProduct);
-
-            if (shopStock is null || shopStock.RemainingStock < updateStockRequest.Quantity) return string.Empty;
-
-            shopStock.RemainingStock -= updateStockRequest.Quantity;
-            existingShop.Tokens += updateStockRequest.Quantity * shopStock.Price;
-
-            var existingTeam = (await _unitOfWork.TeamRepository.GetBy(t => (t.HostRoomCode == updateStockRequest.HostRoomCode) && (t.TeamNumber == updateStockRequest.TeamNumber))).FirstOrDefault();
-
-            if (existingTeam is null) return string.Empty;
-
-            var teamStock = existingTeam.TeamStocks.Where(t => t.ProductName == updateStockRequest.SoldProduct).FirstOrDefault();
-
-            if (teamStock is null) return string.Empty;
-
-            teamStock.RemainingStock += updateStockRequest.Quantity;
-            existingTeam.Tokens -= updateStockRequest.Quantity * shopStock.Price;
-
-            await _unitOfWork.ShopRepository.Update(existingShop);
-            await _unitOfWork.TeamRepository.Update(existingTeam);
-
+            await _unitOfWork.ShopRepository.Update(shop);
             await _unitOfWork.Commit();
 
-            return "Stock updated successfully";
+            return true;
         }
-        catch (Exception)
+        catch (Exception e)
         {
-
-            return string.Empty;
+            return false;
         }
     }
+
+    //public async Task<bool> UpdateShopStock(ShopEntity shop, BuyProduct soldProductEntity)
+    //{
+    //    try
+    //    {
+    //        var shopStocks = shop.ShopStocks;
+    //        var shopStock = shopStocks.FirstOrDefault(s => s.ProductName == soldProductEntity.ProductName);
+    //        if (shopStock is null || shopStock.RemainingStock < soldProductEntity.Quantity) return false;
+
+    //        shopStock.RemainingStock -= soldProductEntity.Quantity;
+    //        shop.Tokens += soldProductEntity.Quantity * shopStock.Price;
+
+    //        shop.ShopStocks = shopStocks;
+    //        shop.ModifiedDate = DateTime.Now;
+
+    //        await _unitOfWork.ShopRepository.Update(shop);
+    //        await _unitOfWork.Commit();
+
+    //        return true;
+    //    }
+    //    catch (Exception)
+    //    {
+    //        return false;
+    //    }
+    //}
 }

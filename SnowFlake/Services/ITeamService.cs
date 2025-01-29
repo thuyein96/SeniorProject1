@@ -1,4 +1,5 @@
 ﻿using SnowFlake.Dtos;
+using SnowFlake.Dtos.APIs.Product;
 using SnowFlake.Dtos.APIs.Team.CreateTeam;
 using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
 using SnowFlake.Dtos.APIs.Team.SearchPlayerInTeam;
@@ -12,10 +13,11 @@ public interface ITeamService
     Task<TeamEntity> Create(CreateTeamRequest createTeamRequest);
     //Reterive
     Task<List<TeamEntity>> GetAll();
-    Task<TeamEntity> GetTeam(int teamNumber, string playerRoomCode);
+    Task<TeamEntity> GetTeam(int teamNumber, string? playerRoomCode, string? hostRoomCode);
     //GetByRoomCode
     Task<List<TeamEntity>> GetTeamsByRoomCode(GetTeamsByRoomCodeRequest getTeamsByRoomCodeRequest);
     Task<string> IsTeamHasPlayer(SearchPlayerRequest searchPlayerRequest);
+    Task<bool> MinusTeamTokens(TeamEntity team, int totalCost);
     //Update 
     Task<string> Update(UpdateTeamRequest updateTeamRequest);
     //delete 
