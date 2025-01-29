@@ -26,7 +26,7 @@ public class TimerService : ITimerService
         await _hubContext.Clients.Group(groupName).SendAsync("LeaveUserGroup", $"{connectionId} leaved the '{groupName}' group.");
     }
 
-    public async Task CreateCountdown(string groupName, string duration)
+    public async Task CreateCountdown(string groupName, string duration, string gameState)
     {
         var seconds = Utils.ConvertToSeconds(duration);
         if (_timers.ContainsKey(groupName))
@@ -39,7 +39,7 @@ public class TimerService : ITimerService
             RemainingSeconds = seconds+1,
             TotalSeconds = seconds,
         };
-        await _hubContext.Clients.Group(groupName).SendAsync("CreateTimer", $"{duration} Timer is created");
+        await _hubContext.Clients.Group(groupName).SendAsync("CreateTimer", gameState);
 
     }
 

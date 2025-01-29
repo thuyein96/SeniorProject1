@@ -2,7 +2,7 @@
 
 public interface ITimerService
 {
-    Task CreateCountdown(string groupName, string duration);
+    Task CreateCountdown(string groupName, string duration, string gameState);
     Task StartCountdown(string groupName);
     Task PauseCountdown(string groupName);
     Task ResumeCountdown(string groupName);

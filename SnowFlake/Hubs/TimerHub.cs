@@ -15,7 +15,7 @@ public class TimerHub : Hub
     public override async Task OnConnectedAsync() 
         => await Clients.Caller.SendAsync("ReceivedMessage", $"{Context.ConnectionId} is connected");
 
-    public async Task CreateTimer(string groupName, string durationSeconds)
+    public async Task CreateTimer(string groupName, string durationSeconds, string gameState)
         => await _countdownService.CreateCountdown(groupName, durationSeconds);
     public Task StartCountdown(string groupName)
         => _countdownService.StartCountdown(groupName);
