@@ -42,7 +42,7 @@ namespace SnowFlake.Services
                 //    var team = new TeamEntity
                 //    {
                 //        Id = ObjectId.GenerateNewId().ToString(),
-                //        TeamNumber = i,
+                //        OwnerId = i,
                 //        Tokens = createPlaygroundRequest.TeamToken,
                 //        HostRoomCode = createPlaygroundRequest.HostRoomCode,
                 //        PlayerRoomCode = createPlaygroundRequest.PlayerRoomCode,
@@ -99,7 +99,9 @@ namespace SnowFlake.Services
             try
             {
                 if (string.IsNullOrWhiteSpace(roomcode)) return null;
-                return (await _unitOfWork.PlaygroundRepository.GetBy(p => p.HostRoomCode == roomcode)).FirstOrDefault();
+                var playground = (await _unitOfWork.PlaygroundRepository.GetBy(p => p.HostRoomCode == roomcode)).FirstOrDefault();
+                playground.Rounds = playground.Rounds?.OrderBy(n => n.RoundNumber).ToList();
+                return playground;
             }
             catch (Exception)
             {
