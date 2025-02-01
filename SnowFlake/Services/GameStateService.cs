@@ -27,6 +27,7 @@ public class GameStateService : IGameStateService
             HostRoomCode = createGameStateRequest.HostRoomCode,
             PlayerRoomCode = createGameStateRequest.PlayerRoomCode,
             CurrentGameState = createGameStateRequest.CurrentGameState,
+            CurrentRoundNumber = createGameStateRequest.CurrentRoundNumber,
             CreationDate = DateTime.Now
         };
 
