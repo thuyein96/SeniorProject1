@@ -67,6 +67,8 @@ public class GameStateService : IGameStateService
             if (existingGameState == null) return string.Empty;
 
             existingGameState.CurrentGameState = updateGameStateRequest.CurrentGameState;
+            if(updateGameStateRequest.CurrentRoundNumber is not null)
+                existingGameState.CurrentRoundNumber = updateGameStateRequest.CurrentRoundNumber;
             existingGameState.ModifiedDate = DateTime.Now;
 
             await _unitOfWork.GameStateRepository.Update(existingGameState);
