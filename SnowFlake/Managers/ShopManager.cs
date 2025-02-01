@@ -1,5 +1,8 @@
 ﻿using SnowFlake.Dtos;
-using SnowFlake.Dtos.APIs.Product.UpdateShop;
+using SnowFlake.Dtos.APIs.Image.GetImage;
+using SnowFlake.Dtos.APIs.Shop.GetShop;
+using SnowFlake.Dtos.APIs.Shop.SellSnowFlake;
+using SnowFlake.Dtos.APIs.Shop.UpdateShop;
 using SnowFlake.Services;
 
 namespace SnowFlake.Managers;
@@ -22,7 +25,7 @@ public class ShopManager : IShopManager
         _productService = productService;
     }
 
-    public async Task<string> ManageIncomingShopOrder(UpdateStockRequest updateShopStockRequest)
+    public async Task<string> ManageIncomingShopOrder(ExchangeProductsRequest updateShopStockRequest)
     {
         var products = updateShopStockRequest.Products.Select(p => new ProductEntity
         {
@@ -58,4 +61,37 @@ public class ShopManager : IShopManager
         
         return "Order processed successful.";
     }
+
+    public async Task<ShopWithProducts> GetShopByHostRoomCode(string hostRoomCode)
+    {
+        var shop = await _shopService.GetShopByHostRoomCode(hostRoomCode);
+        if (shop is null) return null;
+
+        var products = await _productService.GetProductsByOwnerId(shop.Id);
+        if (products is null) return null;
+
+        return new ShopWithProducts
+        {
+            Id = shop.Id,
+            HostRoomCode = shop.HostRoomCode,
+            Tokens = shop.Tokens,
+            ShopStocks = products.Select(p => new Product
+            {
+                ProductName = p.ProductName,
+                RemainingStock = p.RemainingStock,
+                Price = p.Price
+            }).ToList()
+        };
+    }
+
+    //public async Task<string> ManageSnowflakeOrder(BuySnowflakeRequest buySnowflakeRequest)
+    //{
+    //    var team = await _teamService.GetTeam(buySnowflakeRequest.TeamNumber, buySnowflakeRequest.PlayerRoomCode, null);
+    //    if (team is null) return string.Empty;
+
+    //    var image = await _imageService.GetImage(new GetImageRequest { Id = buySnowflakeRequest.ImageId });
+    //    if (image is null) return string.Empty;
+
+
+    //}
 }

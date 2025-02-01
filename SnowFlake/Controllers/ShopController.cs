@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SnowFlake.Dtos.APIs.Product.UpdateShop;
+using SnowFlake.Dtos.APIs.Shop.BuySnowFlake;
 using SnowFlake.Dtos.APIs.Shop.CreateShop;
 using SnowFlake.Dtos.APIs.Shop.GetShop;
+using SnowFlake.Dtos.APIs.Shop.SellSnowFlake;
+using SnowFlake.Dtos.APIs.Shop.UpdateShop;
 using SnowFlake.Managers;
 using SnowFlake.Services;
 
@@ -56,7 +58,7 @@ namespace SnowFlake.Controllers
         {
             try
             {
-                var shop = await _shopService.GetShopByHostRoomCode(hostRoomCode);
+                var shop = await _shopManager.GetShopByHostRoomCode(hostRoomCode);
                 if (shop == null)
                 {
                     return NotFound(new GetShopResponse
@@ -77,25 +79,25 @@ namespace SnowFlake.Controllers
             }
         }
 
-        [HttpPut]
-        public async Task<IActionResult> ManageShopOrder(UpdateStockRequest updateStockRequest)
+        [HttpPut("exchangestocks")]
+        public async Task<IActionResult> ManageShopOrder(ExchangeProductsRequest exchangeProductsRequest)
         {
             try
             {
-                if (updateStockRequest == null)
+                if (exchangeProductsRequest == null)
                 {
                     return BadRequest();
                 }
-                var orderResult = await _shopManager.ManageIncomingShopOrder(updateStockRequest);
+                var orderResult = await _shopManager.ManageIncomingShopOrder(exchangeProductsRequest);
                 if (orderResult == null)
                 {
-                    return NotFound(new UpdateStockResponse
+                    return NotFound(new ExchangeProductsResponse
                     {
                         Success = false,
                         Message = null
                     });
                 }
-                return Ok(new UpdateStockResponse
+                return Ok(new ExchangeProductsResponse
                 {
                     Success = true,
                     Message = orderResult
@@ -107,5 +109,34 @@ namespace SnowFlake.Controllers
             }
         }
 
+        //[HttpPut("buyimage")]
+        //public async Task<IActionResult> ManageSnowFlakeOrder(BuySnowflakeRequest buySnowflakeRequest)
+        //{
+        //    try
+        //    {
+        //        if (buySnowflakeRequest == null)
+        //        {
+        //            return BadRequest();
+        //        }
+        //        var orderResult = ;
+        //        if (orderResult == null)
+        //        {
+        //            return NotFound(new BuySnowflakeResponse
+        //            {
+        //                Success = false,
+        //                Message = null
+        //            });
+        //        }
+        //        return Ok(new BuySnowflakeResponse
+        //        {
+        //            Success = true,
+        //            Message = orderResult
+        //        });
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return StatusCode(500, e.Message);
+        //    }
+        //}
     }
 }

@@ -2,6 +2,6 @@
 {
     public class GetShopResponse : BaseResponse
     {
-        public ShopEntity Message { get; set; }
+        public ShopWithProducts Message { get; set; }
     }
 }
