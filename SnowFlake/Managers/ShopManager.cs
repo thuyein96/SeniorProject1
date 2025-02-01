@@ -74,6 +74,7 @@ public class ShopManager : IShopManager
         {
             Id = shop.Id,
             HostRoomCode = shop.HostRoomCode,
+            PlayerRoomCode = shop.PlayerRoomCode,
             Tokens = shop.Tokens,
             ShopStocks = products.Select(p => new Product
             {
