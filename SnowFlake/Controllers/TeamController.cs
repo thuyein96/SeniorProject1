@@ -112,14 +112,14 @@ public class TeamController : ControllerBase
             PlayerRoomCode = playerRoomCode,
             PlayerName = playerName
         };
-        var player = await _teamService.IsTeamHasPlayer(searchPlayerRequest);
+        var player = await _teamManager.IsTeamHasPlayer(searchPlayerRequest);
 
         if (string.IsNullOrWhiteSpace(player))
         {
             return NotFound(new SearchPlayerResponse
             {
                 Success = false,
-                Message = player
+                Message = "Player not found."
             });
         }
         return Ok(new SearchPlayerResponse

@@ -1,4 +1,5 @@
 ﻿using SnowFlake.Dtos;
+using SnowFlake.Dtos.APIs.Team.SearchPlayerInTeam;
 using SnowFlake.Dtos.APIs.Product.GetProducts;
 using SnowFlake.Dtos.APIs.Team.GetTeams;
 using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
@@ -10,12 +11,15 @@ public class TeamManager : ITeamManager
 {
     private readonly ITeamService _teamService;
     private readonly IProductService _productService;
+    private readonly IPlayerService _playerService;
 
     public TeamManager(ITeamService teamService,
-                       IProductService productService)
+                       IProductService productService,
+                       IPlayerService playerService)
     {
         _teamService = teamService;
         _productService = productService;
+        _playerService = playerService;
     }
 
     public async Task<List<ProductEntity>> GetProductsByTeam(GetProductsByTeamRequest getProductsByTeamRequest)
@@ -49,7 +53,7 @@ public class TeamManager : ITeamManager
                 HostRoomCode = team.HostRoomCode,
                 PlayerRoomCode = team.PlayerRoomCode,
                 Tokens = team.Tokens,
-                Members = team.Members,
+                Members = new List<string>(),
                 TeamStocks = products,
                 CreationTime = team.CreationDate,
                 ModifiedTime = team.ModifiedDate
@@ -57,5 +61,27 @@ public class TeamManager : ITeamManager
         }
 
         return teamsWithProducts;
+    }
+
+    public async Task<string> IsTeamHasPlayer(SearchPlayerRequest searchPlayerRequest)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(searchPlayerRequest.PlayerRoomCode)) return string.Empty;
+
+            var team = (await _teamService.GetTeamsByRoomCode(new GetTeamsByRoomCodeRequest
+            {
+                PlayerRoomCode = searchPlayerRequest.PlayerRoomCode
+            })).FirstOrDefault();
+            if (team is null) return string.Empty;
+
+            var hasPlayer = (await _playerService.GetPlayersByTeamId(team.Id)).Any(p => p.PlayerName.Equals(searchPlayerRequest.PlayerName));
+
+            return hasPlayer ? "Player already exists in the team" : string.Empty;
+        }
+        catch (Exception)
+        {
+            return string.Empty;
+        }
     }
 }

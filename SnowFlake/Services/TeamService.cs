@@ -89,23 +89,6 @@ public class TeamService : ITeamService
 
     }
 
-    // search player in team member list
-    public async Task<string> IsTeamHasPlayer(SearchPlayerRequest searchPlayerRequest)
-    {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(searchPlayerRequest.PlayerRoomCode)) return string.Empty;
-
-            var hasPlayer = (await _unitOfWork.TeamRepository.GetBy(t => t.PlayerRoomCode == searchPlayerRequest.PlayerRoomCode))
-                            .Any(t => t.Members != null && t.Members.Contains(searchPlayerRequest.PlayerName));
-
-            return hasPlayer ? "Player already exists in the team" : string.Empty;
-        }
-        catch (Exception)
-        {
-            return string.Empty;
-        }
-    }
 
     public async Task<bool> MinusTeamTokens(TeamEntity team, int totalCost)
     {
@@ -138,13 +121,13 @@ public class TeamService : ITeamService
             if (existingTeam is null || existingTeam.Id != updateTeamRequest.Id) return string.Empty;
             if (updateTeamRequest.Tokens is not null)
                 existingTeam.Tokens = updateTeamRequest.Tokens;
-            if (updateTeamRequest.Member is not null && existingTeam.Members is not null)
-                existingTeam.Members.Add(updateTeamRequest.Member);
-            if (updateTeamRequest.Member is not null && existingTeam.Members is null)
-            {
-                existingTeam.Members = new List<string>();
-                existingTeam.Members.Add(updateTeamRequest.Member);
-            }
+            //if (updateTeamRequest.Member is not null && existingTeam.Members is not null)
+            //    existingTeam.Members.Add(updateTeamRequest.Member);
+            //if (updateTeamRequest.Member is not null && existingTeam.Members is null)
+            //{
+            //    existingTeam.Members = new List<string>();
+            //    existingTeam.Members.Add(updateTeamRequest.Member);
+            //}
             existingTeam.ModifiedDate = DateTime.Now;
 
             _unitOfWork.TeamRepository.Update(existingTeam);

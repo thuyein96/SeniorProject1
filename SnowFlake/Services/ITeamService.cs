@@ -16,7 +16,6 @@ public interface ITeamService
     Task<TeamEntity> GetTeam(int teamNumber, string? playerRoomCode, string? hostRoomCode);
     //GetByRoomCode
     Task<List<TeamEntity>> GetTeamsByRoomCode(GetTeamsByRoomCodeRequest getTeamsByRoomCodeRequest);
-    Task<string> IsTeamHasPlayer(SearchPlayerRequest searchPlayerRequest);
     Task<bool> MinusTeamTokens(TeamEntity team, int totalCost);
     //Update 
     Task<string> Update(UpdateTeamRequest updateTeamRequest);
