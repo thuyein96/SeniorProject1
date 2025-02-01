@@ -1,0 +1,367 @@
+[
+  {
+    "ContainingType": "SnowFlake.Controllers.GameStateController",
+    "Method": "CreateGameStateAsync",
+    "RelativePath": "api/gamestate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createGameStateRequest",
+        "Type": "SnowFlake.Dtos.APIs.GameState.CreateGameState.CreateGameStateRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.GameStateController",
+    "Method": "GetGameStateAsync",
+    "RelativePath": "api/gamestate",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "hostRoomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "playerRoomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.GameStateController",
+    "Method": "UpdateGameStateAsync",
+    "RelativePath": "api/gamestate",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "updateGameStateRequest",
+        "Type": "SnowFlake.Dtos.APIs.GameState.UpdateGameState.UpdateGameStateRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.PlayerController",
+    "Method": "Entry",
+    "RelativePath": "api/player",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "SnowFlake.Dtos.APIs.CreatePlayerRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.PlayerController",
+    "Method": "GetAll",
+    "RelativePath": "api/player",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.PlayerController",
+    "Method": "Update",
+    "RelativePath": "api/player",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "SnowFlake.Dtos.APIs.Player.UpdatePlayer.UpdatePlayerRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.PlayerController",
+    "Method": "GetPlayerAsync",
+    "RelativePath": "api/player/{playerid}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "playerid",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.PlayerController",
+    "Method": "Delete",
+    "RelativePath": "api/player/{playerid}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "playerid",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.PlayerController",
+    "Method": "GetTeamPlayer",
+    "RelativePath": "api/player/search",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "playerName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "roomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "teamNumber",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.PlayerController",
+    "Method": "ManagePlayer",
+    "RelativePath": "api/player/status",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "managePlayerRequest",
+        "Type": "SnowFlake.Dtos.APIs.Player.AddPlayerToTeam.ManagePlayerRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.PlaygroundController",
+    "Method": "Entry",
+    "RelativePath": "api/playground",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "SnowFlake.Dtos.APIs.Playground.ConfigurePlayground.ConfigurePlaygroundRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.PlaygroundController",
+    "Method": "GetByRoomCode",
+    "RelativePath": "api/playground/hostroomcode",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "hostRoomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.ProductController",
+    "Method": "GetProducts",
+    "RelativePath": "api/product",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ownerId",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.ShopController",
+    "Method": "Create",
+    "RelativePath": "api/shop",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createShopRequest",
+        "Type": "SnowFlake.Dtos.APIs.Shop.CreateShop.CreateShopRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.ShopController",
+    "Method": "GetShopByHostRoomCode",
+    "RelativePath": "api/shop",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "hostRoomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.ShopController",
+    "Method": "ManageShopOrder",
+    "RelativePath": "api/shop",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "updateStockRequest",
+        "Type": "SnowFlake.Dtos.APIs.Product.UpdateShop.UpdateStockRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.TeamController",
+    "Method": "Entry",
+    "RelativePath": "api/team",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createTeamRequest",
+        "Type": "SnowFlake.Dtos.APIs.Team.CreateTeam.CreateTeamRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.TeamController",
+    "Method": "GetAll",
+    "RelativePath": "api/team",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.TeamController",
+    "Method": "Update",
+    "RelativePath": "api/team",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "updateTeamRequest",
+        "Type": "SnowFlake.Dtos.APIs.Team.UpdateTeam.UpdateTeamRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.TeamController",
+    "Method": "Delete",
+    "RelativePath": "api/team/{teamid}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "teamid",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.TeamController",
+    "Method": "SearchPlayer",
+    "RelativePath": "api/team/players/search",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "playerRoomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "playerName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.TeamController",
+    "Method": "GetTeamByRoomCode",
+    "RelativePath": "api/team/search",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "hostRoomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "playerRoomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

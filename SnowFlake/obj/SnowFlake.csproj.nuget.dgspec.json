@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\thuye\\RiderProjects\\SnowFlake\\SnowFlake\\SnowFlake.csproj": {}
+    "C:\\Users\\thuye\\Documents\\GitHub\\SeniorProject1\\SnowFlake\\SnowFlake.csproj": {}
   },
   "projects": {
-    "C:\\Users\\thuye\\RiderProjects\\SnowFlake\\SnowFlake\\SnowFlake.csproj": {
+    "C:\\Users\\thuye\\Documents\\GitHub\\SeniorProject1\\SnowFlake\\SnowFlake.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\thuye\\RiderProjects\\SnowFlake\\SnowFlake\\SnowFlake.csproj",
+        "projectUniqueName": "C:\\Users\\thuye\\Documents\\GitHub\\SeniorProject1\\SnowFlake\\SnowFlake.csproj",
         "projectName": "SnowFlake",
-        "projectPath": "C:\\Users\\thuye\\RiderProjects\\SnowFlake\\SnowFlake\\SnowFlake.csproj",
+        "projectPath": "C:\\Users\\thuye\\Documents\\GitHub\\SeniorProject1\\SnowFlake\\SnowFlake.csproj",
         "packagesPath": "C:\\Users\\thuye\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\thuye\\RiderProjects\\SnowFlake\\SnowFlake\\obj\\",
+        "outputPath": "C:\\Users\\thuye\\Documents\\GitHub\\SeniorProject1\\SnowFlake\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
           "C:\\Users\\thuye\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,7 +26,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -39,16 +42,33 @@
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
-          "auditMode": "direct"
-        }
+          "auditMode": "all"
+        },
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Ardalis.SmartEnum": {
+              "target": "Package",
+              "version": "[8.2.0, )"
+            },
+            "Azure.Identity": {
+              "target": "Package",
+              "version": "[1.13.1, )"
+            },
+            "Azure.Storage.Blobs": {
+              "target": "Package",
+              "version": "[12.23.0, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[8.0.2, )"
+            },
+            "Microsoft.AspNetCore.SignalR": {
+              "target": "Package",
+              "version": "[1.0.4, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "target": "Package",
@@ -106,7 +126,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

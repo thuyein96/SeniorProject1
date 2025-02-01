@@ -7,6 +7,7 @@ namespace SnowFlake.Hubs;
 public class TimerHub : Hub
 {
     private readonly ITimerService _countdownService;
+    public readonly string _connectionId;
 
     public TimerHub(ITimerService countdownService)
     {

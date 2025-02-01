@@ -28,7 +28,7 @@ public class PlayerService : IPlayerService
             Id = ObjectId.GenerateNewId().ToString(),
             Name = createPlayerRequest.Name,
             TeamId = createPlayerRequest.TeamId,
-            RoomCode = createPlayerRequest.RoomdCode,
+            RoomCode = createPlayerRequest.RoomCode,
             CreationDate = DateTime.Now,
             ModifiedDate = null
         };

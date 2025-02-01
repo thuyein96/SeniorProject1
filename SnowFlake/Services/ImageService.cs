@@ -20,17 +20,17 @@ public class ImageService : IImageService
         _blobStorageService = blobStorageService;
     }
 
-    public async Task<ImageEntity> AddImage(CreateImageRequest createImageRequest)
+    public async Task<ImageEntity> UploadImage(UploadImageRequest uploadImageRequest)
     {
-        var imageUploadUrl = await _blobStorageService.UploadBlobAsync("image", createImageRequest.FileName, createImageRequest.ImageByteData);
+        var imageUploadUrl = await _blobStorageService.UploadBlobAsync("image", uploadImageRequest.FileName, uploadImageRequest.ImageByteData);
 
         var imageEntity = new ImageEntity
         {
-            Id = createImageRequest.Id.ToString(),
-            FileName = createImageRequest.FileName,
+            Id = uploadImageRequest.Id.ToString(),
+            FileName = uploadImageRequest.FileName,
             SnowFlakeImageUrl = imageUploadUrl,
             ImageBuyingStatus = ImageBuyingStatus.Pending.Name,
-            TeamId = createImageRequest.TeamId,
+            OwnerId = uploadImageRequest.TeamId,
             CreationDate = DateTime.Now
         };
 
@@ -87,6 +87,22 @@ public class ImageService : IImageService
         await _unitOfWork.ImageRepository.Delete(existingImage);
 
         return $"[ID: {deleteImageRequest.Id}] Successfully Deleted";
+    }
+
+    public async Task<bool> UpdateImageOwner(ImageEntity image)
+    {
+        try
+        {
+            if (image == null) return false;
+            await _unitOfWork.ImageRepository.Update(image);
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+        
     }
 
     public async Task<string> UpdateImage(UpdateImageRequest updateImageRequest)

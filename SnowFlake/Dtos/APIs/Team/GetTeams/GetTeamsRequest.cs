@@ -2,6 +2,6 @@
 
 public class GetTeamsRequest
 {
-    public int Size { get; set; }
-    public int StartAt { get; set; }
+    public string? HostRoomCode { get; set; }
+    public string? PlayerRoomCode { get; set; }
 }
