@@ -6,5 +6,5 @@ public class CreatePlayerRequest
 {
     public string Name { get; set; }
     public string? TeamId { get; set; }
-    public string? RoomdCode { get; set; }
+    public string? RoomCode { get; set; }
 }
