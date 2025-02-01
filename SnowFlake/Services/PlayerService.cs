@@ -113,8 +113,8 @@ public class PlayerService : IPlayerService
     public async Task<string> Update(UpdatePlayerRequest updatePlayerRequest)
     {
         if (updatePlayerRequest is null) return string.Empty;
-        //if (!string.IsNullOrWhiteSpace(updatePlayerRequest.TeamId))
-        //    if (!Utils.IsValidObjectId(updatePlayerRequest.TeamId))
+        //if (!string.IsNullOrWhiteSpace(updatePlayerRequest.OwnerId))
+        //    if (!Utils.IsValidObjectId(updatePlayerRequest.OwnerId))
         //        return string.Empty;
 
         var existingPlayer = (await _unitOfWork.PlayerRepository.GetBy(w => w.Id == updatePlayerRequest.Id)).SingleOrDefault();

@@ -23,6 +23,7 @@ public class PlayerManager : IPlayerManager
     {
         var player = new PlayerEntity();
 
+        // Get player without team number
         if (searchPlayerRequest.TeamNumber == null || searchPlayerRequest.TeamNumber <= 0)
         {
             player = await _playerService.GetPlayerByRoomCode(searchPlayerRequest.PlayerName, searchPlayerRequest.PlayerRoomCode);
@@ -36,6 +37,7 @@ public class PlayerManager : IPlayerManager
             };
         }
 
+        // Get player by team number
         var team = await _teamService.GetTeam(searchPlayerRequest.TeamNumber.Value, searchPlayerRequest.PlayerRoomCode, null);
         if (team is null)
         {

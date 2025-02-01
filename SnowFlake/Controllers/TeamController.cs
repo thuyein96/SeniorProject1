@@ -5,6 +5,7 @@ using SnowFlake.Dtos.APIs.Team.GetTeams;
 using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
 using SnowFlake.Dtos.APIs.Team.SearchPlayerInTeam;
 using SnowFlake.Dtos.APIs.Team.UpdateTeam;
+using SnowFlake.Managers;
 using SnowFlake.Services;
 
 namespace SnowFlake.Controllers;
@@ -13,10 +14,13 @@ namespace SnowFlake.Controllers;
 public class TeamController : ControllerBase
 {
     private readonly ITeamService _teamService;
+    private readonly ITeamManager _teamManager;
 
-    public TeamController(ITeamService teamService)
+    public TeamController(ITeamService teamService,
+                          ITeamManager teamManager)
     {
         _teamService = teamService;
+        _teamManager = teamManager;
     }
 
     [HttpPost]
@@ -82,7 +86,7 @@ public class TeamController : ControllerBase
             PlayerRoomCode = playerRoomCode
         };
 
-        var teams = await _teamService.GetTeamsByRoomCode(getTeamByRoomCodeRequest);
+        var teams = await _teamManager.GetTeamWithProducts(getTeamByRoomCodeRequest);
 
         if (teams == null)
         {

@@ -1,6 +1,8 @@
-﻿namespace SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
+﻿using SnowFlake.Dtos.APIs.Team.GetTeams;
+
+namespace SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
 
 public class GetTeamsByRoomCodeResponse : BaseResponse
 {
-    public List<TeamEntity> Message { get; set; }
+    public List<TeamWithProducts> Message { get; set; }
 }

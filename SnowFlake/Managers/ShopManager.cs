@@ -38,9 +38,9 @@ public class ShopManager : IShopManager
 
         foreach (var product in updateShopStockRequest.Products)
         {
-            var shopProduct = (await _productService.GetProductByOwnerId(shop.Id))
+            var shopProduct = (await _productService.GetProductsByOwnerId(shop.Id))
                                                     .FirstOrDefault(p => p.ProductName == product.ProductName);
-            var teamProduct = (await _productService.GetProductByOwnerId(team.Id))
+            var teamProduct = (await _productService.GetProductsByOwnerId(team.Id))
                                                     .FirstOrDefault(p => p.ProductName == product.ProductName);
 
             var totalCost = product.Quantity * teamProduct.Price;

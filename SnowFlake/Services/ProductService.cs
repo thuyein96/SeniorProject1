@@ -27,7 +27,7 @@ public class ProductService : IProductService
         return (await _unitOfWork.ProductRepository.GetBy(p => p.ProductName == productName)).FirstOrDefault();
     }
 
-    public async Task<List<ProductEntity>> GetProductByOwnerId(string ownerId)
+    public async Task<List<ProductEntity>> GetProductsByOwnerId(string ownerId)
     {
         return (await _unitOfWork.ProductRepository.GetBy(p => p.OwnerId == ownerId)).ToList();
     }
