@@ -3,7 +3,7 @@ using SnowFlake.Repositories.Common;
 
 namespace SnowFlake.Repository;
 
-public interface IPlayerRepository : IBaseRepository<PlayerEntity>
+public interface IPlayerRepository : IBaseRepository<PlayerItem>
 {
     
 }

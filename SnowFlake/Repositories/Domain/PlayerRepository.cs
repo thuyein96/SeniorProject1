@@ -4,7 +4,7 @@ using SnowFlake.Repositories.Common;
 
 namespace SnowFlake.Repository;
 
-public class PlayerRepository : BaseRepository<PlayerEntity>, IPlayerRepository
+public class PlayerRepository : BaseRepository<PlayerItem>, IPlayerRepository
 {
     private readonly SnowFlakeDbContext _snowFlakeDbContext;
 

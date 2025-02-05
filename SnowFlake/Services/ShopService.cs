@@ -37,6 +37,19 @@ public class ShopService : IShopService
         }
     }
 
+    public async Task<ShopEntity> GetShopByPlayerRoomCode(string playerRoomCode)
+    {
+        try
+        {
+            var shop = (await _unitOfWork.ShopRepository.GetBy(s => s.PlayerRoomCode == playerRoomCode)).FirstOrDefault();
+            return shop;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
     public async Task<ShopEntity> GetShopByHostRoomCode(string hostRoomCode)
     {
         try

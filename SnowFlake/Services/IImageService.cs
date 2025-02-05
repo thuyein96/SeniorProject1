@@ -8,10 +8,10 @@ namespace SnowFlake.Services;
 
 public interface IImageService
 {
-    Task<ImageEntity> UploadImage(UploadImageRequest uploadImageRequest);
+    Task<ImageEntity> AddImage(CreateImageRequest createImageRequest, IFormFile file);
     Task<ImageEntity> GetImage(GetImageRequest getImageRequest);
     Task<List<ImageEntity>> GetImages();
-    Task<bool> UpdateImageOwner(ImageEntity image);
     Task<string> UpdateImage(UpdateImageRequest updateImageRequest);
+    Task<ImageEntity> UpdateImage(ImageEntity image);
     Task<string> DeleteImage(DeleteImageRequest deleteImageRequest);
 }

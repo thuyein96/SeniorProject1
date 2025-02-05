@@ -4,11 +4,11 @@ using SnowFlake.Repositories.Common;
 
 namespace SnowFlake.Repositories.Domain;
 
-public class LeaderboardRepository : BaseRepository<LeaderboardEntity>, ILeaderboardRepository
+public class TransactionRepository : BaseRepository<TransactionEntity>, ITransactionRepository
 {
     private readonly SnowFlakeDbContext _snowFlakeDbContext;
 
-    public LeaderboardRepository(SnowFlakeDbContext snowFlakeDbContext) : base(snowFlakeDbContext)
+    public TransactionRepository(SnowFlakeDbContext snowFlakeDbContext) : base(snowFlakeDbContext)
     {
         _snowFlakeDbContext = snowFlakeDbContext;
     }

@@ -109,34 +109,34 @@ namespace SnowFlake.Controllers
             }
         }
 
-        //[HttpPut("buyimage")]
-        //public async Task<IActionResult> ManageSnowFlakeOrder(BuySnowflakeRequest buySnowflakeRequest)
-        //{
-        //    try
-        //    {
-        //        if (buySnowflakeRequest == null)
-        //        {
-        //            return BadRequest();
-        //        }
-        //        var orderResult = ;
-        //        if (orderResult == null)
-        //        {
-        //            return NotFound(new BuySnowflakeResponse
-        //            {
-        //                Success = false,
-        //                Message = null
-        //            });
-        //        }
-        //        return Ok(new BuySnowflakeResponse
-        //        {
-        //            Success = true,
-        //            Message = orderResult
-        //        });
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return StatusCode(500, e.Message);
-        //    }
-        //}
+        [HttpPut("buyimage")]
+        public async Task<IActionResult> ManageSnowFlakeOrder(BuySnowflakeRequest buySnowflakeRequest)
+        {
+            try
+            {
+                if (buySnowflakeRequest == null)
+                {
+                    return BadRequest();
+                }
+                var orderResult = await _shopManager.ManageSnowflakeOrder(buySnowflakeRequest);
+                if (orderResult == null)
+                {
+                    return NotFound(new BuySnowflakeResponse
+                    {
+                        Success = false,
+                        Message = null
+                    });
+                }
+                return Ok(new BuySnowflakeResponse
+                {
+                    Success = true,
+                    Message = orderResult
+                });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@ using SnowFlake.Dtos.APIs.Player.UpdatePlayer;
 using SnowFlake.UnitOfWork;
 using SnowFlake.Utilities;
 using System.Runtime.InteropServices;
+using PlayerItem = SnowFlake.Dtos.PlayerItem;
 
 namespace SnowFlake.Services;
 
@@ -16,14 +17,14 @@ public class PlayerService : IPlayerService
     {
         _unitOfWork = unitOfWork;
     }
-    public async Task<PlayerEntity> Create(CreatePlayerRequest createPlayerRequest)
+    public async Task<PlayerItem> Create(CreatePlayerRequest createPlayerRequest)
     {
         if (createPlayerRequest is null) return null;
         if (!string.IsNullOrWhiteSpace(createPlayerRequest.TeamId))
             if (!Utils.IsValidObjectId(createPlayerRequest.TeamId))
                 return null;
 
-        var player = new PlayerEntity
+        var player = new PlayerItem
         {
             Id = ObjectId.GenerateNewId().ToString(),
             Name = createPlayerRequest.Name,
@@ -39,9 +40,9 @@ public class PlayerService : IPlayerService
         return player;
     }
 
-    public async Task<List<PlayerItem>> GetAll()
+    public async Task<List<Dtos.APIs.Player.PlayerItem>> GetAll()
     {
-        var players = (await _unitOfWork.PlayerRepository.GetAll()).Take(Utils.BatchSize).Select(p => new PlayerItem
+        var players = (await _unitOfWork.PlayerRepository.GetAll()).Take(Utils.BatchSize).Select(p => new Dtos.APIs.Player.PlayerItem
         {
             Id = p.Id,
             PlayerName = p.Name,
@@ -54,12 +55,12 @@ public class PlayerService : IPlayerService
         return players;
     }
 
-    public async Task<PlayerItem> GetByPlayerId(string playerId)
+    public async Task<Dtos.APIs.Player.PlayerItem> GetByPlayerId(string playerId)
     {
         if (string.IsNullOrWhiteSpace(playerId)) return null;
         if (!Utils.IsValidObjectId(playerId)) return null;
 
-        var player = (await _unitOfWork.PlayerRepository.GetBy(t => t.Id == playerId)).Select(p => new PlayerItem
+        var player = (await _unitOfWork.PlayerRepository.GetBy(t => t.Id == playerId)).Select(p => new Dtos.APIs.Player.PlayerItem
         {
             Id = p.Id,
             PlayerName = p.Name,
@@ -72,7 +73,7 @@ public class PlayerService : IPlayerService
         return player;
     }
 
-    public async Task<PlayerEntity> GetPlayerByName(string playerName, [Optional] string? teamId, [Optional] string? playerRoomCode)
+    public async Task<PlayerItem> GetPlayerByName(string playerName, [Optional] string? teamId, [Optional] string? playerRoomCode)
     {
         if (string.IsNullOrWhiteSpace(playerName)) return null;
         if (string.IsNullOrWhiteSpace(teamId) &&
@@ -80,10 +81,12 @@ public class PlayerService : IPlayerService
         {
             return (await _unitOfWork.PlayerRepository.GetBy(p => p.Name == playerName && p.TeamId == null)).FirstOrDefault();
         }
-        return (await _unitOfWork.PlayerRepository.GetBy(p => p.Name == playerName && p.TeamId == teamId && p.RoomCode == playerRoomCode)).FirstOrDefault();
+        var player = (await _unitOfWork.PlayerRepository.GetBy(p => p.Name == playerName && p.TeamId == teamId)).FirstOrDefault();
+
+        return player;
     }
 
-    public async Task<PlayerEntity> GetPlayerByRoomCode(string playerName, string roomCode)
+    public async Task<PlayerItem> GetPlayerByRoomCode(string playerName, string roomCode)
     {
         if (string.IsNullOrWhiteSpace(playerName)) return null;
         if(string.IsNullOrWhiteSpace(roomCode)) return null;
@@ -93,12 +96,12 @@ public class PlayerService : IPlayerService
         return player;
     }
 
-    public async Task<List<PlayerItem>> GetPlayersByTeamId(string teamId)
+    public async Task<List<Dtos.APIs.Player.PlayerItem>> GetPlayersByTeamId(string teamId)
     {
         if (string.IsNullOrWhiteSpace(teamId)) return null;
         if (!Utils.IsValidObjectId(teamId)) return null;
 
-        var players = (await _unitOfWork.PlayerRepository.GetBy(t => t.TeamId == teamId)).Select(p => new PlayerItem
+        var players = (await _unitOfWork.PlayerRepository.GetBy(t => t.TeamId == teamId)).Select(p => new Dtos.APIs.Player.PlayerItem
         {
             Id = p.Id,
             PlayerName = p.Name,

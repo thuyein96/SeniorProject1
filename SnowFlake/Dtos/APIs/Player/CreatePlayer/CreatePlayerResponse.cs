@@ -5,5 +5,5 @@ namespace SnowFlake.Dtos.APIs;
 public class CreatePlayerResponse
 {
     public bool Success { get; set; }
-    public PlayerEntity Message { get; set; }
+    public PlayerItem Message { get; set; }
 }

@@ -7,6 +7,7 @@ namespace SnowFlake.Services;
 public interface IShopService
 {
     Task<ShopEntity> CreateAsync(CreateShopRequest createShopRequest);
+    Task<ShopEntity> GetShopByPlayerRoomCode(string playerRoomCode);
     Task<ShopEntity> GetShopByHostRoomCode(string hostRoomCode);
     Task<bool> AddShopTokens(ShopEntity shop, int totalCost);
     //Task<bool> UpdateShopStock(ShopEntity shop, BuyProduct productEntity);

@@ -4,7 +4,7 @@ using MongoDB.EntityFrameworkCore;
 
 namespace SnowFlake.Dtos;
 [Collection("Players")]
-public class PlayerEntity : BaseEntity
+public class PlayerItem : BaseEntity
 {
     public string Name { get; set; }
     public string? TeamId { get; set; }

@@ -24,6 +24,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IPlayerManager, PlayerManager>();
 builder.Services.AddTransient<ITeamManager, TeamManager>();
 builder.Services.AddTransient<IPlaygroundManager, PlaygroundManger>();
+builder.Services.AddTransient<ILeaderboardManager, LeaderboardManager>();
 builder.Services.AddTransient<IPlayerManager, PlayerManager>();
 builder.Services.AddTransient<IShopManager, ShopManager>();
 
@@ -31,10 +32,13 @@ builder.Services.AddTransient<IPlayerService, PlayerService>();
 builder.Services.AddTransient<ITeamService, TeamService>();
 builder.Services.AddTransient<IGameStateService, GameStateService>();
 builder.Services.AddTransient<IPlaygroundService, PlaygroundService>();
+builder.Services.AddTransient<ILeaderboardService, LeaderboardService>();
 builder.Services.AddSingleton<ITimerService, TimerService>();
 builder.Services.AddTransient<IShopService, ShopService>();
 builder.Services.AddTransient<IImageService, ImageService>();
 builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<ITransactionService, TransactionService>();
+
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();

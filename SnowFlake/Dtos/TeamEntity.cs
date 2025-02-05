@@ -9,5 +9,4 @@ public class TeamEntity : BaseEntity
     public string? HostRoomCode { get; set; }
     public string? PlayerRoomCode { get; set; }
     public int? Tokens { get; set; }
-    public List<string>? Members { get; set; }
 }

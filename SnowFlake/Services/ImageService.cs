@@ -1,4 +1,6 @@
-﻿using SnowFlake.Azure.BlobsStorageService;
+﻿using MongoDB.Bson;
+using Pomelo.EntityFrameworkCore.MySql.Storage.Internal;
+using SnowFlake.Azure.BlobsStorageService;
 using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Image.CreateImage;
 using SnowFlake.Dtos.APIs.Image.DeleteImage;
@@ -20,17 +22,18 @@ public class ImageService : IImageService
         _blobStorageService = blobStorageService;
     }
 
-    public async Task<ImageEntity> UploadImage(UploadImageRequest uploadImageRequest)
+    public async Task<ImageEntity> AddImage(CreateImageRequest createImageRequest, IFormFile file)
     {
-        var imageUploadUrl = await _blobStorageService.UploadBlobAsync("image", uploadImageRequest.FileName, uploadImageRequest.ImageByteData);
+        var readStream = file.OpenReadStream();
+        var imageUploadUrl = await _blobStorageService.UploadBlobAsync("image", file.FileName, readStream);
 
         var imageEntity = new ImageEntity
         {
-            Id = uploadImageRequest.Id.ToString(),
-            FileName = uploadImageRequest.FileName,
+            Id = ObjectId.GenerateNewId().ToString(),
+            FileName = file.FileName,
             SnowFlakeImageUrl = imageUploadUrl,
             ImageBuyingStatus = ImageBuyingStatus.Pending.Name,
-            OwnerId = uploadImageRequest.TeamId,
+            OwnerId = createImageRequest.TeamId,
             CreationDate = DateTime.Now
         };
 
@@ -89,20 +92,13 @@ public class ImageService : IImageService
         return $"[ID: {deleteImageRequest.Id}] Successfully Deleted";
     }
 
-    public async Task<bool> UpdateImageOwner(ImageEntity image)
+    public async Task<ImageEntity> UpdateImage(ImageEntity image)
     {
-        try
-        {
-            if (image == null) return false;
-            await _unitOfWork.ImageRepository.Update(image);
+        if (image is null) return null;
+        await _unitOfWork.ImageRepository.Update(image);
+        await _unitOfWork.Commit();
 
-            return true;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
-        
+        return image;
     }
 
     public async Task<string> UpdateImage(UpdateImageRequest updateImageRequest)
@@ -141,8 +137,8 @@ public class ImageService : IImageService
 
         existingImage.ModifiedDate = DateTime.Now;
 
-        _unitOfWork.ImageRepository.Update(existingImage);
-        _unitOfWork.Commit();
+        await _unitOfWork.ImageRepository.Update(existingImage);
+        await _unitOfWork.Commit();
 
         return $"[ID: {existingImage.Id}] Successfully Updated";
     }

@@ -200,6 +200,7 @@ public class PlayerController : ControllerBase
                     Message = $"[Team: {managePlayerRequest.TeamNumber}][Player: {managePlayerRequest.PlayerName}] Failed to {managePlayerRequest.Status}."
                 });
             }
+
             return Ok(new ManagePlayerResponse
             {
                 Success = true,

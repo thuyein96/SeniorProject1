@@ -4,6 +4,7 @@ using SnowFlake.Dtos.APIs.Product.GetProducts;
 using SnowFlake.Dtos.APIs.Team.GetTeams;
 using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
 using SnowFlake.Services;
+using PlayerItem = SnowFlake.Dtos.APIs.Player.PlayerItem;
 
 namespace SnowFlake.Managers;
 
@@ -46,6 +47,9 @@ public class TeamManager : ITeamManager
                 RemainingStock = p.RemainingStock,
                 
             }).ToList();
+
+            var members = (await _playerService.GetPlayersByTeamId(team.Id)).Select(p => p.PlayerName).ToList();
+
             teamsWithProducts.Add(new TeamWithProducts
             {
                 Id = team.Id,
@@ -53,7 +57,7 @@ public class TeamManager : ITeamManager
                 HostRoomCode = team.HostRoomCode,
                 PlayerRoomCode = team.PlayerRoomCode,
                 Tokens = team.Tokens,
-                Members = new List<string>(),
+                Members = members,
                 TeamStocks = products,
                 CreationTime = team.CreationDate,
                 ModifiedTime = team.ModifiedDate

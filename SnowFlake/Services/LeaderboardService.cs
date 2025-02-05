@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 using SnowFlake.Dtos;
-using SnowFlake.Dtos.APIs.Leaderboard;
+using SnowFlake.Dtos.APIs.Leaderboard.CreateLeaderboard;
 using SnowFlake.UnitOfWork;
 
 namespace SnowFlake.Services;
@@ -14,28 +14,36 @@ public class LeaderboardService : ILeaderboardService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<LeaderboardEntity> Create(CreateLeaderboardRequest createLeaderboardRequest)
+    public async Task<LeaderboardEntity> GetLeaderboardByHostRoomCode(string hostRoomCode)
     {
-        try
+        if (string.IsNullOrWhiteSpace(hostRoomCode)) return null;
+        var leaderboard = (await _unitOfWork.LeaderboardRepository.GetBy(l => l.HostRoomCode == hostRoomCode)).FirstOrDefault();
+        return leaderboard;
+    }
+
+    public async Task<LeaderboardEntity> GetLeaderboardByPlayerRoomCode(string playerRoomCode)
+    {
+        if (string.IsNullOrWhiteSpace(playerRoomCode)) return null;
+        var leaderboard = (await _unitOfWork.LeaderboardRepository.GetBy(l => l.PlayerRoomCode.Equals(playerRoomCode))).FirstOrDefault();
+        return leaderboard;
+    }
+
+    public async Task<LeaderboardEntity> CreateLeaderboard(CreateLeaderboardRequest createLeaderboardRequest)
+    {
+        if (createLeaderboardRequest is null) return null;
+        var leaderboard = new LeaderboardEntity
         {
-            if (createLeaderboardRequest is null) return null;
-            var leaderboard = new LeaderboardEntity
-            {
-                Id = ObjectId.GenerateNewId().ToString(),
-                TeamNumber = createLeaderboardRequest.TeamNumber,
-                TeamRank = createLeaderboardRequest.TeamRank,
-                RemainingTokens = createLeaderboardRequest.RemainingTokens,
-                TotalSales = createLeaderboardRequest.TotalSales,
-                CreationDate = DateTime.Now,
-                ModifiedDate = null
-            };
-            await _unitOfWork.LeaderboardRepository.Create(leaderboard);
-            await _unitOfWork.Commit();
-            return leaderboard;
-        }
-        catch (Exception)
-        {
-            return null;
-        }
+            Id = ObjectId.GenerateNewId().ToString(),
+            HostRoomCode = createLeaderboardRequest.HostRoomCode,
+            PlayerRoomCode = createLeaderboardRequest.PlayerRoomCode,
+            TeamRanks = createLeaderboardRequest.TeamRanks,
+            CreationDate = DateTime.Now,
+            ModifiedDate = null
+        };
+
+        await _unitOfWork.LeaderboardRepository.Create(leaderboard);
+        await _unitOfWork.Commit();
+
+        return leaderboard;
     }
 }

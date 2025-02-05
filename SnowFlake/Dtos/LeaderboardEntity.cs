@@ -1,11 +1,11 @@
-﻿using MongoDB.EntityFrameworkCore;
+﻿using System.Security.Principal;
+using MongoDB.EntityFrameworkCore;
 
 namespace SnowFlake.Dtos;
 [Collection("Leaderboard")]
 public class LeaderboardEntity : BaseEntity
 {
-    public int TeamNumber { get; set; }
-    public int TeamRank { get; set; }
-    public int RemainingTokens { get; set; }
-    public int TotalSales { get; set; }
+    public string HostRoomCode { get; set; }
+    public string PlayerRoomCode { get; set; }
+    public List<TeamRank> TeamRanks { get; set; }
 }

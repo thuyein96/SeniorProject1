@@ -99,6 +99,16 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
+    private ITransactionRepository _transactionRepository;
+
+    public ITransactionRepository TransactionRepository
+    {
+        get
+        {
+            return _transactionRepository = _transactionRepository ?? new TransactionRepository(_snowFlakeDbContext);
+        }
+    }
+
     public async Task Commit()
     {
         _snowFlakeDbContext.SaveChanges();

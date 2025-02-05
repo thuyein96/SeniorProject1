@@ -4,6 +4,7 @@ using SnowFlake.Dtos.APIs.Player.AddPlayerToTeam;
 using SnowFlake.Dtos.APIs.Player.SearchPlayer;
 using SnowFlake.Dtos.APIs.Player.UpdatePlayer;
 using SnowFlake.Services;
+using PlayerItem = SnowFlake.Dtos.PlayerItem;
 
 namespace SnowFlake.Managers;
 
@@ -19,16 +20,16 @@ public class PlayerManager : IPlayerManager
         _teamService = teamService;
     }
 
-    public async Task<PlayerItem> SearchPlayer(SearchPlayerRequest searchPlayerRequest)
+    public async Task<Dtos.APIs.Player.PlayerItem> SearchPlayer(SearchPlayerRequest searchPlayerRequest)
     {
-        var player = new PlayerEntity();
+        var player = new PlayerItem();
 
         // Get player without team number
         if (searchPlayerRequest.TeamNumber == null || searchPlayerRequest.TeamNumber <= 0)
         {
             player = await _playerService.GetPlayerByRoomCode(searchPlayerRequest.PlayerName, searchPlayerRequest.PlayerRoomCode);
 
-            return new PlayerItem
+            return new Dtos.APIs.Player.PlayerItem
             {
                 Id = player.Id,
                 PlayerName = player.Name,
@@ -46,7 +47,7 @@ public class PlayerManager : IPlayerManager
 
         player = await _playerService.GetPlayerByName(searchPlayerRequest.PlayerName, team.Id, searchPlayerRequest.PlayerRoomCode);
 
-        return new PlayerItem
+        return new Dtos.APIs.Player.PlayerItem
         {
             Id = player.Id,
             PlayerName = player.Name,
@@ -66,7 +67,7 @@ public class PlayerManager : IPlayerManager
             }
 
             var updatedPlayer = string.Empty;
-            var player = new PlayerEntity();
+            var player = new PlayerItem();
 
             if (managePlayerRequest.Status.ToLower() == "add")
             {
