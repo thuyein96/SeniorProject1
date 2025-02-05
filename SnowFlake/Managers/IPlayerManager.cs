@@ -8,8 +8,7 @@ namespace SnowFlake.Managers;
 
 public interface IPlayerManager
 {
-    Task<PlayerItem> SearchPlayer(SearchPlayerRequest searchPlayerRequest);
+    Task<string> SearchPlayer(SearchPlayerRequest searchPlayerRequest);
     Task<string> ManagePlayer(ManagePlayerRequest managePlayerRequest);
 
-    //Task<string> RemovePlayerFromTeam(string playerName, int teamNumber, string playerRoomCode);
 }

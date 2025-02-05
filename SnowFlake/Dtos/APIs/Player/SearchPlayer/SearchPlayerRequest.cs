@@ -3,6 +3,5 @@
 public class SearchPlayerRequest
 {
     public string PlayerName { get; set; }
-    public int? TeamNumber { get; set; }
-    public string? PlayerRoomCode { get; set; }
+    public string PlayerRoomCode { get; set; }
 }

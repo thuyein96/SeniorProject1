@@ -2,5 +2,5 @@
 
 public class SearchPlayerResponse : BaseResponse
 {
-    public PlayerItem Message { get; set; }
+    public string Message { get; set; }
 }

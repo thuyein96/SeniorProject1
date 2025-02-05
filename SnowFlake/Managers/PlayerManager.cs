@@ -20,42 +20,15 @@ public class PlayerManager : IPlayerManager
         _teamService = teamService;
     }
 
-    public async Task<Dtos.APIs.Player.PlayerItem> SearchPlayer(SearchPlayerRequest searchPlayerRequest)
+    public async Task<string> SearchPlayer(SearchPlayerRequest searchPlayerRequest)
     {
-        var player = new PlayerItem();
+        var player = await _playerService.GetPlayerByRoomCode(searchPlayerRequest.PlayerName, searchPlayerRequest.PlayerRoomCode);
 
-        // Get player without team number
-        if (searchPlayerRequest.TeamNumber == null || searchPlayerRequest.TeamNumber <= 0)
-        {
-            player = await _playerService.GetPlayerByRoomCode(searchPlayerRequest.PlayerName, searchPlayerRequest.PlayerRoomCode);
+        if(player is null) return string.Empty;
 
-            return new Dtos.APIs.Player.PlayerItem
-            {
-                Id = player.Id,
-                PlayerName = player.Name,
-                PlayerRoomCode = player.RoomCode,
-                TeamId = player.TeamId
-            };
-        }
-
-        // Get player by team number
-        var team = await _teamService.GetTeam(searchPlayerRequest.TeamNumber.Value, searchPlayerRequest.PlayerRoomCode, null);
-        if (team is null)
-        {
-            return null;
-        }
-
-        player = await _playerService.GetPlayerByName(searchPlayerRequest.PlayerName, team.Id, searchPlayerRequest.PlayerRoomCode);
-
-        return new Dtos.APIs.Player.PlayerItem
-        {
-            Id = player.Id,
-            PlayerName = player.Name,
-            PlayerRoomCode = player.RoomCode,
-            TeamId = player.TeamId,
-            TeamNumber = team.TeamNumber
-        };
+        return "Player with same name already exist in the game.";
     }
+
     public async Task<string> ManagePlayer(ManagePlayerRequest managePlayerRequest)
     {
         try

@@ -84,24 +84,24 @@ public class PlayerController : ControllerBase
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> GetTeamPlayer([FromQuery] string playerName, [FromQuery] string? roomCode, [FromQuery] int? teamNumber)
+    public async Task<IActionResult> GetTeamPlayer([FromQuery] string playerName, [FromQuery] string playerRoomCode)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(roomCode) && teamNumber == null) return BadRequest(new GetPlayersResponse
-            {
-                Success = false,
-                Message = null
-            });
+            if (string.IsNullOrWhiteSpace(playerRoomCode) || string.IsNullOrWhiteSpace(playerName)) 
+                return BadRequest(new GetPlayersResponse
+                {
+                    Success = false,
+                    Message = null
+                });
 
-            var player = await _playerManager.SearchPlayer(new SearchPlayerRequest
+            var isPlayerExist = await _playerManager.SearchPlayer(new SearchPlayerRequest
             {
                 PlayerName = playerName,
-                PlayerRoomCode = roomCode,
-                TeamNumber = teamNumber
+                PlayerRoomCode = playerRoomCode
             });
 
-            if (player == null)
+            if (string.IsNullOrWhiteSpace(isPlayerExist))
             {
                 return NotFound(new SearchPlayerResponse
                 {
@@ -113,7 +113,7 @@ public class PlayerController : ControllerBase
             return Ok(new SearchPlayerResponse
             {
                 Success = true,
-                Message = player
+                Message = isPlayerExist
             });
         }
         catch (Exception e)
