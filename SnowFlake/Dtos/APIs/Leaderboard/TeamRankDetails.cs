@@ -10,5 +10,5 @@ public class TeamRankDetails
     public int TotalSales { get; set; }
     public List<string> Players { get; set; }
     public List<ProductEntity> Stocks { get; set; }
-    public List<string> Images { get; set; }
+    public List<string> SoldImages { get; set; }
 }

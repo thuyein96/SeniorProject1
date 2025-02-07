@@ -41,6 +41,9 @@ public class TimerHub : Hub
     public Task LeaveGroup(string groupName)
         => _countdownService.RemoveClientFromGroup(groupName, Context.ConnectionId);
 
+    public Task SendMessage(string groupName, string message)
+        => _countdownService.SendMessage(groupName, message);
+
     public override async Task OnDisconnectedAsync(Exception exception)
     {
         await Clients.Caller.SendAsync("ReceivedMessage", $"{Context.ConnectionId} is disconnected");

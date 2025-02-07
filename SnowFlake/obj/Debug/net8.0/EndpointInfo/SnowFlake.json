@@ -93,6 +93,130 @@
         }
       }
     },
+    "/api/image": {
+      "post": {
+        "tags": [
+          "Image"
+        ],
+        "parameters": [
+          {
+            "name": "teamId",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Image"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateImageRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateImageRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateImageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Image"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteImageRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteImageRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteImageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/leaderboard/{hostRoomCode}": {
+      "get": {
+        "tags": [
+          "Leaderboard"
+        ],
+        "parameters": [
+          {
+            "name": "hostRoomCode",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Leaderboard"
+        ],
+        "parameters": [
+          {
+            "name": "hostRoomCode",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/player": {
       "post": {
         "tags": [
@@ -178,20 +302,11 @@
             }
           },
           {
-            "name": "roomCode",
+            "name": "playerRoomCode",
             "in": "query",
             "style": "form",
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "teamNumber",
-            "in": "query",
-            "style": "form",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
             }
           }
         ],
@@ -330,28 +445,6 @@
         }
       }
     },
-    "/api/product": {
-      "get": {
-        "tags": [
-          "Product"
-        ],
-        "parameters": [
-          {
-            "name": "ownerId",
-            "in": "query",
-            "style": "form",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
     "/api/shop": {
       "post": {
         "tags": [
@@ -401,7 +494,9 @@
             "description": "Success"
           }
         }
-      },
+      }
+    },
+    "/api/shop/exchangestocks": {
       "put": {
         "tags": [
           "Shop"
@@ -410,17 +505,48 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateStockRequest"
+                "$ref": "#/components/schemas/ExchangeProductsRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateStockRequest"
+                "$ref": "#/components/schemas/ExchangeProductsRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateStockRequest"
+                "$ref": "#/components/schemas/ExchangeProductsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/shop/buyimage": {
+      "put": {
+        "tags": [
+          "Shop"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuySnowflakeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuySnowflakeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuySnowflakeRequest"
               }
             }
           }
@@ -602,6 +728,28 @@
         },
         "additionalProperties": false
       },
+      "BuySnowflakeRequest": {
+        "type": "object",
+        "properties": {
+          "playerRoomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageId": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "ConfigurePlaygroundRequest": {
         "type": "object",
         "properties": {
@@ -675,7 +823,7 @@
             "type": "string",
             "nullable": true
           },
-          "roomdCode": {
+          "playerRoomCode": {
             "type": "string",
             "nullable": true
           }
@@ -722,6 +870,45 @@
         },
         "additionalProperties": false
       },
+      "DeleteImageRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "containerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "blobName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExchangeProductsRequest": {
+        "type": "object",
+        "properties": {
+          "hostRoomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuyProduct"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ManagePlayerRequest": {
         "type": "object",
         "properties": {
@@ -762,6 +949,45 @@
         },
         "additionalProperties": false
       },
+      "Stream": {
+        "type": "object",
+        "properties": {
+          "canRead": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "canWrite": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "canSeek": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "canTimeout": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "length": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "position": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "readTimeout": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "writeTimeout": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "StreamStringValueTuple": {
         "type": "object",
         "additionalProperties": false
@@ -785,6 +1011,44 @@
         },
         "additionalProperties": false
       },
+      "UpdateImageRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "oldImageFileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "newImageFileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "newImageByteData": {
+            "$ref": "#/components/schemas/Stream"
+          },
+          "imageBuyingStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "teamId": {
+            "type": "string",
+            "nullable": true
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdatePlayerRequest": {
         "type": "object",
         "properties": {
@@ -802,27 +1066,6 @@
           },
           "roomCode": {
             "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "UpdateStockRequest": {
-        "type": "object",
-        "properties": {
-          "hostRoomCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "teamNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "products": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BuyProduct"
-            },
             "nullable": true
           }
         },

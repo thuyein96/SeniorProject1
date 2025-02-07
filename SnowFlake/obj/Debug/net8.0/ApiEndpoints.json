@@ -53,6 +53,86 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "SnowFlake.Controllers.ImageController",
+    "Method": "UploadImage",
+    "RelativePath": "api/image",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "teamId",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.ImageController",
+    "Method": "UpdateImage",
+    "RelativePath": "api/image",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "updateImageRequest",
+        "Type": "SnowFlake.Dtos.APIs.Image.UpdateImage.UpdateImageRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.ImageController",
+    "Method": "DeleteImage",
+    "RelativePath": "api/image",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "deleteImageRequest",
+        "Type": "SnowFlake.Dtos.APIs.Image.DeleteImage.DeleteImageRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.LeaderboardController",
+    "Method": "GetLeaderboardByHostRoomCode",
+    "RelativePath": "api/leaderboard/{hostRoomCode}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "hostRoomCode",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.LeaderboardController",
+    "Method": "CreateLeaderboard",
+    "RelativePath": "api/leaderboard/{hostRoomCode}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "hostRoomCode",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "SnowFlake.Controllers.PlayerController",
     "Method": "Entry",
     "RelativePath": "api/player",
@@ -140,13 +220,8 @@
         "IsRequired": false
       },
       {
-        "Name": "roomCode",
+        "Name": "playerRoomCode",
         "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "teamNumber",
-        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": false
       }
     ],
@@ -201,22 +276,6 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "SnowFlake.Controllers.ProductController",
-    "Method": "GetProducts",
-    "RelativePath": "api/product",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "ownerId",
-        "Type": "System.String",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
     "ContainingType": "SnowFlake.Controllers.ShopController",
     "Method": "Create",
     "RelativePath": "api/shop",
@@ -250,15 +309,31 @@
   },
   {
     "ContainingType": "SnowFlake.Controllers.ShopController",
-    "Method": "ManageShopOrder",
-    "RelativePath": "api/shop",
+    "Method": "ManageSnowFlakeOrder",
+    "RelativePath": "api/shop/buyimage",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "updateStockRequest",
-        "Type": "SnowFlake.Dtos.APIs.Product.UpdateShop.UpdateStockRequest",
+        "Name": "buySnowflakeRequest",
+        "Type": "SnowFlake.Dtos.APIs.Shop.SellSnowFlake.BuySnowflakeRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.ShopController",
+    "Method": "ManageShopOrder",
+    "RelativePath": "api/shop/exchangestocks",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "exchangeProductsRequest",
+        "Type": "SnowFlake.Dtos.APIs.Shop.UpdateShop.ExchangeProductsRequest",
         "IsRequired": true
       }
     ],

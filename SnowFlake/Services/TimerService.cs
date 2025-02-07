@@ -129,4 +129,9 @@ public class TimerService : ITimerService
             await _hubContext.Clients.Group(groupName).SendAsync("TimerModify", time);
         }
     }
+
+    public async Task SendMessage(string groupName, string message)
+    {
+        await _hubContext.Clients.Group(groupName).SendAsync("ReceiveMessage", message);
+    }
 }

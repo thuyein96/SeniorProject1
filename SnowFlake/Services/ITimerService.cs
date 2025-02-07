@@ -11,4 +11,5 @@ public interface ITimerService
     Task MinusCountdown(string groupName, string duration);
     Task AddClientToGroup(string groupName, string connectionId);
     Task RemoveClientFromGroup(string groupName, string connectionId);
+    Task SendMessage(string groupName, string message);
 }
