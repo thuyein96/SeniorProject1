@@ -4,5 +4,7 @@ namespace SnowFlake.Dtos.APIs.Team.GetTeam;
 
 public class GetTeamRequest
 {
-    public string TeamId { get; set; }
+    public string? HostRoomCode { get; set; }
+    public string? PlayerRoomCode { get; set; }
+    public int TeamNumber { get; set; }
 }

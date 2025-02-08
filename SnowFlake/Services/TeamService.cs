@@ -2,8 +2,8 @@
 using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Product;
 using SnowFlake.Dtos.APIs.Team.CreateTeam;
+using SnowFlake.Dtos.APIs.Team.DeleteTeam;
 using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
-using SnowFlake.Dtos.APIs.Team.SearchPlayerInTeam;
 using SnowFlake.Dtos.APIs.Team.UpdateTeam;
 using SnowFlake.UnitOfWork;
 using SnowFlake.Utilities;
@@ -115,19 +115,22 @@ public class TeamService : ITeamService
         try
         {
             if (updateTeamRequest is null) return string.Empty;
+            if (updateTeamRequest.Tokens <= 0) return string.Empty;
 
-            var existingTeam = (await _unitOfWork.TeamRepository.GetBy(w => w.Id == updateTeamRequest.Id)).SingleOrDefault();
+            var existingTeam = new TeamEntity();
+            if (!string.IsNullOrWhiteSpace(updateTeamRequest.HostRoomCode))
+            {
+                existingTeam = (await _unitOfWork.TeamRepository.GetBy(w => w.TeamNumber == updateTeamRequest.TeamNumber && w.HostRoomCode == updateTeamRequest.HostRoomCode)).FirstOrDefault();
+            }
 
-            if (existingTeam is null || existingTeam.Id != updateTeamRequest.Id) return string.Empty;
-            if (updateTeamRequest.Tokens is not null)
-                existingTeam.Tokens = updateTeamRequest.Tokens;
-            //if (updateTeamRequest.Member is not null && existingTeam.Members is not null)
-            //    existingTeam.Members.Add(updateTeamRequest.Member);
-            //if (updateTeamRequest.Member is not null && existingTeam.Members is null)
-            //{
-            //    existingTeam.Members = new List<string>();
-            //    existingTeam.Members.Add(updateTeamRequest.Member);
-            //}
+            if (!string.IsNullOrWhiteSpace(updateTeamRequest.PlayerRoomCode))
+            {
+                existingTeam = (await _unitOfWork.TeamRepository.GetBy(w => w.TeamNumber == updateTeamRequest.TeamNumber && w.PlayerRoomCode == updateTeamRequest.PlayerRoomCode)).FirstOrDefault();
+            }
+            if (existingTeam is null) return string.Empty;
+
+            
+            existingTeam.Tokens = updateTeamRequest.Tokens;
             existingTeam.ModifiedDate = DateTime.Now;
 
             _unitOfWork.TeamRepository.Update(existingTeam);
@@ -142,13 +145,22 @@ public class TeamService : ITeamService
 
     }
 
-    public async Task<string> Delete(string TeamId)
+    public async Task<string> Delete(DeleteTeamRequest deleteTeamRequest)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(TeamId)) return string.Empty;
+            if (deleteTeamRequest.TeamNumber <= 0) return string.Empty;
 
-            var team = (await _unitOfWork.TeamRepository.GetBy(w => w.Id == TeamId)).SingleOrDefault();
+            var team = new TeamEntity();
+            if (!string.IsNullOrWhiteSpace(deleteTeamRequest.HostRoomCode))
+            {
+                team = (await _unitOfWork.TeamRepository.GetBy(w => w.TeamNumber == deleteTeamRequest.TeamNumber && w.HostRoomCode == deleteTeamRequest.HostRoomCode)).FirstOrDefault();
+            }
+
+            if (!string.IsNullOrWhiteSpace(deleteTeamRequest.PlayerRoomCode))
+            {
+                team = (await _unitOfWork.TeamRepository.GetBy(w => w.TeamNumber == deleteTeamRequest.TeamNumber && w.PlayerRoomCode == deleteTeamRequest.PlayerRoomCode)).FirstOrDefault();
+            }
             if (team is null) return string.Empty;
 
             _unitOfWork.TeamRepository.Delete(team);

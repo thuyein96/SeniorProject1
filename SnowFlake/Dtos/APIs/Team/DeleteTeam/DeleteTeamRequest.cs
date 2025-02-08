@@ -4,5 +4,7 @@ namespace SnowFlake.Dtos.APIs.Team.DeleteTeam;
 
 public class DeleteTeamRequest
 {
-    public ObjectId TeamId { get; set; }
+    public string? HostRoomCode { get; set; }
+    public string? PlayerRoomCode { get; set; }
+    public int TeamNumber { get; set; }
 }

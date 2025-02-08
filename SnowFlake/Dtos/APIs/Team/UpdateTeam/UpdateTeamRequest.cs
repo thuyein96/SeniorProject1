@@ -2,8 +2,8 @@
 
 public class UpdateTeamRequest
 {
-    public string Id { get; set; }
+    public string? HostRoomCode { get; set; }
+    public string? PlayerRoomCode { get; set; }
+    public int TeamNumber { get; set; }
     public int? Tokens { get; set; }
-    public string Member { get; set; }
-    public List<(Stream ImageByteData, string BuyingStatus)>? SnowFlakeImageUrls { get; set; }
 }

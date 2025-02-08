@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Team.CreateTeam;
 using SnowFlake.Dtos.APIs.Team.DeleteTeam;
+using SnowFlake.Dtos.APIs.Team.GetTeam;
 using SnowFlake.Dtos.APIs.Team.GetTeams;
 using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
 using SnowFlake.Dtos.APIs.Team.SearchPlayerInTeam;
@@ -75,6 +77,26 @@ public class TeamController : ControllerBase
         });
     }
 
+    [HttpGet("teamdetails")]
+    public async Task<IActionResult> GetTeam([FromQuery] int teamNumber, [FromQuery] string? playerRoomCode, [FromQuery] string? hostRoomCode)
+    {
+        if (teamNumber <= 0) return BadRequest();
+        var team = await _teamService.GetTeam(teamNumber, playerRoomCode, hostRoomCode);
+        if (team == null)
+        {
+            return base.NotFound(new GetTeamResponse
+            {
+                Success = false,
+                Message = null
+            });
+        }
+        return base.Ok(new GetTeamResponse
+        {
+            Success = true,
+            Message = team
+        });
+    }
+
     [HttpGet("search")]
     public async Task<IActionResult> GetTeamByRoomCode([FromQuery] string? hostRoomCode, [FromQuery] string? playerRoomCode)
     {
@@ -140,7 +162,7 @@ public class TeamController : ControllerBase
 
         var updateMessage = await _teamService.Update(updateTeamRequest);
 
-        if (updateMessage == string.Empty)
+        if (string.IsNullOrWhiteSpace(updateMessage))
         {
             return NotFound(new UpdateTeamResponse
             {
@@ -156,14 +178,14 @@ public class TeamController : ControllerBase
         });
     }
 
-    [HttpDelete("{teamid}")]
-    public async Task<IActionResult> Delete(string teamid)
+    [HttpDelete]
+    public async Task<IActionResult> Delete(DeleteTeamRequest deleteTeamRequest)
     {
-        if (string.IsNullOrWhiteSpace(teamid)) return BadRequest();
+        if (deleteTeamRequest is null) return BadRequest();
 
-        var deleteMessage = await _teamService.Delete(teamid);
+        var deleteMessage = await _teamService.Delete(deleteTeamRequest);
 
-        if (deleteMessage == string.Empty) return NotFound(new DeleteTeamResponse
+        if (string.IsNullOrWhiteSpace(deleteMessage)) return NotFound(new DeleteTeamResponse
         {
             Success = false,
             Message = deleteMessage

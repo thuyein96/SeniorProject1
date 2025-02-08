@@ -1,6 +1,7 @@
 ﻿using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Product;
 using SnowFlake.Dtos.APIs.Team.CreateTeam;
+using SnowFlake.Dtos.APIs.Team.DeleteTeam;
 using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
 using SnowFlake.Dtos.APIs.Team.SearchPlayerInTeam;
 using SnowFlake.Dtos.APIs.Team.UpdateTeam;
@@ -20,5 +21,5 @@ public interface ITeamService
     //Update 
     Task<string> Update(UpdateTeamRequest updateTeamRequest);
     //delete 
-    Task<string> Delete(string TeamId);
+    Task<string> Delete(DeleteTeamRequest deleteTeamRequest);
 }
