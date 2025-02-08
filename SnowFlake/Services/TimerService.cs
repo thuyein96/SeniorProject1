@@ -95,10 +95,8 @@ public class TimerService : ITimerService
     {
         if (_timers.TryRemove(groupName, out var timer))
         {
-            timer.Timer.Dispose();
+            timer.Timer?.Dispose();
         }
-
-        _timers.TryRemove(groupName, out _);
 
         await _hubContext.Clients.Group(groupName).SendAsync("TimerStopped");
     }
