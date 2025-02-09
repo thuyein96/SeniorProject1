@@ -81,7 +81,13 @@ public class TeamController : ControllerBase
     public async Task<IActionResult> GetTeam([FromQuery] int teamNumber, [FromQuery] string? playerRoomCode, [FromQuery] string? hostRoomCode)
     {
         if (teamNumber <= 0) return BadRequest();
-        var team = await _teamService.GetTeam(teamNumber, playerRoomCode, hostRoomCode);
+        var team = await _teamManager.GetTeamWithProducts(new GetTeamRequest
+        {
+            TeamNumber = teamNumber,
+            PlayerRoomCode = playerRoomCode,
+            HostRoomCode = hostRoomCode
+        });
+
         if (team == null)
         {
             return base.NotFound(new GetTeamResponse
@@ -108,7 +114,7 @@ public class TeamController : ControllerBase
             PlayerRoomCode = playerRoomCode
         };
 
-        var teams = await _teamManager.GetTeamWithProducts(getTeamByRoomCodeRequest);
+        var teams = await _teamManager.GetTeamsWithProducts(getTeamByRoomCodeRequest);
 
         if (teams == null)
         {

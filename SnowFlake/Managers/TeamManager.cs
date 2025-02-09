@@ -1,6 +1,7 @@
 ﻿using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Team.SearchPlayerInTeam;
 using SnowFlake.Dtos.APIs.Product.GetProducts;
+using SnowFlake.Dtos.APIs.Team.GetTeam;
 using SnowFlake.Dtos.APIs.Team.GetTeams;
 using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
 using SnowFlake.Services;
@@ -32,7 +33,7 @@ public class TeamManager : ITeamManager
         return await _productService.GetProductsByOwnerId(team.Id);
     }
 
-    public async Task<List<TeamWithProducts>> GetTeamWithProducts(GetTeamsByRoomCodeRequest getTeamsByRoomCodeRequest)
+    public async Task<List<TeamWithProducts>> GetTeamsWithProducts(GetTeamsByRoomCodeRequest getTeamsByRoomCodeRequest)
     {
         var teams = await _teamService.GetTeamsByRoomCode(getTeamsByRoomCodeRequest);
 
@@ -65,6 +66,35 @@ public class TeamManager : ITeamManager
         }
 
         return teamsWithProducts;
+    }
+
+    public async Task<TeamWithProducts> GetTeamWithProducts(GetTeamRequest getTeamRequest)
+    {
+        var team = await _teamService.GetTeam(getTeamRequest.TeamNumber, getTeamRequest.PlayerRoomCode, getTeamRequest.HostRoomCode);
+        if (team is null) return null;
+
+        var products = (await _productService.GetProductsByOwnerId(team.Id)).Select(p => new Product
+        {
+            ProductName = p.ProductName,
+            Price = p.Price,
+            RemainingStock = p.RemainingStock,
+
+        }).ToList();
+
+        var members = (await _playerService.GetPlayersByTeamId(team.Id)).Select(p => p.PlayerName).ToList();
+
+        return new TeamWithProducts
+        {
+            Id = team.Id,
+            TeamNumber = team.TeamNumber,
+            HostRoomCode = team.HostRoomCode,
+            PlayerRoomCode = team.PlayerRoomCode,
+            Tokens = team.Tokens,
+            Members = members ?? null,
+            TeamStocks = products ?? null,
+            CreationTime = team.CreationDate,
+            ModifiedTime = team.ModifiedDate
+        };
     }
 
     public async Task<string> IsTeamHasPlayer(SearchPlayerRequest searchPlayerRequest)
