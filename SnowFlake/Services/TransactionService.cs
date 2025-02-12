@@ -44,9 +44,9 @@ public class TransactionService : ITransactionService
         return transaction;
     }
 
-    public async Task<List<TransactionEntity>> GetTransactions(string shopId)
+    public async Task<List<TransactionEntity>> GetTransactions(int roundNumber, string shopId)
     {
-        var transactions = (await _unitOfWork.TransactionRepository.GetBy(i => i.ShopId == shopId)).ToList();
+        var transactions = (await _unitOfWork.TransactionRepository.GetBy(i => i.ShopId == shopId && i.RoundNumber == roundNumber)).ToList();
         return transactions;
     }
 
@@ -56,15 +56,17 @@ public class TransactionService : ITransactionService
         return transactions;
     }
 
-    public async Task<List<TransactionEntity>> GetImageTransactions()
+    public async Task<List<TransactionEntity>> GetImageTransactions(int roundNumber, string shopId)
     {
-        var transactions = (await _unitOfWork.TransactionRepository.GetBy(i => i.ImageId != null)).ToList();
+        var transactions = (await _unitOfWork.TransactionRepository.GetBy(i => i.ImageId != null && i.RoundNumber == roundNumber && i.ShopId == shopId)).ToList();
         return transactions;
     }
 
-    public async Task<List<TransactionEntity>> GetProductTransactions()
+    public async Task<List<TransactionEntity>> GetProductTransactions(int roundNumber, string shopId)
     {
-        var transactions = (await _unitOfWork.TransactionRepository.GetBy(i => i.ProductId != null)).ToList();
+        var transactions = (await _unitOfWork.TransactionRepository.GetBy(i => i.ProductId != null & i.RoundNumber == roundNumber && i.ShopId == shopId)).ToList();
         return transactions;
     }
+
+
 }

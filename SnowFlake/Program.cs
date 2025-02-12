@@ -25,6 +25,7 @@ builder.Services.AddTransient<IPlayerManager, PlayerManager>();
 builder.Services.AddTransient<ITeamManager, TeamManager>();
 builder.Services.AddTransient<IPlaygroundManager, PlaygroundManger>();
 builder.Services.AddTransient<ILeaderboardManager, LeaderboardManager>();
+builder.Services.AddTransient<ITransactionManager, TransactionManager>();
 builder.Services.AddTransient<IPlayerManager, PlayerManager>();
 builder.Services.AddTransient<IShopManager, ShopManager>();
 

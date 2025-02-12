@@ -6,8 +6,8 @@ namespace SnowFlake.Services;
 public interface ITransactionService
 {
     Task<TransactionEntity> CreateTransaction(CreateTransactionRequest createTransactionRequest);
-    Task<List<TransactionEntity>> GetTransactions(string shopId);
+    Task<List<TransactionEntity>> GetTransactions(int roundNumber, string shopId);
     Task<List<TransactionEntity>> GetTransactionsByTeamId(string teamId);
-    Task<List<TransactionEntity>> GetImageTransactions();
-    Task<List<TransactionEntity>> GetProductTransactions();
+    Task<List<TransactionEntity>> GetImageTransactions(int roundNumber, string shopId);
+    Task<List<TransactionEntity>> GetProductTransactions(int roundNumber, string shopId);
 }
