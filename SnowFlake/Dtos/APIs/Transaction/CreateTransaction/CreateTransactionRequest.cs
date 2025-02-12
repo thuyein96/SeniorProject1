@@ -2,6 +2,7 @@
 
 public class CreateTransactionRequest
 {
+    public int RoundNumber { get; set; }
     public string TeamId { get; set; }
     public string ShopId { get; set; }
     public string? ProductId { get; set; }

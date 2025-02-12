@@ -38,10 +38,20 @@ public class ShopManager : IShopManager
             RemainingStock = p.Quantity,
         });
 
-        var shop = await _shopService.GetShopByHostRoomCode(updateShopStockRequest.HostRoomCode);
-        if (shop is null) return string.Empty;
+        var shop = new ShopEntity();
+        var team = new TeamEntity();
+        if (!string.IsNullOrWhiteSpace(updateShopStockRequest.HostRoomCode))
+        {
+            shop = await _shopService.GetShopByHostRoomCode(updateShopStockRequest.HostRoomCode);
+            team = await _teamService.GetTeam(updateShopStockRequest.TeamNumber, null, updateShopStockRequest.HostRoomCode);
+        }
+        if (!string.IsNullOrWhiteSpace(updateShopStockRequest.PlayerRoomCode))
+        {
+            shop = await _shopService.GetShopByPlayerRoomCode(updateShopStockRequest.PlayerRoomCode);
+            team = await _teamService.GetTeam(updateShopStockRequest.TeamNumber, updateShopStockRequest.PlayerRoomCode, null);
+        }
 
-        var team = await _teamService.GetTeam(updateShopStockRequest.TeamNumber, null, updateShopStockRequest.HostRoomCode);
+        if (shop is null) return string.Empty;
         if (team is null) return string.Empty;
 
         foreach (var product in updateShopStockRequest.Products)
@@ -65,6 +75,7 @@ public class ShopManager : IShopManager
 
             _ = await _transactionService.CreateTransaction(new CreateTransactionRequest
             {
+                RoundNumber = updateShopStockRequest.RoundNumber,
                 TeamId = team.Id,
                 ShopId = shop.Id,
                 ProductId = updatedTeamProduct.Id,
