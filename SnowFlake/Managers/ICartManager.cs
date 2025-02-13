@@ -8,5 +8,5 @@ public interface ICartManager
 {
     Task<List<CartEntity>> AddToCart(AddCartItemRequest addCartItemRequest);
     Task<List<CartEntity>> GetCartItemsByRoomCode(string hostRoomCode, string playerRoomCode, int teamNumber);
-    Task<List<CartEntity>> RemoveCart(RemoveCartItemRequest removeCartItemRequest);
+    Task<string> RemoveCart(RemoveCartItemRequest removeCartItemRequest);
 }

@@ -26,7 +26,9 @@ public class CartManager : ICartManager
             ProductName = addCartItemRequest.ProductName,
             Price = addCartItemRequest.Price,
             Quantity = addCartItemRequest.Quantity,
-            TeamNumber = addCartItemRequest.TeamNumber
+            TeamNumber = addCartItemRequest.TeamNumber,
+            CreationDate = DateTime.Now,
+            ModifiedDate = null
         };
 
         var addedItem = await _cartService.CreateCartItemAsync(cartItem);
@@ -55,7 +57,7 @@ public class CartManager : ICartManager
         return cartItems;
     }
 
-    public async Task<List<CartEntity>> RemoveCart(RemoveCartItemRequest removeCartItemRequest)
+    public async Task<string> RemoveCart(RemoveCartItemRequest removeCartItemRequest)
     {
         var cartItem = await _cartService.GetCartItemAsync(removeCartItemRequest.HostRoomCode,
                                                                      removeCartItemRequest.PlayerRoomCode,
@@ -64,6 +66,6 @@ public class CartManager : ICartManager
         var removeResult = await _cartService.DeleteCartItemAsync(cartItem);
 
         var cartItems = await GetCartItemsByRoomCode(removeCartItemRequest.HostRoomCode, removeCartItemRequest.PlayerRoomCode, removeCartItemRequest.TeamNumber);
-        return cartItems;
+        return $"Cart item {removeCartItemRequest.ProductName} is successfully removed.";
     }
 }

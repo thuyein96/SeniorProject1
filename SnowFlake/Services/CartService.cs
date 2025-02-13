@@ -16,6 +16,7 @@ public class CartService : ICartService
     public async Task<CartEntity> CreateCartItemAsync(CartEntity cartItem)
     {
         await _unitOfWork.CartRepository.Create(cartItem);
+        await _unitOfWork.Commit();
         return cartItem;
     }
 

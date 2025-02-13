@@ -2,5 +2,5 @@
 
 public class RemoveCartItemResponse : BaseResponse
 {
-    public List<CartEntity> Message { get; set; }
+    public string Message { get; set; }
 }

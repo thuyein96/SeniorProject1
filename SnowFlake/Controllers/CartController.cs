@@ -85,7 +85,7 @@ public class CartController : ControllerBase
                 return BadRequest(new RemoveCartItemResponse
                 {
                     Success = false,
-                    Message = null
+                    Message = string.Empty
                 });
 
             var removeCartItem = await _cartManager.RemoveCart(removeCartItemRequest);
@@ -94,7 +94,7 @@ public class CartController : ControllerBase
                 return NotFound(new RemoveCartItemResponse
                 {
                     Success = false,
-                    Message = new List<CartEntity>()
+                    Message = string.Empty
                 });
 
             return Ok(new RemoveCartItemResponse
