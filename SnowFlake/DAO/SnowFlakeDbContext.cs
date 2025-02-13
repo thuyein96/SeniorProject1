@@ -18,6 +18,7 @@ public class SnowFlakeDbContext : DbContext
     public DbSet<Dtos.ProductEntity> Products { get; set; }
     public DbSet<Dtos.LeaderboardEntity> Leaderboards { get; set; }
     public DbSet<Dtos.TransactionEntity> Transactions { get; set; }
+    public DbSet<Dtos.CartEntity> Carts { get; set; }
 
 
 }

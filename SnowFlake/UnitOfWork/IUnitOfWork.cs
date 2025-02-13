@@ -14,6 +14,7 @@ public interface IUnitOfWork
     IProductRepository ProductRepository { get; }
     ILeaderboardRepository LeaderboardRepository { get; }
     ITransactionRepository TransactionRepository { get; }
+    ICartRepository CartRepository { get; }
 
     //Commit stages (insert, update, delete)
     Task Commit();

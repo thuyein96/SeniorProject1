@@ -109,6 +109,16 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
+    private ICartRepository _cartRepository;
+
+    public ICartRepository CartRepository
+    {
+        get
+        {
+            return _cartRepository = _cartRepository ?? new CartRepository(_snowFlakeDbContext);
+        }
+    }
+
     public async Task Commit()
     {
         _snowFlakeDbContext.SaveChanges();

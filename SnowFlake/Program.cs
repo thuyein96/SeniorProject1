@@ -26,6 +26,7 @@ builder.Services.AddTransient<ITeamManager, TeamManager>();
 builder.Services.AddTransient<IPlaygroundManager, PlaygroundManger>();
 builder.Services.AddTransient<ILeaderboardManager, LeaderboardManager>();
 builder.Services.AddTransient<ITransactionManager, TransactionManager>();
+builder.Services.AddTransient<ICartManager, CartManager>();
 builder.Services.AddTransient<IPlayerManager, PlayerManager>();
 builder.Services.AddTransient<IShopManager, ShopManager>();
 
@@ -39,6 +40,7 @@ builder.Services.AddTransient<IShopService, ShopService>();
 builder.Services.AddTransient<IImageService, ImageService>();
 builder.Services.AddTransient<IProductService, ProductService>();
 builder.Services.AddTransient<ITransactionService, TransactionService>();
+builder.Services.AddTransient<ICartService, CartService>();
 
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
