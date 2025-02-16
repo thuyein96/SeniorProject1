@@ -12,4 +12,5 @@ public interface ITimerService
     Task AddClientToGroup(string groupName, string connectionId);
     Task RemoveClientFromGroup(string groupName, string connectionId);
     Task SendMessage(string groupName, string message);
+    Task GetReconnectionState(string groupName, string connectionId);
 }

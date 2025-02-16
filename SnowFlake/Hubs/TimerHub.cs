@@ -44,6 +44,9 @@ public class TimerHub : Hub
     public Task SendMessage(string groupName, string message)
         => _countdownService.SendMessage(groupName, message);
 
+    public Task Reconnect(string gameName)
+        => _countdownService.GetReconnectionState(gameName, Context.ConnectionId);
+
     public override async Task OnDisconnectedAsync(Exception exception)
     {
         await Clients.Caller.SendAsync("ReceivedMessage", $"{Context.ConnectionId} is disconnected");

@@ -11,7 +11,10 @@ using SnowFlake.UnitOfWork;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+    {
+        options.ClientTimeoutInterval = TimeSpan.FromSeconds(300);
+    });
 builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetValue<string>("AzureBlobStorageConnectionString")));
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 var mongoDBSettings = builder.Configuration.GetSection("MongoDBSettings").Get<MongoDBSettings>();

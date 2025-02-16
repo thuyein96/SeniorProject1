@@ -8,6 +8,7 @@ public class TimerService : ITimerService
 {
     private readonly IHubContext<TimerHub> _hubContext;
     private static readonly ConcurrentDictionary<string, TimerState> _timers = new();
+    private static readonly ConcurrentDictionary<string, HashSet<string>> _groupConnections = new();
 
     public TimerService(IHubContext<TimerHub> hubContext)
     {
@@ -17,12 +18,34 @@ public class TimerService : ITimerService
     public async Task AddClientToGroup(string groupName, string connectionId)
     {
         await _hubContext.Groups.AddToGroupAsync(connectionId, groupName);
+
+        _groupConnections.AddOrUpdate(
+            groupName,
+            new HashSet<string> { connectionId },
+            (_, connections) =>
+            {
+                connections.Add(connectionId);
+                return connections;
+            });
+
         await _hubContext.Clients.Group(groupName).SendAsync("JoinUserGroup", $"{connectionId} joined the '{groupName}' group.");
     }
 
     public async Task RemoveClientFromGroup(string groupName, string connectionId)
     {
         await _hubContext.Groups.RemoveFromGroupAsync(connectionId, groupName);
+
+        if (_groupConnections.TryGetValue(groupName, out var connections))
+        {
+            connections.Remove(connectionId);
+            if (connections.Count == 0)
+            {
+                // If no more connections in group, cleanup timer
+                await StopCountdown(groupName);
+                _groupConnections.TryRemove(groupName, out _);
+            }
+        }
+
         await _hubContext.Clients.Group(groupName).SendAsync("LeaveUserGroup", $"{connectionId} leaved the '{groupName}' group.");
     }
 
@@ -38,7 +61,9 @@ public class TimerService : ITimerService
         {
             RemainingSeconds = seconds+1,
             TotalSeconds = seconds,
+            GameState = GameState.FromValue(gameState)
         };
+
         await _hubContext.Clients.Group(groupName).SendAsync("CreateTimer", gameState);
 
     }
@@ -131,5 +156,13 @@ public class TimerService : ITimerService
     public async Task SendMessage(string groupName, string message)
     {
         await _hubContext.Clients.Group(groupName).SendAsync("ReceiveMessage", message);
+    }
+
+    public async Task GetReconnectionState(string groupName, string connectionId)
+    {
+        if (_groupConnections.TryGetValue(connectionId, out var groups))
+        {
+            AddClientToGroup(groupName, connectionId);
+        }
     }
 }
