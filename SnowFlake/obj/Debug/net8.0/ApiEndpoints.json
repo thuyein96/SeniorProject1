@@ -1,5 +1,63 @@
 [
   {
+    "ContainingType": "SnowFlake.Controllers.CartController",
+    "Method": "AddToCart",
+    "RelativePath": "api/cart",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "addCartItemRequest",
+        "Type": "SnowFlake.Dtos.APIs.Cart.AddCartItemRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.CartController",
+    "Method": "GetTeamCartItems",
+    "RelativePath": "api/cart",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "hostRoomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "playerRoomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "teamNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.CartController",
+    "Method": "RemoveCartItem",
+    "RelativePath": "api/cart",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "removeCartItemRequest",
+        "Type": "SnowFlake.Dtos.APIs.Cart.RemoveCartItem.RemoveCartItemRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "SnowFlake.Controllers.GameStateController",
     "Method": "CreateGameStateAsync",
     "RelativePath": "api/gamestate",
@@ -384,14 +442,14 @@
   {
     "ContainingType": "SnowFlake.Controllers.TeamController",
     "Method": "Delete",
-    "RelativePath": "api/team/{teamid}",
+    "RelativePath": "api/team",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "teamid",
-        "Type": "System.String",
+        "Name": "deleteTeamRequest",
+        "Type": "SnowFlake.Dtos.APIs.Team.DeleteTeam.DeleteTeamRequest",
         "IsRequired": true
       }
     ],
@@ -434,6 +492,63 @@
       {
         "Name": "playerRoomCode",
         "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.TeamController",
+    "Method": "GetTeam",
+    "RelativePath": "api/team/teamdetails",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "teamNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "playerRoomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "hostRoomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SnowFlake.Controllers.TransactionController",
+    "Method": "GetTransactions",
+    "RelativePath": "api/transaction",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "hostRoomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "playerRoomCode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "roundNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "teamNumber",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": false
       }
     ],

@@ -20,6 +20,7 @@ public class TransactionService : ITransactionService
         var transaction = new TransactionEntity
         {
             Id = ObjectId.GenerateNewId().ToString(),
+            RoundNumber = createTransactionRequest.RoundNumber,
             ShopId = createTransactionRequest.ShopId,
             TeamId = createTransactionRequest.TeamId,
             Quantity = createTransactionRequest.Quantity,

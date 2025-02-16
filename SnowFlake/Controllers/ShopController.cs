@@ -89,7 +89,7 @@ namespace SnowFlake.Controllers
                     return BadRequest();
                 }
                 var orderResult = await _shopManager.ManageIncomingShopOrder(exchangeProductsRequest);
-                if (orderResult == null)
+                if (string.IsNullOrWhiteSpace(orderResult))
                 {
                     return NotFound(new ExchangeProductsResponse
                     {

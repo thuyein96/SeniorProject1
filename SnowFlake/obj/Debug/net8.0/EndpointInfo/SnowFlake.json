@@ -5,6 +5,103 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/cart": {
+      "post": {
+        "tags": [
+          "Cart"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCartItemRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCartItemRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCartItemRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Cart"
+        ],
+        "parameters": [
+          {
+            "name": "hostRoomCode",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "playerRoomCode",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "teamNumber",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Cart"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveCartItemRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveCartItemRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveCartItemRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/gamestate": {
       "post": {
         "tags": [
@@ -626,6 +723,74 @@
             "description": "Success"
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Team"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteTeamRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteTeamRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteTeamRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/team/teamdetails": {
+      "get": {
+        "tags": [
+          "Team"
+        ],
+        "parameters": [
+          {
+            "name": "teamNumber",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "playerRoomCode",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "hostRoomCode",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/api/team/search": {
@@ -688,19 +853,44 @@
         }
       }
     },
-    "/api/team/{teamid}": {
-      "delete": {
+    "/api/transaction": {
+      "get": {
         "tags": [
-          "Team"
+          "Transaction"
         ],
         "parameters": [
           {
-            "name": "teamid",
-            "in": "path",
-            "required": true,
-            "style": "simple",
+            "name": "hostRoomCode",
+            "in": "query",
+            "style": "form",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "playerRoomCode",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "roundNumber",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "teamNumber",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -714,6 +904,36 @@
   },
   "components": {
     "schemas": {
+      "AddCartItemRequest": {
+        "type": "object",
+        "properties": {
+          "hostRoomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "playerRoomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "productName": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "teamNumber": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "BuyProduct": {
         "type": "object",
         "properties": {
@@ -888,9 +1108,35 @@
         },
         "additionalProperties": false
       },
+      "DeleteTeamRequest": {
+        "type": "object",
+        "properties": {
+          "hostRoomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "playerRoomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamNumber": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "ExchangeProductsRequest": {
         "type": "object",
         "properties": {
+          "roundNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playerRoomCode": {
+            "type": "string",
+            "nullable": true
+          },
           "hostRoomCode": {
             "type": "string",
             "nullable": true
@@ -949,6 +1195,28 @@
         },
         "additionalProperties": false
       },
+      "RemoveCartItemRequest": {
+        "type": "object",
+        "properties": {
+          "hostRoomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "playerRoomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "productName": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamNumber": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "Stream": {
         "type": "object",
         "properties": {
@@ -986,10 +1254,6 @@
             "format": "int32"
           }
         },
-        "additionalProperties": false
-      },
-      "StreamStringValueTuple": {
-        "type": "object",
         "additionalProperties": false
       },
       "UpdateGameStateRequest": {
@@ -1074,24 +1338,21 @@
       "UpdateTeamRequest": {
         "type": "object",
         "properties": {
-          "id": {
+          "hostRoomCode": {
             "type": "string",
             "nullable": true
+          },
+          "playerRoomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamNumber": {
+            "type": "integer",
+            "format": "int32"
           },
           "tokens": {
             "type": "integer",
             "format": "int32",
-            "nullable": true
-          },
-          "member": {
-            "type": "string",
-            "nullable": true
-          },
-          "snowFlakeImageUrls": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/StreamStringValueTuple"
-            },
             "nullable": true
           }
         },

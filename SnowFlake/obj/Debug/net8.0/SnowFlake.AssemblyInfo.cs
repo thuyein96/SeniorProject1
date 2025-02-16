@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SnowFlake")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c0a3dfeaa942c7fc315e81a98484021a48192293")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+15cf75913195909fafc1b43c25b758cf26001ba6")]
 [assembly: System.Reflection.AssemblyProductAttribute("SnowFlake")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SnowFlake")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
