@@ -24,19 +24,8 @@ public class TransactionController : ControllerBase
         try
         {
             var transactions = await _transactionManager.GetTransactionsWithShop(hostRoomCode, playerRoomCode, roundNumber, teamNumber);
-            if (transactions == null)
-            {
-                return NotFound(new 
-                {
-                    Success = false,
-                    Message = new List<TransactionEntity>()
-                });
-            }
-            return Ok(new GetTransactionsResponse
-            {
-                Success = true,
-                Message = transactions
-            });
+            
+            return transactions.Success ? Ok(transactions) : NotFound(transactions);
         }
         catch (Exception e)
         {

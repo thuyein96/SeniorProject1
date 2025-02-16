@@ -10,6 +10,6 @@ public interface IShopManager
 {
     Task<CreateShopResponse> CreateShop(CreateShopRequest createShopRequest);
     Task<ExchangeProductsResponse> ManageIncomingShopOrder(ExchangeProductsRequest updateShopStockRequest);
-    Task<ShopWithProducts> GetShopByHostRoomCode(string hostRoomCode);
+    Task<GetShopResponse> GetShopByHostRoomCode(string hostRoomCode);
     Task<BuySnowflakeResponse> ManageSnowflakeOrder(BuySnowflakeRequest buySnowflakeRequest);
 }

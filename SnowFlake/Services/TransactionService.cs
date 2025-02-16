@@ -15,30 +15,8 @@ public class TransactionService : ITransactionService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<TransactionEntity> CreateTransaction(CreateTransactionRequest createTransactionRequest)
+    public async Task<TransactionEntity> CreateTransaction(TransactionEntity transaction)
     {
-        var transaction = new TransactionEntity
-        {
-            Id = ObjectId.GenerateNewId().ToString(),
-            RoundNumber = createTransactionRequest.RoundNumber,
-            ShopId = createTransactionRequest.ShopId,
-            TeamId = createTransactionRequest.TeamId,
-            Quantity = createTransactionRequest.Quantity,
-            Total = createTransactionRequest.Total,
-            CreationDate = DateTime.Now,
-            ModifiedDate = null
-        };
-
-        if (!string.IsNullOrWhiteSpace(createTransactionRequest.ImageId))
-        {
-            transaction.ImageId = createTransactionRequest.ImageId;
-        }
-
-        if (!string.IsNullOrWhiteSpace(createTransactionRequest.ProductId))
-        {
-            transaction.ProductId = createTransactionRequest.ProductId;
-        }
-        
         await _unitOfWork.TransactionRepository.Create(transaction);
         await _unitOfWork.Commit();
 

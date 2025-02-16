@@ -48,19 +48,8 @@ namespace SnowFlake.Controllers
             try
             {
                 var shop = await _shopManager.GetShopByHostRoomCode(hostRoomCode);
-                if (shop == null)
-                {
-                    return NotFound(new GetShopResponse
-                    {
-                        Success = false,
-                        Message = null
-                    });
-                }
-                return Ok(new GetShopResponse
-                {
-                    Success = true,
-                    Message = shop
-                });
+
+                return shop.Success ? Ok(shop) : NotFound(shop);
             }
             catch (Exception e)
             {

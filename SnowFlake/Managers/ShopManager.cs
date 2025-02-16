@@ -112,14 +112,18 @@ public class ShopManager : IShopManager
             await _teamService.MinusTeamTokens(team, totalCost);
             await _shopService.AddShopTokens(shop, totalCost);
 
-            _ = await _transactionService.CreateTransaction(new CreateTransactionRequest
+            _ = await _transactionService.CreateTransaction(new TransactionEntity
             {
+                Id = ObjectId.GenerateNewId().ToString(),
                 RoundNumber = updateShopStockRequest.RoundNumber,
                 TeamId = team.Id,
                 ShopId = shop.Id,
                 ProductId = updatedTeamProduct.Id,
+                ProductName = updatedTeamProduct.ProductName,
                 Quantity = product.Quantity,
-                Total = totalCost
+                Total = totalCost,
+                CreationDate = DateTime.Now,
+                ModifiedDate = null
             });
         }
         
@@ -130,15 +134,23 @@ public class ShopManager : IShopManager
         };
     }
 
-    public async Task<ShopWithProducts> GetShopByHostRoomCode(string hostRoomCode)
+    public async Task<GetShopResponse> GetShopByHostRoomCode(string hostRoomCode)
     {
         var shop = await _shopService.GetShopByHostRoomCode(hostRoomCode);
-        if (shop is null) return null;
+        if (shop is null) return new GetShopResponse
+        {
+            Success = false,
+            Message = null
+        };
 
         var products = await _productService.GetProductsByOwnerId(shop.Id);
-        if (products is null) return null;
+        if (products is null) return new GetShopResponse
+        {
+            Success = false,
+            Message = null
+        };
 
-        return new ShopWithProducts
+        var shopResult = new ShopWithProducts
         {
             Id = shop.Id,
             HostRoomCode = shop.HostRoomCode,
@@ -150,6 +162,12 @@ public class ShopManager : IShopManager
                 RemainingStock = p.RemainingStock,
                 Price = p.Price
             }).ToList()
+        };
+
+        return new GetShopResponse
+        {
+            Success = true,
+            Message = shopResult
         };
     }
 
@@ -188,13 +206,18 @@ public class ShopManager : IShopManager
             Message = "Image order process unsuccessful."
         };
 
-        _ = await _transactionService.CreateTransaction(new CreateTransactionRequest
+        _ = await _transactionService.CreateTransaction(new TransactionEntity
         {
+            Id = ObjectId.GenerateNewId().ToString(),
             TeamId = team.Id,
             ShopId = shop.Id,
             ImageId = image.Id,
+            ImageName = image.FileName,
+            RoundNumber = buySnowflakeRequest.RoundNumber,
             Quantity = 1,
-            Total = buySnowflakeRequest.Price
+            Total = buySnowflakeRequest.Price,
+            CreationDate = DateTime.Now,
+            ModifiedDate = null
         });
 
         return new BuySnowflakeResponse

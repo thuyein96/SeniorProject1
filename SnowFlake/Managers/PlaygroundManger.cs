@@ -108,11 +108,14 @@ public class PlaygroundManger : IPlaygroundManager
     private async Task ConfigureShop(ConfigurePlaygroundRequest configurePlaygroundRequest)
     {
         // Create Shop
-        var shop = new CreateShopRequest
+        var shop = new ShopEntity
         {
+            Id = ObjectId.GenerateNewId().ToString(),
             HostRoomCode = configurePlaygroundRequest.HostRoomCode,
             PlayerRoomCode = configurePlaygroundRequest.PlayerRoomCode,
-            Tokens = configurePlaygroundRequest.ShopToken
+            Tokens = configurePlaygroundRequest.ShopToken,
+            CreationDate = DateTime.Now,
+            ModifiedDate = null
         };
 
         var createdShop = await _shopService.CreateAsync(shop);
