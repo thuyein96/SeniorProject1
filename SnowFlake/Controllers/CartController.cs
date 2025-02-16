@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using SnowFlake.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
 using SnowFlake.Dtos.APIs.Cart;
-using SnowFlake.Dtos.APIs.Cart.GetTeamCartItems;
 using SnowFlake.Dtos.APIs.Cart.RemoveCartItem;
 using SnowFlake.Managers;
 
@@ -26,49 +23,28 @@ public class CartController : ControllerBase
         {
             var cartItems = await _cartManager.AddToCart(addCartItemRequest);
 
-            if (cartItems is null)
-                return NotFound(new AddCartItemResponse
-                {
-                    Success = false,
-                    Message = null
-                });
-
-            return Ok(new AddCartItemResponse
-            {
-                Success = true,
-                Message = cartItems
-            });
+            return cartItems.Success ? Ok(cartItems) : BadRequest(cartItems);
         }
         catch (Exception e)
         {
             return StatusCode(500, e);
         }
-        
+
     }
 
     [HttpGet]
     public async Task<IActionResult> GetTeamCartItems([FromQuery] string? hostRoomCode,
-                                                      [FromQuery] string? playerRoomCode, 
+                                                      [FromQuery] string? playerRoomCode,
                                                       [FromQuery] int teamNumber)
     {
         try
         {
+            if (teamNumber <= 0)
+                return BadRequest("Require team number.");
+
             var teamCartItems = await _cartManager.GetCartItemsByRoomCode(hostRoomCode, playerRoomCode, teamNumber);
 
-            if (teamCartItems is null)
-            {
-                return NotFound(new GetTeamCartItemsResponse
-                {
-                    Success = false,
-                    Message = null
-                });
-            }
-
-            return Ok(new GetTeamCartItemsResponse
-            {
-                Success = true,
-                Message = teamCartItems
-            });
+            return teamCartItems.Success ? Ok(teamCartItems) : NotFound(teamCartItems);
         }
         catch (Exception e)
         {
@@ -76,32 +52,21 @@ public class CartController : ControllerBase
         }
     }
 
-    [HttpDelete]
-    public async Task<IActionResult> RemoveCartItem(RemoveCartItemRequest removeCartItemRequest)
+    [HttpDelete("{cartId}")]
+    public async Task<IActionResult> RemoveCartItem(string cartId)
     {
         try
         {
-            if (removeCartItemRequest is null)
+            if (cartId is null)
                 return BadRequest(new RemoveCartItemResponse
                 {
                     Success = false,
-                    Message = string.Empty
+                    Message = "Cart ID is required."
                 });
 
-            var removeCartItem = await _cartManager.RemoveCart(removeCartItemRequest);
+            var removeCartItem = await _cartManager.RemoveCart(cartId);
 
-            if (removeCartItem is null)
-                return NotFound(new RemoveCartItemResponse
-                {
-                    Success = false,
-                    Message = string.Empty
-                });
-
-            return Ok(new RemoveCartItemResponse
-            {
-                Success = true,
-                Message = removeCartItem
-            });
+            return removeCartItem.Success ? Ok(removeCartItem) : NotFound(removeCartItem);
         }
         catch (Exception e)
         {

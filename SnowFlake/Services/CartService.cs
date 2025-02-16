@@ -69,6 +69,11 @@ public class CartService : ICartService
         return cartItem;
     }
 
+    public async Task<CartEntity> GetCartItemById(string cartId)
+    {
+        var cartItem = (await _unitOfWork.CartRepository.GetBy(c => c.Id == cartId)).FirstOrDefault();
+        return cartItem;
+    }
     public async Task<string> DeleteCartItemAsync(CartEntity cartItem)
     {
         await _unitOfWork.CartRepository.Delete(cartItem);

@@ -1,6 +1,8 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Cart;
+using SnowFlake.Dtos.APIs.Cart.GetTeamCartItems;
 using SnowFlake.Dtos.APIs.Cart.RemoveCartItem;
 using SnowFlake.Services;
 
@@ -15,7 +17,7 @@ public class CartManager : ICartManager
         _cartService = cartService;
     }
 
-    public async Task<List<CartEntity>> AddToCart(AddCartItemRequest addCartItemRequest)
+    public async Task<GetTeamCartItemsResponse> AddToCart(AddCartItemRequest addCartItemRequest)
     {
 
         var cartItem = new CartEntity
@@ -35,13 +37,11 @@ public class CartManager : ICartManager
 
         var cartItems = await GetCartItemsByRoomCode(addCartItemRequest.HostRoomCode, addCartItemRequest.PlayerRoomCode, addCartItemRequest.TeamNumber);
 
-        if (cartItems is null || cartItems.Count <= 0) return null;
-
         return cartItems;
     }
 
 
-    public async Task<List<CartEntity>> GetCartItemsByRoomCode(string? hostRoomCode, string? playerRoomCode, int teamNumber)
+    public async Task<GetTeamCartItemsResponse> GetCartItemsByRoomCode(string? hostRoomCode, string? playerRoomCode, int teamNumber)
     {
         var cartItems = new List<CartEntity>();
         if (!string.IsNullOrWhiteSpace(hostRoomCode))
@@ -54,18 +54,38 @@ public class CartManager : ICartManager
             cartItems = await _cartService.GetTeamCartItemByPlayerRoomCodeAsync(playerRoomCode, teamNumber);
         }
 
-        return cartItems;
+        return cartItems is null || cartItems.Count <= 0
+            ? new GetTeamCartItemsResponse
+            {
+                Success = false,
+                Message = null
+            }
+            : new GetTeamCartItemsResponse
+            {
+                Success = true,
+                Message = cartItems
+            };
     }
 
-    public async Task<string> RemoveCart(RemoveCartItemRequest removeCartItemRequest)
+    public async Task<RemoveCartItemResponse> RemoveCart(string cartId)
     {
-        var cartItem = await _cartService.GetCartItemAsync(removeCartItemRequest.HostRoomCode,
-                                                                     removeCartItemRequest.PlayerRoomCode,
-                                                                     removeCartItemRequest.ProductName,
-                                                                     removeCartItemRequest.TeamNumber);
+        var cartItem = await _cartService.GetCartItemById(cartId);
+        if(cartItem is null) return new RemoveCartItemResponse
+        {
+            Success = false,
+            Message = "Cart item not found."
+        };
+
         var removeResult = await _cartService.DeleteCartItemAsync(cartItem);
 
-        var cartItems = await GetCartItemsByRoomCode(removeCartItemRequest.HostRoomCode, removeCartItemRequest.PlayerRoomCode, removeCartItemRequest.TeamNumber);
-        return $"Cart item {removeCartItemRequest.ProductName} is successfully removed.";
+        return string.IsNullOrWhiteSpace(removeResult) ? new RemoveCartItemResponse
+        {
+            Success = false,
+            Message = "Failed to remove cart item."
+        } : new RemoveCartItemResponse
+        {
+            Success = true,
+            Message = $"Cart item {cartItem.ProductName} is successfully removed."
+        };
     }
 }

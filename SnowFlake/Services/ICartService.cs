@@ -10,5 +10,6 @@ public interface ICartService
     Task<List<CartEntity>> GetTeamCartItemByHostRoomCodeAsync(string hostRoomCode, int teamNumber);
     Task<List<CartEntity>> GetTeamCartItemByPlayerRoomCodeAsync(string playerRoomCode, int teamNumber);
     Task<CartEntity> GetCartItemAsync(string hostRoomCode, string playerRoomCode, string productName, int teamNumber);
+    Task<CartEntity> GetCartItemById(string cartId);
     Task<string> DeleteCartItemAsync(CartEntity cartItem);
 }
