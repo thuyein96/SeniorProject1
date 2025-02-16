@@ -1,5 +1,8 @@
-﻿using SnowFlake.Dtos;
+﻿using MongoDB.Bson;
+using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Image.GetImage;
+using SnowFlake.Dtos.APIs.Shop.BuySnowFlake;
+using SnowFlake.Dtos.APIs.Shop.CreateShop;
 using SnowFlake.Dtos.APIs.Shop.GetShop;
 using SnowFlake.Dtos.APIs.Shop.SellSnowFlake;
 using SnowFlake.Dtos.APIs.Shop.UpdateShop;
@@ -30,7 +33,31 @@ public class ShopManager : IShopManager
         _transactionService = transactionService;
     }
 
-    public async Task<string> ManageIncomingShopOrder(ExchangeProductsRequest updateShopStockRequest)
+    public async Task<CreateShopResponse> CreateShop(CreateShopRequest createShopRequest)
+    {
+        var shop = new ShopEntity
+        {
+            Id = ObjectId.GenerateNewId().ToString(),
+            HostRoomCode = createShopRequest.HostRoomCode,
+            PlayerRoomCode = createShopRequest.PlayerRoomCode,
+            Tokens = createShopRequest.Tokens,
+            CreationDate = DateTime.Now,
+            ModifiedDate = null
+        };
+
+        var shopResult = await _shopService.CreateAsync(shop);
+        if (shopResult is null) return new CreateShopResponse
+        {
+            Success = false,
+            Message = null
+        };
+        return new CreateShopResponse
+        {
+            Success = true,
+            Message = shopResult
+        };
+    }
+    public async Task<ExchangeProductsResponse> ManageIncomingShopOrder(ExchangeProductsRequest updateShopStockRequest)
     {
         var products = updateShopStockRequest.Products.Select(p => new ProductEntity
         {
@@ -51,8 +78,16 @@ public class ShopManager : IShopManager
             team = await _teamService.GetTeam(updateShopStockRequest.TeamNumber, updateShopStockRequest.PlayerRoomCode, null);
         }
 
-        if (shop is null) return string.Empty;
-        if (team is null) return string.Empty;
+        if (shop is null) return new ExchangeProductsResponse
+        {
+            Success = false,
+            Message = "Shop not found."
+        };
+        if (team is null) return new ExchangeProductsResponse
+        {
+            Success = false,
+            Message = "Team not found."
+        };
 
         foreach (var product in updateShopStockRequest.Products)
         {
@@ -62,7 +97,11 @@ public class ShopManager : IShopManager
                                                     .FirstOrDefault(p => p.ProductName == product.ProductName);
 
             var totalCost = product.Quantity * teamProduct.Price;
-            if (team.Tokens < totalCost) return string.Empty;
+            if (team.Tokens < totalCost) return new ExchangeProductsResponse
+            {
+                Success = false,
+                Message = "Insufficient tokens."
+            };
 
             shopProduct.RemainingStock -= product.Quantity;
             teamProduct.RemainingStock += product.Quantity;
@@ -84,7 +123,11 @@ public class ShopManager : IShopManager
             });
         }
         
-        return "Order processed successful.";
+        return new ExchangeProductsResponse
+        {
+            Success = false,
+            Message = "Order success successfully."
+        };
     }
 
     public async Task<ShopWithProducts> GetShopByHostRoomCode(string hostRoomCode)
@@ -110,16 +153,28 @@ public class ShopManager : IShopManager
         };
     }
 
-    public async Task<string> ManageSnowflakeOrder(BuySnowflakeRequest buySnowflakeRequest)
+    public async Task<BuySnowflakeResponse> ManageSnowflakeOrder(BuySnowflakeRequest buySnowflakeRequest)
     {
         var team = await _teamService.GetTeam(buySnowflakeRequest.TeamNumber, buySnowflakeRequest.PlayerRoomCode, null);
-        if (team is null) return string.Empty;
+        if (team is null) return new BuySnowflakeResponse
+        {
+            Success = false,
+            Message = "Team not found."
+        };
 
         var shop = await _shopService.GetShopByPlayerRoomCode(buySnowflakeRequest.PlayerRoomCode);
-        if (shop is null) return string.Empty;
+        if (shop is null) return new BuySnowflakeResponse
+        {
+            Success = false,
+            Message = "Shop not found."
+        };
 
         var image = await _imageService.GetImage(new GetImageRequest { Id = buySnowflakeRequest.ImageId });
-        if (image is null) return string.Empty;
+        if (image is null) return new BuySnowflakeResponse
+        {
+            Success = false,
+            Message = "Image not found."
+        };
 
         image.OwnerId = shop.Id;
         image.Price = buySnowflakeRequest.Price;
@@ -127,7 +182,11 @@ public class ShopManager : IShopManager
         image.ModifiedDate = DateTime.Now;
 
         var updatedImage = await _imageService.UpdateImage(image);
-        if(updatedImage is null) return string.Empty;
+        if(updatedImage is null) return new BuySnowflakeResponse
+        {
+            Success = false,
+            Message = "Image order process unsuccessful."
+        };
 
         _ = await _transactionService.CreateTransaction(new CreateTransactionRequest
         {
@@ -138,6 +197,10 @@ public class ShopManager : IShopManager
             Total = buySnowflakeRequest.Price
         });
 
-        return "Order processed successful.";
+        return new BuySnowflakeResponse
+        {
+            Success = false,
+            Message = "Order processed successfully."
+        };
     }
 }

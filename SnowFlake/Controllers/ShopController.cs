@@ -32,20 +32,9 @@ namespace SnowFlake.Controllers
                 {
                     return BadRequest();
                 }
-                var shop = await _shopService.CreateAsync(createShopRequest);
-                if (shop == null)
-                {
-                    return NotFound(new CreateShopResponse
-                    {
-                        Success = false,
-                        Message = null
-                    });
-                }
-                return Ok(new CreateShopResponse
-                {
-                    Success = true,
-                    Message = shop
-                });
+                var shop = await _shopManager.CreateShop(createShopRequest);
+
+                return shop.Success ? Ok(shop) : NotFound(shop);
             }
             catch (Exception e)
             {
@@ -89,19 +78,8 @@ namespace SnowFlake.Controllers
                     return BadRequest();
                 }
                 var orderResult = await _shopManager.ManageIncomingShopOrder(exchangeProductsRequest);
-                if (string.IsNullOrWhiteSpace(orderResult))
-                {
-                    return NotFound(new ExchangeProductsResponse
-                    {
-                        Success = false,
-                        Message = null
-                    });
-                }
-                return Ok(new ExchangeProductsResponse
-                {
-                    Success = true,
-                    Message = orderResult
-                });
+
+                return orderResult.Success ? Ok(orderResult) : NotFound(orderResult);
             }
             catch (Exception e)
             {
@@ -119,19 +97,8 @@ namespace SnowFlake.Controllers
                     return BadRequest();
                 }
                 var orderResult = await _shopManager.ManageSnowflakeOrder(buySnowflakeRequest);
-                if (orderResult == null)
-                {
-                    return NotFound(new BuySnowflakeResponse
-                    {
-                        Success = false,
-                        Message = null
-                    });
-                }
-                return Ok(new BuySnowflakeResponse
-                {
-                    Success = true,
-                    Message = orderResult
-                });
+
+                return orderResult.Success ? Ok(orderResult) : NotFound(orderResult);
             }
             catch (Exception e)
             {

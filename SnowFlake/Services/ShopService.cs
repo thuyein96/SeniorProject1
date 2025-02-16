@@ -14,20 +14,13 @@ public class ShopService : IShopService
     {
         _unitOfWork = unitOfWork;
     }
-    public async Task<ShopEntity> CreateAsync(CreateShopRequest createShopRequest)
+    public async Task<ShopEntity> CreateAsync(ShopEntity shop)
     {
         try
         {
-            var shop = new ShopEntity
-            {
-                Id = ObjectId.GenerateNewId().ToString(),
-                HostRoomCode = createShopRequest.HostRoomCode,
-                PlayerRoomCode = createShopRequest.PlayerRoomCode,
-                Tokens = createShopRequest.Tokens,
-                CreationDate = DateTime.Now,
-                ModifiedDate = null
-            };
             await _unitOfWork.ShopRepository.Create(shop);
+            await _unitOfWork.Commit();
+
             return shop;
         }
         catch (Exception)

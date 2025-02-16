@@ -130,7 +130,7 @@ public class TeamService : ITeamService
             if (existingTeam is null) return string.Empty;
 
             
-            existingTeam.Tokens = updateTeamRequest.Tokens;
+            existingTeam.Tokens += updateTeamRequest.Tokens;
             existingTeam.ModifiedDate = DateTime.Now;
 
             _unitOfWork.TeamRepository.Update(existingTeam);
