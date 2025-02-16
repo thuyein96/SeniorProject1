@@ -19,11 +19,11 @@ public class TransactionController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetTransactions([FromQuery] string? hostRoomCode, [FromQuery] string? playerRoomCode, [FromQuery] int roundNumber)
+    public async Task<IActionResult> GetTransactions([FromQuery] string? hostRoomCode, [FromQuery] string? playerRoomCode, [FromQuery] int roundNumber, [FromQuery] int? teamNumber)
     {
         try
         {
-            var transactions = await _transactionManager.GetTransactionsWithShop(hostRoomCode, playerRoomCode, roundNumber);
+            var transactions = await _transactionManager.GetTransactionsWithShop(hostRoomCode, playerRoomCode, roundNumber, teamNumber);
             if (transactions == null)
             {
                 return NotFound(new 

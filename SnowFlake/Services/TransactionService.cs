@@ -46,8 +46,17 @@ public class TransactionService : ITransactionService
 
     public async Task<List<TransactionEntity>> GetTransactions(int roundNumber, string shopId)
     {
-        var transactions = (await _unitOfWork.TransactionRepository.GetBy(i => i.ShopId == shopId && i.RoundNumber == roundNumber)).ToList();
-        return transactions;
+        var transactions = (await _unitOfWork.TransactionRepository.GetAll()).ToList();
+        var roundTransactions = transactions.Where(s => s.ShopId == shopId && s.RoundNumber == roundNumber).ToList();
+        //var transactions = (await _unitOfWork.TransactionRepository.GetBy(i => i.ShopId == shopId && i.RoundNumber == roundNumber)).ToList();
+        return roundTransactions;
+    }
+    public async Task<List<TransactionEntity>> GetTeamTransactionsByRound(int roundNumber, string shopId, string teamId)
+    {
+        var transactions = (await _unitOfWork.TransactionRepository.GetAll()).ToList();
+        var teamTransactions = transactions.Where(s => s.RoundNumber == roundNumber && s.TeamId == teamId).ToList();
+        //var transactions = (await _unitOfWork.TransactionRepository.GetBy(i => i.RoundNumber == roundNumber && i.TeamId == teamId)).ToList();
+        return teamTransactions;
     }
 
     public async Task<List<TransactionEntity>> GetTransactionsByTeamId(string teamId)
