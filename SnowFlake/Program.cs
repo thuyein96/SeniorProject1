@@ -33,6 +33,7 @@ builder.Services.AddTransient<ITransactionManager, TransactionManager>();
 builder.Services.AddTransient<ICartManager, CartManager>();
 builder.Services.AddTransient<IPlayerManager, PlayerManager>();
 builder.Services.AddTransient<IShopManager, ShopManager>();
+builder.Services.AddTransient<IImageManager, ImageManager>();
 
 builder.Services.AddTransient<IPlayerService, PlayerService>();
 builder.Services.AddTransient<ITeamService, TeamService>();
