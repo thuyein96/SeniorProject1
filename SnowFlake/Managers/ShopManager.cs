@@ -130,7 +130,7 @@ public class ShopManager : IShopManager
         
         return new ExchangeProductsResponse
         {
-            Success = false,
+            Success = true,
             Message = "Order success successfully."
         };
     }
