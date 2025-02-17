@@ -142,11 +142,11 @@ public class LeaderboardManager : ILeaderboardManager
         try
         {
             var leaderboard = new LeaderboardEntity();
-            if(string.IsNullOrWhiteSpace(hostRoomCode))
+            if(!string.IsNullOrWhiteSpace(hostRoomCode))
             {
                 leaderboard = await _leaderboardService.GetLeaderboardByHostRoomCode(hostRoomCode);
             };
-            if (string.IsNullOrWhiteSpace(playerRoomCode))
+            if (!string.IsNullOrWhiteSpace(playerRoomCode))
             {
                 leaderboard = await _leaderboardService.GetLeaderboardByPlayerRoomCode(playerRoomCode);
             };
