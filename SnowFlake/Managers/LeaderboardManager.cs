@@ -8,6 +8,7 @@ using SnowFlake.Dtos.APIs.Leaderboard.CreateLeaderboard;
 using SnowFlake.Dtos.APIs.Leaderboard.GetLeaderboard;
 using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
 using SnowFlake.Services;
+using SnowFlake.Utilities;
 
 namespace SnowFlake.Managers;
 
@@ -80,6 +81,11 @@ public class LeaderboardManager : ILeaderboardManager
 
             teamDetails.Stocks = new List<ProductEntity>();
             teamDetails.Stocks = await _productService.GetProductsByOwnerId(team.Id);
+
+            teamDetails.SoldImages = new List<string>();
+            var imageUrls = (await _imageService.GetImagesByTeamId(team.Id, ImageBuyingStatus.Sold.Name))
+                .Select(i => i.SnowFlakeImageUrl).ToList();
+            teamDetails.SoldImages = imageUrls;
 
             var transactions = await _transactionService.GetTransactionsByTeamId(team.Id);
             var totalSales = transactions.Select(t => t.Total).Sum();
@@ -168,7 +174,12 @@ public class LeaderboardManager : ILeaderboardManager
 
                 teamDetails.Stocks = new List<ProductEntity>();
                 teamDetails.Stocks = await _productService.GetProductsByOwnerId(team.Id);
-                    
+
+                teamDetails.SoldImages = new List<string>();
+                var imageUrls = (await _imageService.GetImagesByTeamId(team.Id, ImageBuyingStatus.Sold.Name))
+                    .Select(i => i.SnowFlakeImageUrl).ToList();
+                teamDetails.SoldImages = imageUrls;
+
                 teamDetailsList.Add(teamDetails);
             }
             return teamDetailsList is null || teamDetailsList.Count == 0 
