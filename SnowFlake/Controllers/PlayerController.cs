@@ -221,7 +221,7 @@ public class PlayerController : ControllerBase
             if (string.IsNullOrWhiteSpace(playerid)) return BadRequest(new DeletePlayerResponse
             {
                 Success = false,
-                Message = "Input correct player ImageId."
+                Message = "Input correct player ID."
             });
 
             var deleteMessage = await _playerService.Delete(playerid);

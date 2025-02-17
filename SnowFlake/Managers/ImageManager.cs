@@ -21,7 +21,7 @@ public class ImageManager : IImageManager
             return new DeleteImageResponse
             {
                 Success = false,
-                Message = "ImageId is required"
+                Message = "ImageUrl is required"
             };
 
         var image = await _imageService.GetImage(new GetImageRequest{ ImageId = deleteImageRequest.ImageId });

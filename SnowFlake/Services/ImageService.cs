@@ -49,6 +49,12 @@ public class ImageService : IImageService
         return images;
     }
 
+    public async Task<ImageEntity> GetImageByUrl(string imageUrl, string imageBuyingStatus)
+    {
+        var image = (await _unitOfWork.ImageRepository.GetBy(i => i.SnowFlakeImageUrl == imageUrl && i.ImageBuyingStatus == imageBuyingStatus)).FirstOrDefault();
+        return image;
+    }
+
     public async Task<ImageEntity> GetImage(GetImageRequest getImageRequest)
     {
         if (string.IsNullOrWhiteSpace(getImageRequest.ImageId))

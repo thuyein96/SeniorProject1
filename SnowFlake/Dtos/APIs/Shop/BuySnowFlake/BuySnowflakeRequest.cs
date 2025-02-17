@@ -7,7 +7,7 @@ public class BuySnowflakeRequest
     public string? PlayerRoomCode { get; set; }
     public int RoundNumber { get; set; }
     public int TeamNumber { get; set; }
-    public string ImageId { get; set; }
+    public string ImageUrl { get; set; }
     public int Price { get; set; }
 
 }

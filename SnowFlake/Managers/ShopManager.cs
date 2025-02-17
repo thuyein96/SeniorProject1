@@ -192,7 +192,7 @@ public class ShopManager : IShopManager
 
     public async Task<BuySnowflakeResponse> ManageSnowflakeOrder(BuySnowflakeRequest buySnowflakeRequest)
     {
-        var image = await _imageService.GetImage(new GetImageRequest { ImageId = buySnowflakeRequest.ImageId });
+        var image = await _imageService.GetImageByUrl(buySnowflakeRequest.ImageUrl, ImageBuyingStatus.Pending.Name);
         if (image is null) return new BuySnowflakeResponse
         {
             Success = false,
