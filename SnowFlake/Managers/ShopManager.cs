@@ -66,18 +66,9 @@ public class ShopManager : IShopManager
             RemainingStock = p.Quantity,
         });
 
-        var shop = new ShopEntity();
-        var team = new TeamEntity();
-        if (!string.IsNullOrWhiteSpace(updateShopStockRequest.HostRoomCode))
-        {
-            shop = await _shopService.GetShopByHostRoomCode(updateShopStockRequest.HostRoomCode);
-            team = await _teamService.GetTeam(updateShopStockRequest.TeamNumber, null, updateShopStockRequest.HostRoomCode);
-        }
-        if (!string.IsNullOrWhiteSpace(updateShopStockRequest.PlayerRoomCode))
-        {
-            shop = await _shopService.GetShopByPlayerRoomCode(updateShopStockRequest.PlayerRoomCode);
-            team = await _teamService.GetTeam(updateShopStockRequest.TeamNumber, updateShopStockRequest.PlayerRoomCode, null);
-        }
+        var (shop, team) = await GetShopAndTeam(updateShopStockRequest.HostRoomCode,
+                                                updateShopStockRequest.PlayerRoomCode,
+                                                updateShopStockRequest.TeamNumber);
 
         if (shop is null) return new ExchangeProductsResponse
         {
@@ -133,6 +124,24 @@ public class ShopManager : IShopManager
             Success = false,
             Message = "Order success successfully."
         };
+    }
+
+    private async Task<(ShopEntity shop, TeamEntity team)> GetShopAndTeam(string? hostRoomCode, string? playerRoomCode, int teamNumber)
+    {
+        var shop = new ShopEntity();
+        var team = new TeamEntity();
+        if (!string.IsNullOrWhiteSpace(hostRoomCode))
+        {
+            shop = await _shopService.GetShopByHostRoomCode(hostRoomCode);
+            team = await _teamService.GetTeam(teamNumber, null, hostRoomCode);
+        }
+        if (!string.IsNullOrWhiteSpace(playerRoomCode))
+        {
+            shop = await _shopService.GetShopByPlayerRoomCode(playerRoomCode);
+            team = await _teamService.GetTeam(teamNumber, playerRoomCode, null);
+        }
+
+        return (shop, team);
     }
 
     public async Task<GetShopResponse> GetShopByHostRoomCode(string hostRoomCode)
@@ -198,24 +207,19 @@ public class ShopManager : IShopManager
                 };
         }
 
-        var team = await _teamService.GetTeam(buySnowflakeRequest.TeamNumber, buySnowflakeRequest.PlayerRoomCode, null);
+        var (shop, team) = await GetShopAndTeam(buySnowflakeRequest.HostRoomCode,
+                                                buySnowflakeRequest.PlayerRoomCode,
+                                                buySnowflakeRequest.TeamNumber);
+
         if (team is null) return new BuySnowflakeResponse
         {
             Success = false,
             Message = "Team not found."
         };
-
-        var shop = await _shopService.GetShopByPlayerRoomCode(buySnowflakeRequest.PlayerRoomCode);
         if (shop is null) return new BuySnowflakeResponse
         {
             Success = false,
             Message = "Shop not found."
-        };
-
-        if (image is null) return new BuySnowflakeResponse
-        {
-            Success = false,
-            Message = "Image not found."
         };
 
         image.Price = buySnowflakeRequest.Price;
