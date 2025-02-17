@@ -80,27 +80,23 @@ public class TeamController : ControllerBase
     [HttpGet("teamdetails")]
     public async Task<IActionResult> GetTeam([FromQuery] int teamNumber, [FromQuery] string? playerRoomCode, [FromQuery] string? hostRoomCode)
     {
-        if (teamNumber <= 0) return BadRequest();
-        var team = await _teamManager.GetTeamWithProducts(new GetTeamRequest
+        try
         {
-            TeamNumber = teamNumber,
-            PlayerRoomCode = playerRoomCode,
-            HostRoomCode = hostRoomCode
-        });
+            if (teamNumber <= 0) return BadRequest("Require valid team number.");
 
-        if (team == null)
-        {
-            return base.NotFound(new GetTeamResponse
+            var teams = await _teamManager.GetTeamWithProducts(new GetTeamRequest
             {
-                Success = false,
-                Message = null
+                TeamNumber = teamNumber,
+                PlayerRoomCode = playerRoomCode,
+                HostRoomCode = hostRoomCode
             });
+
+            return teams.Success ? Ok(teams) : NotFound(teams);
         }
-        return base.Ok(new GetTeamResponse
+        catch (Exception e)
         {
-            Success = true,
-            Message = team
-        });
+            return StatusCode(500, e);
+        }
     }
 
     [HttpGet("search")]

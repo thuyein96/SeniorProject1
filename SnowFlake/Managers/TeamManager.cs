@@ -5,6 +5,7 @@ using SnowFlake.Dtos.APIs.Team.GetTeam;
 using SnowFlake.Dtos.APIs.Team.GetTeams;
 using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
 using SnowFlake.Services;
+using SnowFlake.Utilities;
 using PlayerItem = SnowFlake.Dtos.APIs.Player.PlayerItem;
 
 namespace SnowFlake.Managers;
@@ -14,14 +15,17 @@ public class TeamManager : ITeamManager
     private readonly ITeamService _teamService;
     private readonly IProductService _productService;
     private readonly IPlayerService _playerService;
+    private readonly IImageService _imageService;
 
     public TeamManager(ITeamService teamService,
                        IProductService productService,
-                       IPlayerService playerService)
+                       IPlayerService playerService,
+                       IImageService imageService)
     {
         _teamService = teamService;
         _productService = productService;
         _playerService = playerService;
+        _imageService = imageService;
     }
 
     public async Task<List<ProductEntity>> GetProductsByTeam(GetProductsByTeamRequest getProductsByTeamRequest)
@@ -41,60 +45,30 @@ public class TeamManager : ITeamManager
         var teamsWithProducts = new List<TeamWithProducts>();
         foreach (var team in teams)
         {
-            var products = (await _productService.GetProductsByOwnerId(team.Id)).Select(p => new Product
-            {
-                ProductName = p.ProductName,
-                Price = p.Price,
-                RemainingStock = p.RemainingStock,
-                
-            }).ToList();
-
-            var members = (await _playerService.GetPlayersByTeamId(team.Id)).Select(p => p.PlayerName).ToList();
-
-            teamsWithProducts.Add(new TeamWithProducts
-            {
-                Id = team.Id,
-                TeamNumber = team.TeamNumber,
-                HostRoomCode = team.HostRoomCode,
-                PlayerRoomCode = team.PlayerRoomCode,
-                Tokens = team.Tokens,
-                Members = members,
-                TeamStocks = products,
-                CreationTime = team.CreationDate,
-                ModifiedTime = team.ModifiedDate
-            });
+            teamsWithProducts.Add(await GetTeamDetails(team));
         }
 
         return teamsWithProducts;
     }
 
-    public async Task<TeamWithProducts> GetTeamWithProducts(GetTeamRequest getTeamRequest)
+    public async Task<GetTeamResponse> GetTeamWithProducts(GetTeamRequest getTeamRequest)
     {
         var team = await _teamService.GetTeam(getTeamRequest.TeamNumber, getTeamRequest.PlayerRoomCode, getTeamRequest.HostRoomCode);
         if (team is null) return null;
 
-        var products = (await _productService.GetProductsByOwnerId(team.Id)).Select(p => new Product
-        {
-            ProductName = p.ProductName,
-            Price = p.Price,
-            RemainingStock = p.RemainingStock,
+        var teamsDetails = await GetTeamDetails(team);
 
-        }).ToList();
-
-        var members = (await _playerService.GetPlayersByTeamId(team.Id)).Select(p => p.PlayerName).ToList();
-
-        return new TeamWithProducts
-        {
-            Id = team.Id,
-            TeamNumber = team.TeamNumber,
-            HostRoomCode = team.HostRoomCode,
-            PlayerRoomCode = team.PlayerRoomCode,
-            Tokens = team.Tokens,
-            Members = members ?? null,
-            TeamStocks = products ?? null,
-            CreationTime = team.CreationDate,
-            ModifiedTime = team.ModifiedDate
-        };
+        return teamsDetails is not null 
+            ? new GetTeamResponse
+            {
+                Success = true,
+                Message = teamsDetails
+            }
+            : new GetTeamResponse
+            {
+                Success = false,
+                Message = null
+            };
     }
 
     public async Task<string> IsTeamHasPlayer(SearchPlayerRequest searchPlayerRequest)
@@ -117,5 +91,33 @@ public class TeamManager : ITeamManager
         {
             return string.Empty;
         }
+    }
+
+    private async Task<TeamWithProducts> GetTeamDetails(TeamEntity team)
+    {
+        var products = (await _productService.GetProductsByOwnerId(team.Id)).Select(p => new Product
+        {
+            ProductName = p.ProductName,
+            Price = p.Price,
+            RemainingStock = p.RemainingStock,
+
+        }).ToList();
+
+        var members = (await _playerService.GetPlayersByTeamId(team.Id)).Select(p => p.PlayerName).ToList();
+        var images = (await _imageService.GetImagesByTeamId(team.Id, ImageBuyingStatus.Pending.Name));
+
+        return new TeamWithProducts
+        {
+            Id = team.Id,
+            TeamNumber = team.TeamNumber,
+            HostRoomCode = team.HostRoomCode,
+            PlayerRoomCode = team.PlayerRoomCode,
+            Tokens = team.Tokens,
+            Members = members,
+            Images = images.Select(i => i.SnowFlakeImageUrl).ToList(),
+            TeamStocks = products,
+            CreationTime = team.CreationDate,
+            ModifiedTime = team.ModifiedDate
+        };
     }
 }

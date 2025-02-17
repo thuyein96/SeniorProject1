@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using SnowFlake.Dtos;
+using SnowFlake.Dtos.APIs.Image.DeleteImage;
 using SnowFlake.Dtos.APIs.Image.GetImage;
 using SnowFlake.Dtos.APIs.Shop.BuySnowFlake;
 using SnowFlake.Dtos.APIs.Shop.CreateShop;
@@ -173,6 +174,30 @@ public class ShopManager : IShopManager
 
     public async Task<BuySnowflakeResponse> ManageSnowflakeOrder(BuySnowflakeRequest buySnowflakeRequest)
     {
+        var image = await _imageService.GetImage(new GetImageRequest { ImageId = buySnowflakeRequest.ImageId });
+        if (image is null) return new BuySnowflakeResponse
+        {
+            Success = false,
+            Message = "Image not found."
+        };
+
+        if (buySnowflakeRequest.IsBuyingConfirm == false)
+        {
+            image.ImageBuyingStatus = ImageBuyingStatus.Rejected.Name;
+            image = await _imageService.UpdateImage(image);
+            return image is not null
+                ? new BuySnowflakeResponse
+                {
+                    Success = true,
+                    Message = "Image deletion process successful."
+                }
+                : new BuySnowflakeResponse
+                {
+                    Success = false,
+                    Message = "Image deletion process unsuccessful."
+                };
+        }
+
         var team = await _teamService.GetTeam(buySnowflakeRequest.TeamNumber, buySnowflakeRequest.PlayerRoomCode, null);
         if (team is null) return new BuySnowflakeResponse
         {
@@ -187,16 +212,14 @@ public class ShopManager : IShopManager
             Message = "Shop not found."
         };
 
-        var image = await _imageService.GetImage(new GetImageRequest { Id = buySnowflakeRequest.ImageId });
         if (image is null) return new BuySnowflakeResponse
         {
             Success = false,
             Message = "Image not found."
         };
 
-        image.OwnerId = shop.Id;
         image.Price = buySnowflakeRequest.Price;
-        image.ImageBuyingStatus = ImageBuyingStatus.Bought.Name;
+        image.ImageBuyingStatus = ImageBuyingStatus.Sold.Name;
         image.ModifiedDate = DateTime.Now;
 
         var updatedImage = await _imageService.UpdateImage(image);
@@ -226,4 +249,6 @@ public class ShopManager : IShopManager
             Message = "Order processed successfully."
         };
     }
+
+    
 }

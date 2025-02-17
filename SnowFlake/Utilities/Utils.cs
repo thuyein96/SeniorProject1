@@ -4,6 +4,7 @@ namespace SnowFlake.Utilities;
 public static class Utils
 {
     public static int BatchSize = 50;
+    public static string BlobContainerName = "image";
     public static bool IsValidObjectId(string id)
     {
         if(ObjectId.TryParse(id, out _)) return true;

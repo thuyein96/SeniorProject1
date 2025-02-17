@@ -1,6 +1,5 @@
 ﻿using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Image.CreateImage;
-using SnowFlake.Dtos.APIs.Image.DeleteImage;
 using SnowFlake.Dtos.APIs.Image.GetImage;
 using SnowFlake.Dtos.APIs.Image.UpdateImage;
 
@@ -10,9 +9,9 @@ public interface IImageService
 {
     Task<ImageEntity> AddImage(CreateImageRequest createImageRequest, IFormFile file);
     Task<ImageEntity> GetImage(GetImageRequest getImageRequest);
-    Task<List<ImageEntity>> GetImages();
-    Task<List<ImageEntity>> GetImagesByOwnerId(string ownerId);
+    Task<List<ImageEntity>> GetImagesByTeamId(string teamId, string imageBuyingStatus);
     Task<string> UpdateImage(UpdateImageRequest updateImageRequest);
     Task<ImageEntity> UpdateImage(ImageEntity image);
-    Task<string> DeleteImage(DeleteImageRequest deleteImageRequest);
+    Task<bool> DeleteImageFromDb(ImageEntity image);
+    Task<bool> DeleteImageFromBlob(string fileName);
 }

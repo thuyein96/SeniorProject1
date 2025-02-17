@@ -8,6 +8,6 @@ public class ImageEntity : BaseEntity
     public string FileName { get; set; }
     public string SnowFlakeImageUrl { get; set; }
     public string ImageBuyingStatus { get; set; }
-    public string OwnerId { get; set; }
+    public string TeamId { get; set; }
     public int? Price { get; set; }
 }

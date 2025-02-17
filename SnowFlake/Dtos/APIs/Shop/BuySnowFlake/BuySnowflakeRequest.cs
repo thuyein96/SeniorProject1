@@ -2,6 +2,7 @@
 
 public class BuySnowflakeRequest
 {
+    public bool IsBuyingConfirm { get; set; }
     public string PlayerRoomCode { get; set; }
     public int RoundNumber { get; set; }
     public int TeamNumber { get; set; }

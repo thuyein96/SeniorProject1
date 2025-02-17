@@ -11,6 +11,6 @@ public interface ITeamManager
 {
     Task<List<ProductEntity>> GetProductsByTeam(GetProductsByTeamRequest getProductsByTeamRequest);
     Task<List<TeamWithProducts>> GetTeamsWithProducts(GetTeamsByRoomCodeRequest getTeamsByRoomCodeRequest);
-    Task<TeamWithProducts> GetTeamWithProducts(GetTeamRequest getTeamRequest);
+    Task<GetTeamResponse> GetTeamWithProducts(GetTeamRequest getTeamRequest);
     Task<string> IsTeamHasPlayer(SearchPlayerRequest searchPlayerRequest);
 }

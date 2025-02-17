@@ -2,8 +2,6 @@
 
 public class DeleteImageRequest
 {
-    public string Id { get; set; }
-    public string ContainerName { get; set; }
-    public string BlobName { get; set; }
+    public string ImageId { get; set; }
 
 }

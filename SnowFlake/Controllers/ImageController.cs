@@ -4,6 +4,7 @@ using SnowFlake.Dtos.APIs.Image.CreateImage;
 using SnowFlake.Dtos.APIs.Image.DeleteImage;
 using SnowFlake.Dtos.APIs.Image.UpdateImage;
 using SnowFlake.Dtos.APIs.Image.UploadImage;
+using SnowFlake.Managers;
 using SnowFlake.Services;
 
 namespace SnowFlake.Controllers
@@ -13,10 +14,13 @@ namespace SnowFlake.Controllers
     public class ImageController : ControllerBase
     {
         private readonly IImageService _imageService;
+        private readonly IImageManager _imageManager;
 
-        public ImageController(IImageService imageService)
+        public ImageController(IImageService imageService,
+                               IImageManager imageManager)
         {
             _imageService = imageService;
+            _imageManager = imageManager;
         }
 
         [HttpPost]
@@ -86,10 +90,10 @@ namespace SnowFlake.Controllers
             });
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteImage(DeleteImageRequest deleteImageRequest)
+        [HttpDelete("{imageid}")]
+        public async Task<IActionResult> DeleteImage(string imageId)
         {
-            if (deleteImageRequest is null)
+            if (string.IsNullOrWhiteSpace(imageId))
             {
                 return BadRequest(new UploadImageResponse
                 {
@@ -97,21 +101,9 @@ namespace SnowFlake.Controllers
                     Message = "Request body is not valid"
                 });
             }
-            var result = await _imageService.DeleteImage(deleteImageRequest);
+            var deleteResult = await _imageManager.DeleteImage(new DeleteImageRequest{ ImageId = imageId });
 
-            if (string.IsNullOrWhiteSpace(result))
-            {
-                return NotFound(new DeleteImageResponse
-                {
-                    Success = false,
-                    Message = "Image not found"
-                });
-            }
-            return Ok(new DeleteImageResponse
-            {
-                Success = true,
-                Message = result
-            });
+            return deleteResult.Success ? Ok(deleteResult) : NotFound(deleteResult);
         }
     }
 }

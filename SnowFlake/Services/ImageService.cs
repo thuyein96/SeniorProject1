@@ -25,7 +25,7 @@ public class ImageService : IImageService
     public async Task<ImageEntity> AddImage(CreateImageRequest createImageRequest, IFormFile file)
     {
         var readStream = file.OpenReadStream();
-        var imageUploadUrl = await _blobStorageService.UploadBlobAsync("image", file.FileName, readStream);
+        var imageUploadUrl = await _blobStorageService.UploadBlobAsync(Utils.BlobContainerName, file.FileName, readStream);
 
         var imageEntity = new ImageEntity
         {
@@ -33,7 +33,7 @@ public class ImageService : IImageService
             FileName = file.FileName,
             SnowFlakeImageUrl = imageUploadUrl,
             ImageBuyingStatus = ImageBuyingStatus.Pending.Name,
-            OwnerId = createImageRequest.TeamId,
+            TeamId = createImageRequest.TeamId,
             CreationDate = DateTime.Now
         };
 
@@ -43,25 +43,19 @@ public class ImageService : IImageService
         return imageEntity;
     }
 
-    public async Task<List<ImageEntity>> GetImages()
+    public async Task<List<ImageEntity>> GetImagesByTeamId(string teamId, string imageBuyingStatus)
     {
-        var images = (await _unitOfWork.ImageRepository.GetAll()).Take(Utils.BatchSize).ToList();
-        return images;
-    }
-
-    public async Task<List<ImageEntity>> GetImagesByOwnerId(string ownerId)
-    {
-        var images = (await _unitOfWork.ImageRepository.GetBy(i => i.OwnerId == ownerId)).ToList();
+        var images = (await _unitOfWork.ImageRepository.GetBy(i => i.TeamId == teamId && i.ImageBuyingStatus == imageBuyingStatus)).ToList();
         return images;
     }
 
     public async Task<ImageEntity> GetImage(GetImageRequest getImageRequest)
     {
-        if (string.IsNullOrWhiteSpace(getImageRequest.Id))
+        if (string.IsNullOrWhiteSpace(getImageRequest.ImageId))
         {
             return null;
         }
-        var image = (await _unitOfWork.ImageRepository.GetBy(i => i.Id == getImageRequest.Id)).FirstOrDefault();
+        var image = (await _unitOfWork.ImageRepository.GetBy(i => i.Id == getImageRequest.ImageId)).FirstOrDefault();
 
         if (image == null)
         {
@@ -71,31 +65,25 @@ public class ImageService : IImageService
         return image;
     }
 
-    public async Task<string> DeleteImage(DeleteImageRequest deleteImageRequest)
+    public async Task<bool> DeleteImageFromDb(ImageEntity image)
     {
-        if (string.IsNullOrWhiteSpace(deleteImageRequest.Id) || string.IsNullOrWhiteSpace(deleteImageRequest.ContainerName) || string.IsNullOrWhiteSpace(deleteImageRequest.BlobName))
+        try
         {
-            return string.Empty;
+            await _unitOfWork.ImageRepository.Delete(image);
+            await _unitOfWork.Commit();
+
+            return true;
         }
-
-        var isDeleted = await _blobStorageService.DeleteBlobAsync(deleteImageRequest.ContainerName, deleteImageRequest.BlobName);
-
-        if (!isDeleted)
+        catch (Exception e)
         {
-            return string.Empty;
+            return false;
         }
-
-
-        var existingImage = (await _unitOfWork.ImageRepository.GetBy(i => i.Id == deleteImageRequest.Id)).FirstOrDefault();
-
-        if (existingImage is null)
-        {
-            return string.Empty;
-        }
-
-        await _unitOfWork.ImageRepository.Delete(existingImage);
-
-        return $"[ID: {deleteImageRequest.Id}] Successfully Deleted";
+        
+    }
+    public async Task<bool> DeleteImageFromBlob(string fileName)
+    {
+        var isDeleted = await _blobStorageService.DeleteBlobAsync(Utils.BlobContainerName, fileName);
+        return isDeleted;
     }
 
     public async Task<ImageEntity> UpdateImage(ImageEntity image)
