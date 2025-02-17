@@ -37,7 +37,7 @@ public class LeaderboardController : ControllerBase
         }
     }
 
-    [HttpPost("{hostRoomCode}")]
+    [HttpPost]
     public async Task<IActionResult> CreateLeaderboard(string? hostRoomCode, string? playerRoomCode)
     {
         try

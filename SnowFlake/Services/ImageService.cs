@@ -49,6 +49,12 @@ public class ImageService : IImageService
         return images;
     }
 
+    public async Task<List<ImageEntity>> GetImagesByOwnerId(string ownerId)
+    {
+        var images = (await _unitOfWork.ImageRepository.GetBy(i => i.OwnerId == ownerId)).ToList();
+        return images;
+    }
+
     public async Task<ImageEntity> GetImage(GetImageRequest getImageRequest)
     {
         if (string.IsNullOrWhiteSpace(getImageRequest.Id))
