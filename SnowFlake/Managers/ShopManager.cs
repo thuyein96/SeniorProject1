@@ -258,7 +258,7 @@ public class ShopManager : IShopManager
 
         return new BuySnowflakeResponse
         {
-            Success = false,
+            Success = true,
             Message = "Order processed successfully."
         };
     }
