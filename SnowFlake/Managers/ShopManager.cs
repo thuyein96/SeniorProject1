@@ -19,18 +19,21 @@ public class ShopManager : IShopManager
     private readonly IShopService _shopService;
     private readonly ITeamService _teamService;
     private readonly IProductService _productService;
+    private readonly ICartService _cartService;
     private readonly ITransactionService _transactionService;
 
     public ShopManager(IImageService imageService,
                        IShopService shopService,
                        ITeamService teamService,
                        IProductService productService,
+                       ICartService cartService,
                        ITransactionService transactionService)
     {
         _imageService = imageService;
         _shopService = shopService;
         _teamService = teamService;
         _productService = productService;
+        _cartService = cartService;
         _transactionService = transactionService;
     }
 
@@ -117,6 +120,12 @@ public class ShopManager : IShopManager
                 CreationDate = DateTime.Now,
                 ModifiedDate = null
             });
+        }
+
+        foreach (var cartId in updateShopStockRequest.CartIds)
+        {
+            var cartItem = await _cartService.GetCartItemById(cartId);
+            _ = await _cartService.DeleteCartItemAsync(cartItem);
         }
         
         return new ExchangeProductsResponse

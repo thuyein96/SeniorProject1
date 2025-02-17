@@ -64,7 +64,7 @@ public class CartController : ControllerBase
                     Message = "Cart ID is required."
                 });
 
-            var removeCartItem = await _cartManager.RemoveCart(cartId);
+            var removeCartItem = await _cartManager.RemoveFromCart(cartId);
 
             return removeCartItem.Success ? Ok(removeCartItem) : NotFound(removeCartItem);
         }

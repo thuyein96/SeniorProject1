@@ -66,8 +66,7 @@ public class CartManager : ICartManager
                 Message = cartItems
             };
     }
-
-    public async Task<RemoveCartItemResponse> RemoveCart(string cartId)
+    public async Task<RemoveCartItemResponse> RemoveFromCart(string cartId)
     {
         var cartItem = await _cartService.GetCartItemById(cartId);
         if(cartItem is null) return new RemoveCartItemResponse
