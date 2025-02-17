@@ -17,30 +17,19 @@ public class LeaderboardController : ControllerBase
         _leaderboardManager = leaderboardManager;
     }
 
-    [HttpGet("{hostRoomCode}")]
-    public async Task<IActionResult> GetLeaderboardByHostRoomCode(string hostRoomCode)
+    [HttpGet]
+    public async Task<IActionResult> GetLeaderboardByHostRoomCode(string? hostRoomCode, string? playerRoomCode)
     {
         try
         {
-            if (string.IsNullOrEmpty(hostRoomCode))
+            if (string.IsNullOrWhiteSpace(hostRoomCode) && string.IsNullOrWhiteSpace(playerRoomCode))
             {
-                return BadRequest();
+                return BadRequest("Require player or host room code.");
             }
 
-            var leaderboard = await _leaderboardManager.GetLeaderboardByHostRoomCode(hostRoomCode); 
-            if (leaderboard == null)
-            {
-                return NotFound(new GetLeaderboardResponse
-                {
-                    Success = false,
-                    Message = null
-                });
-            }
-            return Ok(new GetLeaderboardResponse
-            {
-                Success = true,
-                Message = leaderboard
-            });
+            var teamsRank = await _leaderboardManager.GetLeaderboard(hostRoomCode, playerRoomCode);
+
+            return teamsRank.Success ? Ok(teamsRank) : NotFound(teamsRank);
         }
         catch (Exception e)
         {
@@ -49,30 +38,18 @@ public class LeaderboardController : ControllerBase
     }
 
     [HttpPost("{hostRoomCode}")]
-    public async Task<IActionResult> CreateLeaderboard(string hostRoomCode)
+    public async Task<IActionResult> CreateLeaderboard(string? hostRoomCode, string? playerRoomCode)
     {
         try
         {
-            if (string.IsNullOrEmpty(hostRoomCode))
+            if (string.IsNullOrWhiteSpace(hostRoomCode) && string.IsNullOrWhiteSpace(playerRoomCode))
             {
-                return BadRequest();
+                return BadRequest("Require player or host room code.");
             }
 
-            var leaderboard = await _leaderboardManager.CreateLeaderboard(hostRoomCode);
-
-            if (leaderboard.Count <= 0 || leaderboard is null)
-            {
-                return NotFound(new CreateLeaderboardResponse
-                {
-                    Success = false,
-                    Message = null
-                });
-            }
-            return Ok(new CreateLeaderboardResponse
-            {
-                Success = true,
-                Message = leaderboard
-            });
+            var teamsRank = await _leaderboardManager.CreateLeaderboard(hostRoomCode, playerRoomCode);
+            
+            return teamsRank.Success ? Ok(teamsRank): NotFound(teamsRank);
         }
         catch (Exception e)
         {

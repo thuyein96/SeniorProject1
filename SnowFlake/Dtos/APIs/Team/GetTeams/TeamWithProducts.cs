@@ -9,6 +9,7 @@ public class TeamWithProducts
     public int? Tokens { get; set; }
     public List<string>? Members { get; set; }
     public List<Dtos.Product>? TeamStocks { get; set; }
+    public List<ImageEntity> Images { get; set; }
     public DateTime CreationTime { get; set; }
     public DateTime? ModifiedTime { get; set; }
 }

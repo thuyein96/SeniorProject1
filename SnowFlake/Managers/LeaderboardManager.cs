@@ -5,6 +5,7 @@ using MongoDB.Bson;
 using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Leaderboard;
 using SnowFlake.Dtos.APIs.Leaderboard.CreateLeaderboard;
+using SnowFlake.Dtos.APIs.Leaderboard.GetLeaderboard;
 using SnowFlake.Dtos.APIs.Team.GetTeamsByRoomCode;
 using SnowFlake.Services;
 
@@ -37,64 +38,86 @@ public class LeaderboardManager : ILeaderboardManager
         _transactionService = transactionService;
     }
 
-    public async Task<List<TeamRankDetails>> CreateLeaderboard(string hostRoomCode)
+    public async Task<CreateLeaderboardResponse> CreateLeaderboard(string hostRoomCode, string playerRoomCode)
     {
-        try
+        var teamDetailsList = new List<TeamRankDetails>();
+        var teams = new List<TeamEntity>();
+        var shop = new ShopEntity();
+
+        if (!string.IsNullOrWhiteSpace(hostRoomCode))
         {
-            var teamDetailsList = new List<TeamRankDetails>();
-            var teams = await _teamService.GetTeamsByRoomCode(new GetTeamsByRoomCodeRequest
+            teams = await _teamService.GetTeamsByRoomCode(new GetTeamsByRoomCodeRequest
             {
                 HostRoomCode = hostRoomCode
             });
 
-            var shop = await _shopService.GetShopByHostRoomCode(hostRoomCode);
-            if (shop is null) return null;
-
-            foreach (var team in teams)
-            {
-                var teamDetails = new TeamRankDetails();
-                teamDetails.TeamNumber = team.TeamNumber;
-                teamDetails.RemainingTokens = (int)team.Tokens;
-
-                teamDetails.Players = new List<string>();
-                var teamPlayers = await _playerService.GetPlayersByTeamId(team.Id);
-                teamDetails.Players = teamPlayers.Select(p => p.PlayerName).ToList();
-
-                teamDetails.Stocks = new List<ProductEntity>();
-                teamDetails.Stocks = await _productService.GetProductsByOwnerId(team.Id);
-
-                var transactions = await _transactionService.GetTransactionsByTeamId(team.Id);
-                var totalSales = transactions.Select(t => t.Total).Sum();
-                teamDetails.TotalSales = totalSales;
-
-                teamDetailsList.Add(teamDetails);
-            }
-
-            // Calculate rank based on total sales
-            var rankedTeams = await TagTeamRankNumber(teamDetailsList);
-
-            var leaderboard = (await _leaderboardService.CreateLeaderboard(new CreateLeaderboardRequest
-            {
-                HostRoomCode = shop.HostRoomCode,
-                PlayerRoomCode = shop.PlayerRoomCode,
-                TeamRanks = rankedTeams.Select(t => new TeamRank
-                {
-                    Id = ObjectId.GenerateNewId().ToString(),
-                    TeamNumber = t.TeamNumber,
-                    Rank = t.TeamRank,
-                    RemainingTokens = t.RemainingTokens,
-                    TotalSnowFlakeSales = t.TotalSales,
-                    CreationDate = DateTime.Now,
-                    ModifiedDate = null
-                }).ToList()
-            }));
-
-            return rankedTeams;
+            shop = await _shopService.GetShopByHostRoomCode(hostRoomCode);
         }
-        catch (Exception e)
+        if(!string.IsNullOrWhiteSpace(playerRoomCode))
         {
-            return null;
+            teams = await _teamService.GetTeamsByRoomCode(new GetTeamsByRoomCodeRequest
+            {
+                PlayerRoomCode = playerRoomCode
+            });
+            shop = await _shopService.GetShopByPlayerRoomCode(playerRoomCode);
         }
+
+        if (shop is null) return new CreateLeaderboardResponse
+        {
+            Success = false,
+            Message = null
+        };
+
+        foreach (var team in teams)
+        {
+            var teamDetails = new TeamRankDetails();
+            teamDetails.TeamNumber = team.TeamNumber;
+            teamDetails.RemainingTokens = (int)team.Tokens;
+
+            teamDetails.Players = new List<string>();
+            var teamPlayers = await _playerService.GetPlayersByTeamId(team.Id);
+            teamDetails.Players = teamPlayers.Select(p => p.PlayerName).ToList();
+
+            teamDetails.Stocks = new List<ProductEntity>();
+            teamDetails.Stocks = await _productService.GetProductsByOwnerId(team.Id);
+
+            var transactions = await _transactionService.GetTransactionsByTeamId(team.Id);
+            var totalSales = transactions.Select(t => t.Total).Sum();
+            teamDetails.TotalSales = totalSales;
+
+            teamDetailsList.Add(teamDetails);
+        }
+
+        // Calculate rank based on total sales
+        var rankedTeams = await TagTeamRankNumber(teamDetailsList);
+
+        var leaderboard = (await _leaderboardService.CreateLeaderboard(new CreateLeaderboardRequest
+        {
+            HostRoomCode = shop.HostRoomCode,
+            PlayerRoomCode = shop.PlayerRoomCode,
+            TeamRanks = rankedTeams.Select(t => new TeamRank
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                TeamNumber = t.TeamNumber,
+                Rank = t.TeamRank,
+                RemainingTokens = t.RemainingTokens,
+                TotalSnowFlakeSales = t.TotalSales,
+                CreationDate = DateTime.Now,
+                ModifiedDate = null
+            }).ToList()
+        }));
+
+        return rankedTeams is null || rankedTeams.Count <= 0 
+            ? new CreateLeaderboardResponse
+            {
+                Success = false,
+                Message = null
+            }
+            :new CreateLeaderboardResponse
+            {
+                Success = true,
+                Message = teamDetailsList
+            };
     }
 
     private async Task<List<TeamRankDetails>> TagTeamRankNumber(List<TeamRankDetails> teamDetailsList)
@@ -108,13 +131,25 @@ public class LeaderboardManager : ILeaderboardManager
         return rankedTeams;
     }
 
-    public async Task<List<TeamRankDetails>> GetLeaderboardByHostRoomCode(string hostRoomCode)
+    public async Task<GetLeaderboardResponse> GetLeaderboard(string? hostRoomCode, string? playerRoomCode)
     {
         try
         {
-            // Get leaderboard by host room code
-            var leaderboard = await _leaderboardService.GetLeaderboardByHostRoomCode(hostRoomCode);
-            if (leaderboard.TeamRanks.Count <= 0) return null;
+            var leaderboard = new LeaderboardEntity();
+            if(string.IsNullOrWhiteSpace(hostRoomCode))
+            {
+                leaderboard = await _leaderboardService.GetLeaderboardByHostRoomCode(hostRoomCode);
+            };
+            if (string.IsNullOrWhiteSpace(playerRoomCode))
+            {
+                leaderboard = await _leaderboardService.GetLeaderboardByPlayerRoomCode(playerRoomCode);
+            };
+
+            if (leaderboard.TeamRanks.Count <= 0) return new GetLeaderboardResponse
+            {
+                Success = false,
+                Message = null
+            };
 
             var teamDetailsList = new List<TeamRankDetails>();
             foreach (var teamRank in leaderboard.TeamRanks)
@@ -136,7 +171,16 @@ public class LeaderboardManager : ILeaderboardManager
                     
                 teamDetailsList.Add(teamDetails);
             }
-            return teamDetailsList;
+            return teamDetailsList is null || teamDetailsList.Count == 0 
+                ? new GetLeaderboardResponse
+                {
+                    Success = false,
+                    Message = null
+                } : new GetLeaderboardResponse
+                {
+                    Success = true,
+                    Message = teamDetailsList
+                };
         }
         catch (Exception e)
         {
