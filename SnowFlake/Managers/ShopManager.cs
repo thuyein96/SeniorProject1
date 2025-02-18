@@ -7,6 +7,7 @@ using SnowFlake.Dtos.APIs.Shop.CreateShop;
 using SnowFlake.Dtos.APIs.Shop.GetShop;
 using SnowFlake.Dtos.APIs.Shop.SellSnowFlake;
 using SnowFlake.Dtos.APIs.Shop.UpdateShop;
+using SnowFlake.Dtos.APIs.Team.UpdateTeam;
 using SnowFlake.Dtos.APIs.Transaction.CreateTransaction;
 using SnowFlake.Services;
 using SnowFlake.Utilities;
@@ -241,6 +242,19 @@ public class ShopManager : IShopManager
             Success = false,
             Message = "Image order process unsuccessful."
         };
+
+        var updatedTeam = await _teamService.Update(new UpdateTeamRequest
+        {
+            HostRoomCode = team.HostRoomCode,
+            Tokens = buySnowflakeRequest.Price,
+            TeamNumber = team.TeamNumber
+        });
+        if (updatedTeam is null)
+            return new BuySnowflakeResponse
+            {
+                Success = false,
+                Message = "Tokens transfer to team incomplete."
+            };
 
         _ = await _transactionService.CreateTransaction(new TransactionEntity
         {
