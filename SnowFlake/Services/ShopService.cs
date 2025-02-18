@@ -77,6 +77,26 @@ public class ShopService : IShopService
         }
     }
 
+    public async Task<bool> MinusShopTokens(ShopEntity shop, int totalCost)
+    {
+        try
+        {
+            if (shop is null || totalCost <= 0) return false;
+
+            shop.Tokens -= totalCost;
+            shop.ModifiedDate = DateTime.Now;
+
+            await _unitOfWork.ShopRepository.Update(shop);
+            await _unitOfWork.Commit();
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+
     //public async Task<bool> UpdateShopStock(ShopEntity shop, BuyProduct soldProductEntity)
     //{
     //    try

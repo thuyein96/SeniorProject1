@@ -10,6 +10,7 @@ public interface IShopService
     Task<ShopEntity> GetShopByPlayerRoomCode(string playerRoomCode);
     Task<ShopEntity> GetShopByHostRoomCode(string hostRoomCode);
     Task<bool> AddShopTokens(ShopEntity shop, int totalCost);
+    Task<bool> MinusShopTokens(ShopEntity shop, int totalCost);
     //Task<bool> UpdateShopStock(ShopEntity shop, BuyProduct productEntity);
 
 }

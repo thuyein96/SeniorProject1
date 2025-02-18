@@ -256,6 +256,14 @@ public class ShopManager : IShopManager
                 Message = "Tokens transfer to team incomplete."
             };
 
+        var updatedShop = await _shopService.MinusShopTokens(shop, buySnowflakeRequest.Price);
+        if (updatedShop == false)
+            return new BuySnowflakeResponse
+            {
+                Success = false,
+                Message = "Tokens transfer from shop incomplete."
+            };
+
         _ = await _transactionService.CreateTransaction(new TransactionEntity
         {
             Id = ObjectId.GenerateNewId().ToString(),
