@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.SignalR;
 using SnowFlake.Services;
 using SnowFlake.Utilities;
 
@@ -12,6 +13,7 @@ public class TimerHub : Hub
     {
         _countdownService = countdownService;
     }
+    
     public override async Task OnConnectedAsync() 
         => await Clients.Caller.SendAsync("ReceivedMessage", $"{Context.ConnectionId} is connected");
 
