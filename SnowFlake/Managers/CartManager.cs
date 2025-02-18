@@ -57,7 +57,7 @@ public class CartManager : ICartManager
         return cartItems is null || cartItems.Count <= 0
             ? new GetTeamCartItemsResponse
             {
-                Success = false,
+                Success = true,
                 Message = null
             }
             : new GetTeamCartItemsResponse
