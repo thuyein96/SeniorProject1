@@ -26,6 +26,14 @@ namespace SnowFlake.Controllers
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(request.HostRoomCode) ||
+                    string.IsNullOrWhiteSpace(request.PlayerRoomCode))
+                {
+                    return BadRequest("Require player or host room code.");
+                }
+
+                if (request.Rounds.Count <= 0) return BadRequest("Need to have at least 1 round.");
+
                 var playgroundResponse = await _playgroundManager.SetupPlayground(request);
 
                 if (playgroundResponse == null)
