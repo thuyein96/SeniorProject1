@@ -13,8 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSignalR(options =>
     {
-        options.ClientTimeoutInterval = TimeSpan.FromSeconds(120);
-        options.KeepAliveInterval = TimeSpan.FromSeconds(40);
+        options.ClientTimeoutInterval = TimeSpan.FromSeconds(1200);
+        options.KeepAliveInterval = TimeSpan.FromSeconds(400);
     });
 builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetValue<string>("AzureBlobStorageConnectionString")));
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
