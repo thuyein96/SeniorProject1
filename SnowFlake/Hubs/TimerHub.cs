@@ -1,7 +1,5 @@
-﻿using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using SnowFlake.Services;
-using SnowFlake.Utilities;
 
 namespace SnowFlake.Hubs;
 
@@ -13,8 +11,8 @@ public class TimerHub : Hub
     {
         _countdownService = countdownService;
     }
-    
-    public override async Task OnConnectedAsync() 
+
+    public override async Task OnConnectedAsync()
         => await Clients.Caller.SendAsync("ReceivedMessage", $"{Context.ConnectionId} is connected");
 
     public async Task CreateTimer(string groupName, string durationSeconds, string gameState)
@@ -31,7 +29,7 @@ public class TimerHub : Hub
     public Task StopCountdown(string groupName)
         => _countdownService.StopCountdown(groupName);
 
-    public Task AddCountdown(string groupName, string duration) 
+    public Task AddCountdown(string groupName, string duration)
         => _countdownService.AddCountdown(groupName, duration);
 
     public Task MinusCountdown(string groupName, string duration)

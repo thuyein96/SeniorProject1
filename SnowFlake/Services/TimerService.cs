@@ -9,12 +9,15 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 public class TimerService : ITimerService
 {
     private readonly IHubContext<TimerHub> _hubContext;
+    private readonly ILogger<TimerService> _logger;
     private static readonly ConcurrentDictionary<string, TimerState> _timers = new();
     private static readonly ConcurrentDictionary<string, HashSet<string>> _groupConnections = new();
 
-    public TimerService(IHubContext<TimerHub> hubContext)
+    public TimerService(IHubContext<TimerHub> hubContext,
+                        ILogger<TimerService> logger)
     {
         _hubContext = hubContext;
+        _logger = logger;
     }
 
     public async Task AddClientToGroup(string groupName, string connectionId)
@@ -33,11 +36,13 @@ public class TimerService : ITimerService
                 });
 
             await _hubContext.Clients.Group(groupName).SendAsync("JoinUserGroup", $"{connectionId} joined the '{groupName}' group.");
+            await AddLog(groupName, $"Client joined the group.");
         }
         catch (Exception e)
         {
+            await AddLog(groupName, $"Error occur while adding client to group: {e}");
             await _hubContext.Clients.Group(groupName).SendAsync("JoinUserGroup",
-                $"Error occur while adding client to group: {e}");
+                $"Error occur while adding client to group ({groupName}): {e}");
         }
     }
 
@@ -59,11 +64,13 @@ public class TimerService : ITimerService
             }
 
             await _hubContext.Clients.Group(groupName).SendAsync("LeaveUserGroup", $"{connectionId} leaved the '{groupName}' group.");
+            await AddLog(groupName, $"Client leave from the group.");
         }
         catch (Exception e)
         {
+            await AddLog(groupName, $"Error occur while adding client to group: {e}");
             await _hubContext.Clients.Group(groupName).SendAsync("LeaveUserGroup",
-                $"Error occur while removing client from group: {connectionId}");
+                $"Error occur while removing client from group ({groupName}): {connectionId}");
         }
     }
 
@@ -85,11 +92,13 @@ public class TimerService : ITimerService
             };
 
             await _hubContext.Clients.Group(groupName).SendAsync("CreateTimer", gameState);
+            await AddLog(groupName, $"Created a new countdown with {duration} seconds.");
         }
         catch (Exception e)
         {
+            _logger.LogError($"Error occur while creating countdown: {e}");
             await _hubContext.Clients.Group(groupName).SendAsync("CreateTimer",
-                $"Error occur while creating timer: {e}");
+                $"Error occur while creating countdown: {e}");
         }
         
 
@@ -102,6 +111,7 @@ public class TimerService : ITimerService
             _timers[groupName].Status = TimerStatus.Running;
 
             _hubContext.Clients.Group(groupName).SendAsync("TimerStarted");
+            await AddLog(groupName, "Started the countdown.");
 
             _timers[groupName].Timer = new Timer(async _ =>
             {
@@ -116,14 +126,16 @@ public class TimerService : ITimerService
                     {
                         StopCountdown(groupName);
                         await _hubContext.Clients.Group(groupName).SendAsync("CountdownCompleted");
+                        await AddLog(groupName, "Countdown completed.");
                     }
                 }
             }, null, 0, 1000);
         }
         catch (Exception e)
         {
+            await AddLog(groupName, $"Error occur while running countdown: {e}");
             await _hubContext.Clients.Group(groupName).SendAsync("TimerUpdate",
-                $"Error occur while starting timer: {e}");
+                $"Error occur while running countdown: {e}");
         }
     }
 
@@ -136,14 +148,15 @@ public class TimerService : ITimerService
                 timerState.RemainingSeconds++;
                 timerState.Status = TimerStatus.Paused;
 
-                // Notify the group
                 await _hubContext.Clients.Group(groupName).SendAsync("TimerPaused");
+                await AddLog(groupName, "Paused the countdown.");
             }
         }
         catch (Exception e)
         {
+            await AddLog(groupName, $"Error occur while pausing countdown: {e}");
             await _hubContext.Clients.Group(groupName).SendAsync("TimerPaused",
-                $"Error occur while pausing timer: {e}");
+                $"Error occur while pausing countdown: {e}");
         }
         
     }
@@ -156,14 +169,15 @@ public class TimerService : ITimerService
             {
                 timerState.Status = TimerStatus.Running;
 
-                // Notify the group
                 await _hubContext.Clients.Group(groupName).SendAsync("TimerResume");
+                await AddLog(groupName, "Resumed the countdown.");
             }
         }
         catch (Exception e)
         {
+            await AddLog(groupName, $"Error occur while resuming countdown: {e}");
             await _hubContext.Clients.Group(groupName).SendAsync("TimerResume",
-                $"Error occur while resuming timer: {e}");
+                $"Error occur while resuming countdown: {e}");
         }
         
     }
@@ -178,11 +192,13 @@ public class TimerService : ITimerService
             }
 
             await _hubContext.Clients.Group(groupName).SendAsync("TimerStopped");
+            await AddLog(groupName, $"Stopped the countdown.");
         }
         catch (Exception e)
-        {
+        { 
+            await AddLog(groupName, $"Error occur while stopping countdown: {e}");
             await _hubContext.Clients.Group(groupName).SendAsync("TimerStopped",
-                $"Error occur while stopping timer: {e}");
+                $"Error occur while stopping countdown: {e}");
         }
         
     }
@@ -196,16 +212,17 @@ public class TimerService : ITimerService
                 var seconds = Utils.ConvertToSeconds(duration);
                 timer.RemainingSeconds = timer.RemainingSeconds + seconds;
                 timer.TotalSeconds = timer.TotalSeconds + seconds;
-
                 var time = Utils.SecondsToString(timer.RemainingSeconds);
-                // Notify the group
+
                 await _hubContext.Clients.Group(groupName).SendAsync("TimerModify", time);
+                await AddLog(groupName, $"Added {duration} to the countdown.");
             }
         }
         catch (Exception e)
         {
+            await AddLog(groupName, $"Error occur while adding extra time to countdown: {e}");
             await _hubContext.Clients.Group(groupName).SendAsync("TimerModify",
-                $"Error occur while adding more timer: {e}");
+                $"Error occur while adding extra time to countdown: {e}");
         }
         
     }
@@ -220,14 +237,16 @@ public class TimerService : ITimerService
                 timer.RemainingSeconds = timer.RemainingSeconds - seconds;
                 timer.TotalSeconds = timer.TotalSeconds - seconds;
                 var time = Utils.SecondsToString(timer.RemainingSeconds);
-                // Notify the group
+
                 await _hubContext.Clients.Group(groupName).SendAsync("TimerModify", time);
+                await AddLog(groupName, $"Reduced {duration} from countdown.");
             }
         }
         catch (Exception e)
         {
+            await AddLog(groupName, $"Error occur while reducing time from countdown: {e}");
             await _hubContext.Clients.Group(groupName).SendAsync("TimerModify",
-                $"Error occur while reducing timer: {e}");
+                $"Error occur while reducing time from countdown: {e}");
         }
         
     }
@@ -237,9 +256,11 @@ public class TimerService : ITimerService
         try
         {
             await _hubContext.Clients.Group(groupName).SendAsync("ReceiveMessage", message);
+            await AddLog(groupName, "Send message to all clients.");
         }
         catch (Exception e)
         {
+            await AddLog(groupName, $"Error occur while sending message: {e}");
             await _hubContext.Clients.Group(groupName).SendAsync("ReceiveMessage",
                 $"Error occur while sending message: {e}");
         }
@@ -252,5 +273,10 @@ public class TimerService : ITimerService
         {
             AddClientToGroup(groupName, connectionId);
         }
+    }
+
+    public async Task AddLog(string groupName, string logMessage)
+    {
+        _logger.LogInformation($"[Timer][Group: {groupName}] {logMessage}");
     }
 }
