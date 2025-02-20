@@ -4,6 +4,8 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>b7a2d513-a027-419f-97c6-b72a4f38bd54</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,6 +17,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.10" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
         <PackageReference Include="MongoDB.Driver" Version="3.0.0" />
         <PackageReference Include="MongoDB.EntityFrameworkCore" Version="8.2.0" />
         <PackageReference Include="MySqlConnector" Version="2.4.0-beta.2" />
