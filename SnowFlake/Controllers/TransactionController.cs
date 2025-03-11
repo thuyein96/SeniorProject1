@@ -32,4 +32,34 @@ public class TransactionController : ControllerBase
             return StatusCode(500, e.Message);
         }
     }
+
+    [HttpGet("itemtransactions")]
+    public async Task<IActionResult> GetItemTransactions([FromQuery] string? hostRoomCode, [FromQuery] string? playerRoomCode, [FromQuery] int roundNumber, [FromQuery] int? teamNumber)
+    {
+        try
+        {
+            var transactions = await _transactionManager.GetItemTransactionsWithShop(hostRoomCode, playerRoomCode, roundNumber, teamNumber);
+
+            return transactions.Success ? Ok(transactions) : NotFound(transactions);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    [HttpGet("imagetransactions")]
+    public async Task<IActionResult> GetImageTransactions([FromQuery] string? hostRoomCode, [FromQuery] string? playerRoomCode, [FromQuery] int roundNumber, [FromQuery] int? teamNumber)
+    {
+        try
+        {
+            var transactions = await _transactionManager.GetImageTransactionsWithShop(hostRoomCode, playerRoomCode, roundNumber, teamNumber);
+
+            return transactions.Success ? Ok(transactions) : NotFound(transactions);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
 }
