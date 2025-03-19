@@ -45,3 +45,19 @@ Technologies used in the project:
 *   C# 12.0
 *   SignalR
 *   Azure
+
+
+<h2>UML Diagram</h2>
+
+![Flowchart SnowFlake](https://github.com/user-attachments/assets/b362d735-de45-401f-8721-f1c8e58a90cd)
+
+
+<h2>Architecture</h2>
+
+![Architecture SnowFlake drawio](https://github.com/user-attachments/assets/91ce1575-5185-421b-a235-c3c209c15016)
+
+
+<h2>Database Design</h2>
+
+![ER Diagram SnowFlake](https://github.com/user-attachments/assets/9a880756-836b-46e1-82dc-7955563a34f1)
+
