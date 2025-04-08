@@ -3,6 +3,6 @@
 public class UpdateStockRequest
 {
     public string HostRoomCode { get; set; }
-    public int TeamNumber { get; set; }
-    public List<BuyProduct> Products { get; set; }
+    public string ProductName { get; set; }
+    public int QuantityToAdd { get; set; }
 }

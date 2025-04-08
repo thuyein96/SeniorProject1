@@ -2,6 +2,7 @@
 using SnowFlake.Dtos;
 using SnowFlake.Dtos.APIs.Image.DeleteImage;
 using SnowFlake.Dtos.APIs.Image.GetImage;
+using SnowFlake.Dtos.APIs.Product.UpdateShop;
 using SnowFlake.Dtos.APIs.Shop.BuySnowFlake;
 using SnowFlake.Dtos.APIs.Shop.CreateShop;
 using SnowFlake.Dtos.APIs.Shop.GetShop;
@@ -282,6 +283,47 @@ public class ShopManager : IShopManager
         {
             Success = true,
             Message = "Order processed successfully."
+        };
+    }
+
+    public async Task<UpdateStockResponse> AddProductsToShop(UpdateStockRequest updateStockRequest)
+    {
+        if(string.IsNullOrWhiteSpace(updateStockRequest.HostRoomCode)) return new UpdateStockResponse
+        {
+            Success = false,
+            Message = "Host room code is required."
+        };
+        if (string.IsNullOrWhiteSpace(updateStockRequest.ProductName)) return new UpdateStockResponse
+        {
+            Success = false,
+            Message = "Product name is required."
+        };
+        if (updateStockRequest.QuantityToAdd <= 0) return new UpdateStockResponse
+        {
+            Success = false,
+            Message = "Quantity to add must be greater than zero."
+        };
+
+        var shopId = (await _shopService.GetShopByHostRoomCode(updateStockRequest.HostRoomCode)).Id;
+        var products = await _productService.GetProductsByOwnerId(shopId);
+
+        var existingProduct = products.FirstOrDefault(p => p.ProductName == updateStockRequest.ProductName);
+        if (existingProduct != null)
+        {
+            existingProduct.RemainingStock += updateStockRequest.QuantityToAdd;
+            await _productService.UpdateProduct(existingProduct);
+
+            return new UpdateStockResponse
+            {
+                Success = true,
+                Message = string.Format("{0} quantity updated successfully.", updateStockRequest.ProductName)
+            };
+        }
+
+        return new UpdateStockResponse
+        {
+            Success = false,
+            Message = string.Format("{0} not found in shop.", updateStockRequest.ProductName)
         };
     }
 

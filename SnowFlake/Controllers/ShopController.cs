@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SnowFlake.Dtos.APIs.Product.UpdateShop;
 using SnowFlake.Dtos.APIs.Shop.BuySnowFlake;
 using SnowFlake.Dtos.APIs.Shop.CreateShop;
 using SnowFlake.Dtos.APIs.Shop.GetShop;
@@ -87,6 +88,24 @@ namespace SnowFlake.Controllers
                 }
                 var orderResult = await _shopManager.ManageSnowflakeOrder(buySnowflakeRequest);
 
+                return orderResult.Success ? Ok(orderResult) : NotFound(orderResult);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+
+        [HttpPut("stock")]
+        public async Task<IActionResult> UpdateShopStock(UpdateStockRequest updateStockRequest)
+        {
+            try
+            {
+                if (updateStockRequest == null)
+                {
+                    return BadRequest();
+                }
+                var orderResult = await _shopManager.AddProductsToShop(updateStockRequest);
                 return orderResult.Success ? Ok(orderResult) : NotFound(orderResult);
             }
             catch (Exception e)
